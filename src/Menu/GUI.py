@@ -7,6 +7,8 @@ font = Font(None, 50)
 
 WIDTH_SCREEN = 1920
 HEIGHT_SCREEN = 1080
+# BACKGROUND = "2D_Normal_Shooting_Game/src/Menu/assets/imgs/br1.jpg"
+# BUTTON = "2D_Normal_Shooting_Game/src/Menu/assets/imgs/button.png"  
 BACKGROUND = "D:/WorkSpace/python_project/python_game_project/2D_Normal_Shooting_Game/src/Menu/assets/imgs/br1.jpg"
 BUTTON = "D:/WorkSpace\python_project/python_game_project/2D_Normal_Shooting_Game/src/Menu/assets/imgs/button.png"  
 
@@ -51,10 +53,6 @@ def initialize_screen():
     button_play_text_rect = button_play_text.get_rect(center=(button_play_rect.centerx, button_play_rect.centery))  
     button_settings_text_rect = button_settings_text.get_rect(center=(button_settings_rect.centerx, button_settings_rect.centery ))  
     button_quit_text_rect = button_quit_text.get_rect(center=(button_quit_rect.centerx, button_quit_rect.centery))  
-
-    # button_play.blit(button_play_text, button_play_text_rect)
-    # button_settings.blit(button_settings_text, button_settings_text_rect)
-    # button_quit.blit(button_quit_text, button_quit_text_rect)
 
     return screen, background_image, button_play, button_settings, button_quit, button_play_rect, button_settings_rect, button_quit_rect, button_play_text, button_play_text_rect, button_settings_text, button_settings_text_rect, button_quit_text, button_quit_text_rect
 
