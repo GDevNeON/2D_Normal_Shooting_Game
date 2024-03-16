@@ -58,6 +58,8 @@ class Player(pygame.sprite.Sprite):
                 (SCREEN_HEIGHT-self.surf.get_height())/2
             ) 
         )
+        self.bullets = []
+        self.shooting = False
         
     # Các phương thức set/get
     def set_player_size(self, value):
@@ -77,12 +79,65 @@ class Player(pygame.sprite.Sprite):
         
     def get_player_speed(self):
         return self.player_speed
-        
+    
     # Các phương thức bổ trợ cho Player
-    def update(self, pressed_keys):
+    def start_shooting(self):
+        self.shooting = True
+
+    def stop_shooting(self):
+        self.shooting = False
+        
+    def shoot(self, target_x, target_y):
+        # Tính toán hướng di chuyển của viên đạn
+        player_pos_x = self.rect.x
+        player_pos_y = self.rect.y
+        dx = target_x - player_pos_x
+        dy = target_y - player_pos_y
+        distance = math.sqrt(dx**2 + dy**2)
+
+        # Chuẩn hóa véc-tơ
+        if distance != 0:
+            dx_normalized = dx / distance
+            dy_normalized = dy / distance
+        else:
+            dx_normalized = 0
+            dy_normalized = 0
+
+        # Tạo đối tượng đạn mới và thêm vào danh sách đạn
+        bullet = {
+            'x': player_pos_x,
+            'y': player_pos_y,
+            'dx': dx_normalized,
+            'dy': dy_normalized,
+            'speed': 8
+        }
+        self.bullets.append(bullet)
+
+    def update_bullets(self):
+        # Nếu đang bắn, thực hiện bắn đạn
+        if self.shooting:
+            target_x, target_y = pygame.mouse.get_pos()
+            self.shoot(target_x, target_y)
+
+        # Cập nhật vị trí của tất cả các viên đạn
+        for bullet in self.bullets:
+            bullet['x'] += bullet['dx'] * bullet['speed']
+            bullet['y'] += bullet['dy'] * bullet['speed']
+
+        # Loại bỏ các viên đạn ra khỏi màn hình khi chúng ra khỏi biên
+        self.bullets = [bullet for bullet in self.bullets if 0 <= bullet['x'] <= SCREEN_WIDTH and 0 <= bullet['y'] <= SCREEN_HEIGHT]
+
+    def draw_bullets(self, screen):
+        # Vẽ tất cả các viên đạn lên màn hình
+        for bullet in self.bullets:
+            pygame.draw.circle(screen, Green, (int(bullet['x']), int(bullet['y'])), 5)
+            
+    def update(self, pressed_keys, screen):
         self.surf = pygame.Surface((self.player_size, self.player_size))
         self.surf.fill(self.player_color)
         self.rect = self.surf.get_rect(center=self.rect.center)
+        self.update_bullets()
+        self.draw_bullets(screen)
         
         if pressed_keys[K_w]:
             self.rect.move_ip(0, -self.player_speed)
@@ -147,6 +202,7 @@ class Enemy(pygame.sprite.Sprite):
             self.kill()
 
 
+
 if __name__ == '__main__':
     clock = pygame.time.Clock()
     
@@ -165,7 +221,6 @@ if __name__ == '__main__':
     enemy_new_speed = enemy.get_enemy_speed()
     enemy_new_color = enemy.get_enemy_color()
     
-    
     # Create groups to hold enemy sprites and all sprites
     # - enemies is used for collision detection and position updates
     # - all_sprites is used for rendering
@@ -183,14 +238,16 @@ if __name__ == '__main__':
         for event in pygame.event.get():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-                    
+                    running = False    
             elif event.type == QUIT:
                 running = False
-                
-             # Add a new enemy?
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if event.button == 1:  # Nút chuột trái
+                    player.start_shooting()
+            elif event.type == pygame.MOUSEBUTTONUP:
+                if event.button == 1:  # Nút chuột trái
+                    player.stop_shooting()
             elif event.type == ADDENEMY:
-                # Create the new enemy and add it to sprite groups
                 new_enemy = Enemy()
                 new_enemy.set_enemy_size(enemy_new_size)
                 new_enemy.set_enemy_speed(enemy_new_speed)
@@ -198,7 +255,7 @@ if __name__ == '__main__':
                 enemies.add(new_enemy)
                 all_sprites.add(new_enemy)
                 
-        player.update(pressed_keys)
+        player.update(pressed_keys, screen)
         enemies.update()
         
         for entity in all_sprites:
@@ -206,7 +263,6 @@ if __name__ == '__main__':
         screen.blit(player.surf, player.rect)
         
         # Kiểm tra xem enemy đụng vào người chơi chưa
-        
         if pygame.sprite.spritecollideany(player, enemies):
             # player.set_player_size(player.get_player_size() + 1)
             if (new_enemy.get_enemy_size() >= SCREEN_HEIGHT):
@@ -224,4 +280,4 @@ if __name__ == '__main__':
         
         clock.tick(FPS)
     
-    pygame.quit()  
+    pygame.quit()
