@@ -104,12 +104,12 @@ class Player(pygame.sprite.Sprite):
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self):
-        self.enemy_size = (20, 10)
+        self.enemy_size = 20
         self.enemy_color = White
         self.enemy_speed = 10
         super(Enemy, self).__init__()
         
-        self.surf = pygame.Surface(self.enemy_size)
+        self.surf = pygame.Surface((self.enemy_size, self.enemy_size))
         self.surf.fill(self.enemy_color)
         self.rect = self.surf.get_rect(
             center = (
@@ -138,8 +138,9 @@ class Enemy(pygame.sprite.Sprite):
     # Move the sprite based on speed
     # Remove the sprite when it passes the left edge of the screen
     def update(self):
-        self.surf = pygame.Surface(self.enemy_size)
+        self.surf = pygame.Surface((self.enemy_size, self.enemy_size))
         self.surf.fill(self.enemy_color)
+        self.rect = self.surf.get_rect(center=self.rect.center)
         
         self.rect.move_ip(-self.enemy_speed, 0)
         if self.rect.right < 0:
@@ -157,8 +158,13 @@ if __name__ == '__main__':
     ADDENEMY = pygame.USEREVENT + 1
     pygame.time.set_timer(ADDENEMY, 250)
     
-    # Tạo ra 1 thằng "Người chơi"
+    # Tạo ra 1 object
     player = Player()
+    enemy = Enemy()
+    enemy_new_size = enemy.get_enemy_size()
+    enemy_new_speed = enemy.get_enemy_speed()
+    enemy_new_color = enemy.get_enemy_color()
+    
     
     # Create groups to hold enemy sprites and all sprites
     # - enemies is used for collision detection and position updates
@@ -186,6 +192,9 @@ if __name__ == '__main__':
             elif event.type == ADDENEMY:
                 # Create the new enemy and add it to sprite groups
                 new_enemy = Enemy()
+                new_enemy.set_enemy_size(enemy_new_size)
+                new_enemy.set_enemy_speed(enemy_new_speed)
+                new_enemy.set_enemy_color(enemy_new_color)
                 enemies.add(new_enemy)
                 all_sprites.add(new_enemy)
                 
@@ -197,14 +206,20 @@ if __name__ == '__main__':
         screen.blit(player.surf, player.rect)
         
         # Kiểm tra xem enemy đụng vào người chơi chưa
+        
         if pygame.sprite.spritecollideany(player, enemies):
-            player.set_player_size(player.get_player_size() + 1)
-            if (player.get_player_size() >= SCREEN_HEIGHT):
+            # player.set_player_size(player.get_player_size() + 1)
+            if (new_enemy.get_enemy_size() >= SCREEN_HEIGHT):
                 player.kill()
                 running = False
+            # Cập nhật giá trị của tất cả enemy
+            enemy_new_size += 3
+            # enemy_new_speed += 1
+            if (enemy_new_color == White):
+                enemy_new_color = Yellow
+            else:
+                enemy_new_color = White
             
-            
-        
         pygame.display.update()
         
         clock.tick(FPS)
