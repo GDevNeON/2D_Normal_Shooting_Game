@@ -9,8 +9,8 @@ WIDTH_SCREEN = 1920
 HEIGHT_SCREEN = 1080
 # BACKGROUND = "2D_Normal_Shooting_Game/src/Menu/assets/imgs/br1.jpg"
 # BUTTON = "2D_Normal_Shooting_Game/src/Menu/assets/imgs/button.png"  
-BACKGROUND = "D:/WorkSpace/python_project/python_game_project/2D_Normal_Shooting_Game/src/Menu/assets/imgs/br1.jpg"
-BUTTON = "D:/WorkSpace\python_project/python_game_project/2D_Normal_Shooting_Game/src/Menu/assets/imgs/button.png"  
+BACKGROUND = "./2D_Normal_Shooting_Game/src/Menu/assets/imgs/br1.jpg"
+BUTTON = "./2D_Normal_Shooting_Game/src/Menu/assets/imgs/button.png"  
 
 # Giao diện game
 def initialize_screen():

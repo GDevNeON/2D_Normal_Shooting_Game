@@ -63,6 +63,44 @@ class Player(pygame.sprite.Sprite):
         self.bullets = []
         self.shooting = False
         
+        #health 
+        self.current_health = 200
+        self.maximum_health = 1000
+        self.health_bar_length = 400
+        self.health_ratio = self.maximum_health / self.health_bar_length
+        self.target_health = 500
+        self.health_change_speed = 5
+    
+    def get_damage(self, amount):
+        if self.current_health > 0:
+            self.current_health -= amount
+        if self.current_health <= 0:
+            self.current_health = 0
+    
+    def basic_health(self):
+        pygame.draw.rect(screen, (255,0,0), (10,10,self.current_health/self.health_ratio,25))
+        pygame.draw.rect(screen, (255,255,255), (10,10,self.health_bar_length,25), 4)
+        
+    def advanced_health(self):
+        transition_width = 0
+        transition_color = (255,0,0)
+        
+        if self.current_health < self.target_health:
+            self.current_health += self.health_change_speed
+            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
+            transition_color = (0,255,0)
+        if self.current_health > self.target_health:
+            self.current_health -= self.health_change_speed
+            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
+            transition_color = (255,255,0)
+            
+        health_bar_rect = pygame.Rect(10,45,self.current_health/self.health_ratio,25)
+        transition_bar_rect = pygame.Rect(health_bar_rect.right,45,transition_width,25)
+        
+        pygame.draw.rect(screen, (255,0,0), health_bar_rect)
+        pygame.draw.rect(screen, transition_color, transition_bar_rect)
+        pygame.draw.rect(screen, (255,255,255), (10,45,self.health_bar_length,25), 4)
+        
     # Các phương thức set/get
     def get_player_position_x(self):
         return self.rect.x
@@ -146,6 +184,10 @@ class Player(pygame.sprite.Sprite):
         self.rect = self.surf.get_rect(center=self.rect.center)
         self.update_bullets()
         self.draw_bullets(screen)
+        
+        # Health_bar
+        self.basic_health()
+        self.advanced_health()
         
         if pressed_keys[K_w]:
             self.rect.move_ip(0, -self.player_speed)
