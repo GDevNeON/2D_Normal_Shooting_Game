@@ -22,39 +22,52 @@ pygame.init()
 FPS = 30
 
 # Screen resolution
-SCREEN_WIDTH = 1366
-SCREEN_HEIGHT = 768
+SCREEN_WIDTH    = 1366
+SCREEN_HEIGHT   = 768
 
 # Mã màu
-Black = (0,0,0)
-White = (255,255,255)
-Red	= (255,0,0)
-Lime = (0,255,0)
-Blue = (0,0,255)
-Yellow = (255,255,0)
-Cyan = (0,255,255)
+Black   = (0,0,0)
+White   = (255,255,255)
+Red	    = (255,0,0)
+Lime    = (0,255,0)
+Blue    = (0,0,255)
+Yellow  = (255,255,0)
+Cyan    = (0,255,255)
 Magenta = (255,0,255)
-Silver = (192,192,192)
-Gray = (128,128,128)
-Maroon = (128,0,0)
-Olive = (128,128,0)
-Green = (0,128,0)
-Purple = (128,0,128)
-Teal = (0,128,128)
-Navy = (0,0,128)
+Silver  = (192,192,192)
+Gray    = (128,128,128)
+Maroon  = (128,0,0)
+Olive   = (128,128,0)
+Green   = (0,128,0)
+Purple  = (128,0,128)
+Teal    = (0,128,128)
+Navy    = (0,0,128)
 
 
 # Định nghĩa các lớp
 class Player(pygame.sprite.Sprite):
     # Constructor
     def __init__(self):
+        # Player's base attr
         self.player_size = 25
         self.player_color = Red
-        self.player_speed = 5
-        self.bullets = []
-        self.flag = False
+        self.player_speed = 3
         super(Player, self).__init__()
         
+        # Player's health attr 
+        self.current_health = 200
+        self.maximum_health = 1000
+        self.health_bar_length = 400
+        self.health_ratio = self.maximum_health / self.health_bar_length
+        self.target_health = 500
+        self.health_change_speed = 5
+
+        # Bullet's attr
+        self.bullets = []
+        self.bullet_count = 0
+        self.bullet_fire_rate = False
+
+        # Player's surf attr
         self.surf = pygame.Surface((self.player_size, self.player_size))
         self.surf.fill(self.player_color)
         self.rect = self.surf.get_rect(
@@ -64,15 +77,7 @@ class Player(pygame.sprite.Sprite):
             ) 
         )
         
-        #health 
-        self.current_health = 200
-        self.maximum_health = 1000
-        self.health_bar_length = 400
-        self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 500
-        self.health_change_speed = 5
-        
-    # Các phương thức set/get
+    # Các phương thức get/set
     def get_player_position_x(self):
         return self.rect.x
     
@@ -130,7 +135,8 @@ class Player(pygame.sprite.Sprite):
         
     def shoot(self, target_x, target_y):
         # Tính toán hướng di chuyển của viên đạn
-        if self.flag == True:
+        if self.bullet_fire_rate == True:
+            self.bullet_count += 1
             player_pos_x = self.get_player_position_x()
             player_pos_y = self.get_player_position_y()
             dx = target_x - player_pos_x
@@ -151,14 +157,16 @@ class Player(pygame.sprite.Sprite):
                 'y': player_pos_y,
                 'dx': dx_normalized,
                 'dy': dy_normalized,
-                'speed': 20
+                'speed': 10,
+                'count': self.bullet_count
             }
             self.bullets.append(bullet)
+        self.bullet_fire_rate = False
 
     def draw_bullets(self, screen):
         # Vẽ tất cả các viên đạn lên màn hình
         for bullet in self.bullets:
-            pygame.draw.circle(screen, Yellow, (int(bullet['x']), int(bullet['y'])), 5)
+            pygame.draw.circle(screen, Yellow, (int(bullet['x']), int(bullet['y'])), 20)
 
     def update_bullets(self):
         # Bullets fly from Player obj to mouse cursor
@@ -211,7 +219,7 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, player_rect):
         self.enemy_size = 20
         self.enemy_color = White
-        self.enemy_speed = 5
+        self.enemy_speed = 3
         super(Enemy, self).__init__()
 
         self.surf = pygame.Surface((self.enemy_size, self.enemy_size))
@@ -252,10 +260,11 @@ class Enemy(pygame.sprite.Sprite):
 
     def collide_with_bullet(self, bullets):
         for bullet in bullets:
-            bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 10, 10)  # Tạo một Rect cho viên đạn
+            bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 20, 20)  # Tạo một Rect cho viên đạn
             enemy_rect = self.rect  # Tạo một Rect cho kẻ địch
             if bullet_rect.colliderect(enemy_rect):  # Kiểm tra va chạm giữa hai Rect
                 # Xóa kẻ địch khi viên đạn trúng
+                player.bullets.pop()
                 return True
         return False
     
@@ -290,7 +299,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     
     # Tạo màn hình trò chơi và set tên cửa sổ
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FULLSCREEN)
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     
     # Tạo sự kiện
@@ -299,7 +308,7 @@ if __name__ == '__main__':
     INCREASE_STAT = USEREVENT + 2
     pygame.time.set_timer(INCREASE_STAT, 10000)
     FIRE_RATE = USEREVENT + 3
-    pygame.time.set_timer(FIRE_RATE, 500)
+    pygame.time.set_timer(FIRE_RATE, 1000)
     
     # Tạo ra 1 object
     player = Player()
@@ -325,16 +334,16 @@ if __name__ == '__main__':
 
         # Xử lý sự kiện (Event Handling)
         for event in pygame.event.get():
+            # Sự kiện nhấn phím
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False    
             elif event.type == QUIT:
                 running = False
-            elif event.type == FIRE_RATE:
-                if player.flag == True:
-                    player.flag = False
-                else:
-                    player.flag = True
+
+            # Sự kiện của Enemy
+            if event.type == FIRE_RATE:
+                player.bullet_fire_rate = True
             elif event.type == ADD_ENEMY:
                 for _ in range(10):  # Tạo 10 kẻ địch
                     new_enemy = Enemy(player.rect)
