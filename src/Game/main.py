@@ -49,11 +49,25 @@ Navy    = (0,0,128)
 class Player(pygame.sprite.Sprite):
     # Constructor
     def __init__(self):
+        # Player's base attr
         self.player_size = 25
         self.player_color = Red
         self.player_speed = 3
         super(Player, self).__init__()
         
+        # Player's health attr 
+        self.current_health = 200
+        self.maximum_health = 1000
+        self.health_bar_length = 400
+        self.health_ratio = self.maximum_health / self.health_bar_length
+        self.target_health = 500
+        self.health_change_speed = 5
+
+        # Bullet's attr
+        self.bullets = []
+        self.bullet_count = 0
+        self.bullet_fire_rate = False
+
         # Player's surf attr
         self.surf = pygame.Surface((self.player_size, self.player_size))
         self.surf.fill(self.player_color)
@@ -134,7 +148,8 @@ class Player(pygame.sprite.Sprite):
         
     def shoot(self, target_x, target_y):
         # Tính toán hướng di chuyển của viên đạn
-        if self.flag == True:
+        if self.bullet_fire_rate == True:
+            self.bullet_count += 1
             player_pos_x = self.get_player_position_x()
             player_pos_y = self.get_player_position_y()
             dx = target_x - player_pos_x
@@ -155,20 +170,16 @@ class Player(pygame.sprite.Sprite):
                 'y': player_pos_y,
                 'dx': dx_normalized,
                 'dy': dy_normalized,
-                'speed': 20
+                'speed': 10,
+                'count': self.bullet_count
             }
             self.bullets.append(bullet)
-        self.flag = False
+        self.bullet_fire_rate = False
 
     def draw_bullets(self, screen):
         # Vẽ tất cả các viên đạn lên màn hình
         for bullet in self.bullets:
-            pygame.draw.rect(screen, Yellow, int(bullet['x']), int(bullet['y']))
-
-    def update_player(self):
-        self.surf = pygame.Surface((self.player_size, self.player_size))
-        self.surf.fill(self.player_color)
-        self.rect = self.surf.get_rect(center=self.rect.center)
+            pygame.draw.circle(screen, Yellow, (int(bullet['x']), int(bullet['y'])), 20)
 
     def update_bullets(self):
         # Bullets fly from Player obj to mouse cursor
@@ -258,11 +269,11 @@ class Enemy(pygame.sprite.Sprite):
 
     def collide_with_bullet(self, bullets):
         for bullet in bullets:
-            bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 10, 10)  # Tạo một Rect cho viên đạn
+            bullet_rect = pygame.Rect(bullet['x'], bullet['y'], 20, 20)  # Tạo một Rect cho viên đạn
             enemy_rect = self.rect  # Tạo một Rect cho kẻ địch
             if bullet_rect.colliderect(enemy_rect):  # Kiểm tra va chạm giữa hai Rect
                 # Xóa kẻ địch khi viên đạn trúng
-                bullet_rect = (0, 0)
+                player.bullets.pop()
                 return True
         return False
     
@@ -294,7 +305,7 @@ if __name__ == '__main__':
     clock = pygame.time.Clock()
     
     # Tạo màn hình trò chơi và set tên cửa sổ
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), FULLSCREEN)
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     # background = pygame.image.load("")
     
