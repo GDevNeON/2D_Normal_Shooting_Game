@@ -55,151 +55,13 @@ class Player(pygame.sprite.Sprite):
         self.speed = 3
         super(Player, self).__init__()
         
-<<<<<<< HEAD
-        self.surf = pygame.Surface((self.player_size, self.player_size))
-        self.surf.fill(self.player_color)
-        self.rect = self.surf.get_rect(
-            center = (
-                (SCREEN_WIDTH-self.surf.get_width())/2,
-                (SCREEN_HEIGHT-self.surf.get_height())/2
-            ) 
-        )
-        self.bullets = []
-        self.shooting = False
-        
-        # Health 
-=======
         # Player's health attr 
->>>>>>> 842845b5f1c54165f5ec1cb5e21a1a381fae75f6
         self.current_health = 200
         self.maximum_health = 1000
         self.health_bar_length = 400
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 500
         self.health_change_speed = 5
-<<<<<<< HEAD
-        
-    # Các phương thức set/get
-    def get_player_position_x(self):
-        return self.rect.x
-    
-    def get_player_position_y(self):
-        return self.rect.y
-    
-    def set_player_size(self, value):
-        self.player_size = value
-        
-    def get_player_size(self):
-        return self.player_size
-    
-    def set_player_color(self, value):
-        self.player_color = value
-        
-    def get_player_color(self):
-        return self.player_color
-    
-    def set_player_speed(self, value):
-        self.player_speed = value
-        
-    def get_player_speed(self):
-        return self.player_speed
-    
-    # Các phương thức bổ trợ cho Player
-    def start_shooting(self):
-        self.shooting = True
-
-    def stop_shooting(self):
-        self.shooting = False
-        
-    def shoot(self, target_x, target_y):
-        # Tính toán hướng di chuyển của viên đạn
-        player_pos_x = self.get_player_position_x()
-        player_pos_y = self.get_player_position_y()
-        dx = target_x - player_pos_x
-        dy = target_y - player_pos_y
-        distance = math.sqrt(dx**2 + dy**2)
-
-        # Chuẩn hóa véc-tơ
-        if distance != 0:
-            dx_normalized = dx / distance
-            dy_normalized = dy / distance
-        else:
-            dx_normalized = 0
-            dy_normalized = 0
-
-        # Tạo đối tượng đạn mới và thêm vào danh sách đạn
-        bullet = {
-            'x': player_pos_x,
-            'y': player_pos_y,
-            'dx': dx_normalized,
-            'dy': dy_normalized,
-            'speed': 8
-        }
-        self.bullets.append(bullet)
-
-    def update_bullets(self):
-        # Nếu đang bắn, thực hiện bắn đạn
-        if self.shooting:
-            target_x, target_y = pygame.mouse.get_pos()
-            self.shoot(target_x, target_y)
-
-        # Cập nhật vị trí của tất cả các viên đạn
-        for bullet in self.bullets:
-            bullet['x'] += bullet['dx'] * bullet['speed']
-            bullet['y'] += bullet['dy'] * bullet['speed']
-
-        # Loại bỏ các viên đạn ra khỏi màn hình khi chúng ra khỏi biên
-        self.bullets = [bullet for bullet in self.bullets if 0 <= bullet['x'] <= SCREEN_WIDTH and 0 <= bullet['y'] <= SCREEN_HEIGHT]
-
-    def draw_bullets(self, screen):
-        # Vẽ tất cả các viên đạn lên màn hình
-        for bullet in self.bullets:
-            pygame.draw.circle(screen, Green, (int(bullet['x']), int(bullet['y'])), 5)
-    
-    # Health_bar
-    def get_damage(self, amount):
-        if self.target_health > 0:
-            self.target_health -= amount
-        if self.target_health <= 0:
-            self.target_health = 0
-            
-    def get_health(self, amount):
-        if self.target_health < self.maximum_health:
-            self.target_health += amount
-        if self.target_health >= self.maximum_health:
-            self.target_health = self.maximum_health
-    
-    def basic_health(self):
-        pygame.draw.rect(screen, (255,0,0), (10,10,self.target_health/self.health_ratio,25))
-        pygame.draw.rect(screen, (255,255,255), (10,10,self.health_bar_length,25), 4)
-      
-    def advanced_health(self):
-        transition_width = 0
-        transition_color = (255,0,0)
-        
-        if self.current_health < self.target_health:
-            self.current_health += self.health_change_speed
-            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
-            transition_color = (0,255,0)
-        if self.current_health > self.target_health:
-            self.current_health -= self.health_change_speed
-            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
-            transition_color = (255,255,0)
-            
-        health_bar_rect = pygame.Rect(10,45,self.current_health/self.health_ratio,25)
-        transition_bar_rect = pygame.Rect(health_bar_rect.right,45,transition_width,25)
-        
-        pygame.draw.rect(screen, (255,0,0), health_bar_rect)
-        pygame.draw.rect(screen, transition_color, transition_bar_rect)
-        pygame.draw.rect(screen, (255,255,255), (10,45,self.health_bar_length,25), 4)
-                
-    def update(self, pressed_keys, screen):
-        self.surf = pygame.Surface((self.player_size, self.player_size))
-        self.surf.fill(self.player_color)
-        self.rect = self.surf.get_rect(center=self.rect.center)
-        self.update_bullets()
-        self.draw_bullets(screen)
-=======
 
         # Player's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -283,7 +145,6 @@ class Player(pygame.sprite.Sprite):
     # Hàm cập nhật trạng thái Player
     def update(self, pressed_keys):
         self.update_player()
->>>>>>> 842845b5f1c54165f5ec1cb5e21a1a381fae75f6
         
         # Health_bar
         self.basic_health()
@@ -428,6 +289,8 @@ class Bullet(pygame.sprite.Sprite):
         self.y += self.dy * self.speed
 
         self.rect.move_ip(self.x, self.y)
+        
+        pygame.draw.rect(screen, Yellow, self.rect, 20)
 
         # Xóa đạn khi ra khỏi màn hình hoặc va chạm với kẻ địch
         if (0 < self.rect.x < SCREEN_WIDTH) or (0 < self.rect.y < SCREEN_HEIGHT):
@@ -468,11 +331,7 @@ if __name__ == '__main__':
     # - Nhóm bullets để phát hiện va chạm và cập nhật vị trí
     # - Nhóm all_sprites để render ảnh
     enemies = pygame.sprite.Group()
-<<<<<<< HEAD
-    #player = pygame.sprite.Group(Player())
-=======
     bullets = pygame.sprite.Group()
->>>>>>> 842845b5f1c54165f5ec1cb5e21a1a381fae75f6
     all_sprites = pygame.sprite.Group()
     all_sprites.add(player)
     
@@ -486,17 +345,7 @@ if __name__ == '__main__':
 
         # Xử lý sự kiện (Event Handling)
         for event in pygame.event.get():
-<<<<<<< HEAD
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_UP:
-                    player.sprite.get_health(200)
-            if event.type == pygame.KEYDOWN:
-                if event.key == pygame.K_DOWN:
-                    player.sprite.get_damage(200)
-                    
-=======
             # Các sự kiện nhấn phím
->>>>>>> 842845b5f1c54165f5ec1cb5e21a1a381fae75f6
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False    
