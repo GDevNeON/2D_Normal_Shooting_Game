@@ -14,7 +14,8 @@ class Player(pygame.sprite.Sprite):
         # Player's base attr
         self.size = 25
         self.color = Red
-        self.speed = 10
+        self.speed = 5
+        self.energy = 0
         super(Player, self).__init__()
         
         # Player's health attr 
@@ -98,7 +99,7 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(SCREEN, (255,0,0), health_bar_rect)
         pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
         pygame.draw.rect(SCREEN, (255,255,255), (10,45,self.health_bar_length,25), 4)
-        
+                
     def update_player(self):
         self.surf = pygame.Surface((self.size, self.size))
         self.surf.fill(self.color)
@@ -112,6 +113,7 @@ class Player(pygame.sprite.Sprite):
         self.basic_health()
         self.advanced_health()
         
+        # Movement
         if pressed_keys[K_w]:
             self.rect.move_ip(0, -self.speed)
         if pressed_keys[K_s]:

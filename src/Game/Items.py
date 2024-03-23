@@ -4,13 +4,28 @@ import math
 from DEFINE import *
 
 class ExpItem(pygame.sprite.Sprite):
-    def __init__(self):
+    def __init__(self, enemy):
         #ExpItem's base attr
         self.size = 10
         self.color = Blue
+        self.x = enemy.get_enemy_position_x()
+        self.y = enemy.get_enemy_position_y()
         super(ExpItem, self).__init__()
         
+        # ExpItem's surf attr
+        self.surf = pygame.Surface((self.size, self.size))
+        self.surf.fill(self.color)
+        self.rect = self.surf.get_rect(
+            center = (
+                self.x + enemy.get_enemy_size()/2, 
+                self.y + enemy.get_enemy_size()/2
+            )
+        )
         
+    def update(self):
+        self.surf = pygame.Surface((self.size, self.size))
+        self.surf.fill(self.color)
+        self.rect = self.surf.get_rect(center = self.rect.center)
 
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, player, mouse):
@@ -40,14 +55,11 @@ class Bullet(pygame.sprite.Sprite):
                 player.get_player_position_y() + player.get_player_size()/2
             )
         )
-            
-    def update_bullets(self):
+    
+    def update(self):
         self.surf = pygame.Surface((self.size, self.size))
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect(center = self.rect.center)
-        
-    def update(self, player, enemies):
-        self.update_bullets()
 
         self.dx = self.target_x - self.x
         self.dy = self.target_y - self.y
@@ -60,13 +72,5 @@ class Bullet(pygame.sprite.Sprite):
             self.dx_normalized = 0
             self.dy_normalized = 0
 
-        self.rect.move_ip(self.dx_normalized * self.speed, self.dy_normalized * self.speed)
-
-        # Xóa đạn khi ra khỏi màn hình hoặc va chạm với kẻ địch
-        if (0 < self.rect.x < SCREEN_WIDTH) or (0 < self.rect.y < SCREEN_HEIGHT):
-            for enemy in enemies:
-                if pygame.sprite.collide_rect(self, enemy):
-                    self.kill()
-                    enemy.kill()
-                    break
+        self.rect.move_ip(self.dx_normalized * self.speed, self.dy_normalized * self.speed)    
         

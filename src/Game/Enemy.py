@@ -8,7 +8,7 @@ class Enemy(pygame.sprite.Sprite):
         # Enemy's base attr
         self.size = 20
         self.color = White
-        self.speed = 3
+        self.speed = 1.5
         super(Enemy, self).__init__()
 
         # Enemy's surf attr
@@ -20,6 +20,12 @@ class Enemy(pygame.sprite.Sprite):
         self.generate_random_position(player_rect)
         
     # Các phương thức get/set
+    def get_enemy_position_x(self):
+        return self.rect.x
+    
+    def get_enemy_position_y(self):
+        return self.rect.y
+    
     def set_enemy_size(self, value):
         self.size = value
         
