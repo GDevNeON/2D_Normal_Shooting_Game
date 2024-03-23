@@ -1,4 +1,5 @@
 import pygame
+import math
 
 from DEFINE import *
 from pygame.locals import (
@@ -45,28 +46,28 @@ class Player(pygame.sprite.Sprite):
         )
         
     # Các phương thức get/set
-    def get_player_position_x(self):
+    def get_position_x(self):
         return self.rect.x
     
-    def get_player_position_y(self):
+    def get_position_y(self):
         return self.rect.y
     
-    def set_player_size(self, value):
+    def set_size(self, value):
         self.size = value
         
-    def get_player_size(self):
+    def get_size(self):
         return self.size
     
-    def set_player_color(self, value):
+    def set_color(self, value):
         self.color = value
         
-    def get_player_color(self):
+    def get_color(self):
         return self.color
     
-    def set_player_speed(self, value):
+    def set_peed(self, value):
         self.speed = value
         
-    def get_player_speed(self):
+    def get_speed(self):
         return self.speed
     
     # Các hàm phụ cho Player
@@ -131,3 +132,4 @@ class Player(pygame.sprite.Sprite):
             self.rect.top = 0
         if self.rect.bottom >= SCREEN_HEIGHT:
             self.rect.bottom = SCREEN_HEIGHT
+            

@@ -29,6 +29,7 @@ if __name__ == '__main__':
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     
     enemies = pygame.sprite.Group()
+    elites = pygame.sprite.Group()
     bullets = pygame.sprite.Group()
     exp_items = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
@@ -37,9 +38,9 @@ if __name__ == '__main__':
     player = Player()
     all_sprites.add(player)
     enemy = Enemy(player.rect)
-    enemy_new_size = enemy.get_enemy_size()
-    enemy_new_speed = enemy.get_enemy_speed()
-    enemy_new_color = enemy.get_enemy_color()
+    enemy_new_size = enemy.get_size()
+    enemy_new_speed = enemy.get_speed()
+    enemy_new_color = enemy.get_color()
     
     # Gameplay chạy trong này
     running = True
@@ -62,17 +63,20 @@ if __name__ == '__main__':
             if event.type == ADD_ENEMY:
                 for _ in range(5):  # Tạo 10 kẻ địch
                     new_enemy = Enemy(player.rect)
-                    new_enemy.set_enemy_size(enemy_new_size)
-                    new_enemy.set_enemy_speed(enemy_new_speed)
-                    new_enemy.set_enemy_color(enemy_new_color)
+                    new_enemy.set_size(enemy_new_size)
+                    new_enemy.set_speed(enemy_new_speed)
+                    new_enemy.set_color(enemy_new_color)
                     enemies.add(new_enemy)
                     all_sprites.add(new_enemy)
             elif event.type == INCREASE_STAT:
-                enemy_new_size += 15
+                enemy_new_speed += 1
                 if enemy_new_color == White:
                     enemy_new_color = Cyan
                 else:
                     enemy_new_color = White
+                 
+            # if event.type == ADD_ELITE:
+            #     new_elite
                  
             if event.type == FIRE_RATE:
                 mouse = pygame.mouse.get_pos()
