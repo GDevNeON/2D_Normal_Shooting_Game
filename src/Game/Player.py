@@ -64,7 +64,7 @@ class Player(pygame.sprite.Sprite):
     def get_color(self):
         return self.color
     
-    def set_peed(self, value):
+    def set_speed(self, value):
         self.speed = value
         
     def get_speed(self):

@@ -1,7 +1,9 @@
 import pygame
 import math
 import random
+
 from DEFINE import *
+from Items import *
 
 class Enemy(pygame.sprite.Sprite):
     def __init__(self, player_rect):
@@ -78,13 +80,19 @@ class Enemy(pygame.sprite.Sprite):
         # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
         self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
         
-class Elite(pygame.sprite.Sprite):
+# 3 types of Elite enemies
+class Elite_1(pygame.sprite.Sprite):
     def __init__(self, player):
-        self.size = 20
+        self.size = 100
         self.color = Purple
         self.speed = 20
         self.hp = 1000
-        super(Elite, self).__init__()
+        self.shoot_flag = 0
+        super(Elite_1, self).__init__()
+        
+        self.surf = pygame.Surface((self.size, self.size))
+        self.surf.fill(self.color)
+        self.rect = self.surf.get_rect()
         
         self.generate_random_position(player)
         
@@ -113,20 +121,20 @@ class Elite(pygame.sprite.Sprite):
     def get_speed(self):
         return self.speed
             
-    def generate_random_position(self, player_rect):
+    def generate_random_position(self, player):
         # Bán kính của vùng phát sinh ngẫu nhiên
         radius = 500
         # Tạo một vị trí ngẫu nhiên xung quanh người chơi
         angle = random.uniform(0, 2 * math.pi)
-        random_x = player_rect.centerx + radius * math.cos(angle)
-        random_y = player_rect.centery + radius * math.sin(angle)
+        random_x = player.get_position_x() + radius * math.cos(angle)
+        random_y = player.get_position_y() + radius * math.sin(angle)
         # Cập nhật vị trí của kẻ địch
         self.rect.center = (random_x, random_y)
         
-    def move(self, player):
+    def move(self, player_new_pos):
         # Tính toán hướng vector từ kẻ địch đến người chơi
-        dx = player.rect.centerx - self.rect.centerx
-        dy = player.rect.centery - self.rect.centery
+        dx = player_new_pos[0] - self.rect.centerx
+        dy = player_new_pos[1] - self.rect.centery
         distance = math.sqrt(dx ** 2 + dy ** 2)
         # Chuẩn hóa hướng vector
         if distance != 0:
@@ -138,5 +146,14 @@ class Elite(pygame.sprite.Sprite):
         # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
         self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
         
-    # def shoot(self):
-    #     bullet = Bullet(enemy, )
+    def shoot(self, player_new_pos, bullets, all_sprites):
+        bullet = Bullet(self, player_new_pos)
+        bullet.size = 200
+        bullets.add(bullet)
+        all_sprites.add(bullet)
+    
+    def update(self, player_new_pos, bullets, all_sprites):
+        self.move(player_new_pos)
+        if self.shoot_flag % 3 == 0:
+            self.shoot(player_new_pos, bullets, all_sprites)
+            self.shoot_flag += 1

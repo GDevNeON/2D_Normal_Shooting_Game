@@ -35,13 +35,13 @@ Navy    = (0,0,128)
 ADD_ENEMY = USEREVENT + 1
 pygame.time.set_timer(ADD_ENEMY, 5000)
 INCREASE_STAT = USEREVENT + 2
-pygame.time.set_timer(INCREASE_STAT, 10000)
+pygame.time.set_timer(INCREASE_STAT, 20000)
 FIRE_RATE = USEREVENT + 3
 pygame.time.set_timer(FIRE_RATE, 300)
 ADD_ELITE = USEREVENT + 10
-pygame.time.set_timer(ADD_ELITE, 60000)
+pygame.time.set_timer(ADD_ELITE, 3000, 1)
 ELITE_CHANGE_DIRECTION = USEREVENT + 11
-pygame.time.set_timer(ELITE_CHANGE_DIRECTION, 5000)
+pygame.time.set_timer(ELITE_CHANGE_DIRECTION, 3000)
 ELITE_FIRE = USEREVENT + 12
 pygame.time.set_timer(ELITE_FIRE, 5000)
 ADD_BOSS = USEREVENT + 20

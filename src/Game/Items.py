@@ -27,6 +27,25 @@ class ExpItem(pygame.sprite.Sprite):
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect(center = self.rect.center)
         
+class EnergyItem(pygame.sprite.Sprite):
+    # EnergyItem's base attr
+    def __init__(self, enemy):
+        self.size = 15
+        self.color = Lime
+        self.x = enemy.get_position_x()
+        self.y = enemy.get_position_y()
+        super(EnergyItem, self).__init__()
+
+        # EnergyItem's surf attr
+        self.surf = pygame.Surface((self.size, self.size))
+        self.surf.fill(self.color)
+        self.rect = self.surf.get_rect(
+            center = (
+                self.x + enemy.get_size()/2, 
+                self.y + enemy.get_size()/2
+            )
+        )
+        
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, current, target):
         # Bullet's base attr
