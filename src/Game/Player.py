@@ -2,12 +2,6 @@ import pygame
 import math
 
 from DEFINE import *
-from pygame.locals import (
-    K_w,
-    K_a, 
-    K_s, 
-    K_d,
-)
 
 class Player(pygame.sprite.Sprite):
     # Constructor
