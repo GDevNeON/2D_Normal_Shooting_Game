@@ -192,7 +192,6 @@ def Run_User_Interface():
 
 
 if __name__ == '__main__':
-if __name__ == '__main__':
     Run_User_Interface()
     
 
