@@ -32,7 +32,18 @@ def player_collide_with_energy_items(player, energy_items):
             return True
     return False
 
-def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, energy_items, all_sprites):
+def player_collide_with_hp_items(player, hp_items):
+    for hp in hp_items:
+        if pygame.sprite.collide_rect(player, hp):
+            if player.health < 1000:
+                player.health += 100
+            else:
+                player.health = 1000
+            hp.kill()
+            return True
+    return False
+
+def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, all_sprites):
     for bullet in player_bullets:
         if pygame.sprite.collide_rect(enemy, bullet):
             new_exp_item = ExpItem(enemy)
@@ -40,12 +51,15 @@ def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, energy_i
             all_sprites.add(new_exp_item)
             
             # Tỉ lệ rớt ra Energy là 8%
-            rand = numpy.random.choice(numpy.arange(0, 2), p=[0.08, 0.92])
+            rand = numpy.random.choice(numpy.arange(0, 3), p=[0.08, 0.05, 0.87])
             if rand == 0:
                 new_energy_item = EnergyItem(enemy)
                 energy_items.add(new_energy_item)
                 all_sprites.add(new_energy_item)
-            
+            elif rand == 1:
+                new_hp_item = HpItem(enemy)
+                hp_items.add(new_hp_item)
+                all_sprites.add(new_hp_item)
             bullet.kill()
             enemy.kill()
             return True

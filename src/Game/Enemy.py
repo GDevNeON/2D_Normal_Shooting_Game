@@ -86,7 +86,7 @@ class Elite_1(pygame.sprite.Sprite):
         self.size = 100
         self.color = Purple
         self.speed = 15
-        self.hp = 5000
+        self.hp = 1000
         self.shoot_flag = 0
         super(Elite_1, self).__init__()
         

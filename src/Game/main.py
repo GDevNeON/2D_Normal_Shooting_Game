@@ -24,6 +24,7 @@ if __name__ == '__main__':
     boss_bullets = pygame.sprite.Group()
     exp_items = pygame.sprite.Group()
     energy_items = pygame.sprite.Group()
+    hp_items = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
     
     # Tạo ra 1 object
@@ -92,17 +93,19 @@ if __name__ == '__main__':
                 player_bullets.add(new_bullet)
                 all_sprites.add(new_bullet)
         
-        # Phát hiện va chạm, debug:
-        # if player_collide_with(player, enemies) == True:
-        #     player.target_health -= 100
-            # if player.target_health == 0:
-            #     running = False
+        # Phát hiện va chạm, debusg:
+        if player_collide_with_enemies(player, enemies) == True:
+            player.target_health -= 100
+            if player.target_health == 0:
+                running = False
         if player_collide_with_exp_items(player, exp_items) == True:
             print('yes')
         if player_collide_with_energy_items(player, energy_items) == True:
             print('yesYES')
+        if player_collide_with_hp_items(player, hp_items) == True:
+            print('Heal')
         for enemy in enemies:
-            if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, energy_items, all_sprites) == True:
+            if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, all_sprites) == True:
                 print('killed')
         for elite in elites:
             if elite_collide_with_player_bullets(elite, player_bullets) == True:
