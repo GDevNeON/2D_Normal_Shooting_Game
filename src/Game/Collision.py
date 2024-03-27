@@ -24,7 +24,7 @@ def player_collide_with(player, exp_items):
 def player_collide_with(player, energy_items):
     for ener in energy_items:
         if pygame.sprite.collide_rect(player, ener):
-            if player.energy <= 3:
+            if player.energy < 3:
                 player.energy += 1
             else:
                 player.energy = 3
