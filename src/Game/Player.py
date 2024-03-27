@@ -25,6 +25,7 @@ class Player(pygame.sprite.Sprite):
         self.health_bar_length = 300
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 500
+        self.hp = self.target_health
         self.health_change_speed = 5
         
         # Player's energy attr 
@@ -32,8 +33,17 @@ class Player(pygame.sprite.Sprite):
         self.maximum_energy = 100
         self.energy_bar_length = 200
         self.energy_ratio = self.maximum_energy / self.energy_bar_length
-        self.energy = 10
+        self.target_energy = 10
+        self.energy = self.target_energy
         self.energy_change_speed = 1
+        
+        # Player's exp attr 
+        self.current_exp = 100
+        self.maximum_exp = 100
+        self.exp_bar_length = 200
+        self.exp_ratio = self.maximum_exp / self.exp_bar_length
+        self.exp = 10
+        self.exp_change_speed = 1
         
         # Player's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -105,13 +115,13 @@ class Player(pygame.sprite.Sprite):
         transition_width = 0
         transition_color = (255,0,0)
         
-        if self.current_energy < self.energy:
+        if self.current_energy < self.target_energy:
             self.current_energy += self.energy_change_speed
-            transition_width = int((self.energy - self.current_energy)/self.energy_ratio)
+            transition_width = int((self.target_energy - self.current_energy)/self.energy_ratio)
             transition_color = (0,255,0)
-        if self.current_energy > self.energy:
+        if self.current_energy > self.target_energy:
             self.current_energy -= self.energy_change_speed
-            transition_width = int((self.energy - self.current_energy)/self.energy_ratio)
+            transition_width = int((self.target_energy - self.current_energy)/self.energy_ratio)
             transition_color = (255,255,0)
             
         energy_bar_rect = pygame.Rect(10,32,self.current_energy/self.energy_ratio,20)
