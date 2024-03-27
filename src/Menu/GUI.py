@@ -1,12 +1,9 @@
 import pygame
-import os
-
+import sys
 from pygame.locals import *
-from pygame.font import Font
 from define import *
 
 pygame.init()
-
 
 class Text_Create(pygame.sprite.Sprite):
     def __init__(self, text, font_size, color):
@@ -82,12 +79,10 @@ def initialize_screen():
 
 def show_settings_menu(screen, background_image):
     button_close = pygame.image.load(PATH_TO_CLOSE_BUTTON)
-
+    button_close = pygame.transform.scale(button_close,(int(button_close.get_width() * 0.1), int(button_close.get_height() * 0.1)))
+    
     overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
     overlay.fill((0, 0, 0, 128))
-
-    screen.blit(background_image, (0, 0))
-    screen.blit(overlay, (0, 0))
 
     settings_menu_width = 1080
     settings_menu_height = 768
@@ -99,38 +94,45 @@ def show_settings_menu(screen, background_image):
     settings_menu_surface.fill((255, 255, 255))
     pygame.draw.rect(settings_menu_surface, (0, 0, 0), settings_menu_surface.get_rect(), 2)
     
-    button_close = pygame.transform.scale(button_close,(int(button_close.get_width() * 0.1), int(button_close.get_height() * 0.1)))
-    close_button_rect = settings_menu_surface.blit(button_close, (settings_menu_width - button_close.get_width() - 50, 50))
-    
+    close_button_rect = button_close.get_rect(topright=(settings_menu_width - 50, 50))
+    settings_menu_surface.blit(button_close, close_button_rect)
 
     video_text = Text_Create("Video", 40, (0,0,0))
     sound_text = Text_Create("Sound", 40, (0,0,0))
     resolution_text = Text_Create("Resolution", 40, (0,0,0))
     
     text_width = video_text.rect.width
-    text_height = video_text.rect.height
     text_spacing = 50
     text_start_x = 100
-    text_start_y = 150
-    video_text.rect.topleft = (text_start_x, 150) #(100, text_start_y) theo truc y      (text_start_x, 150) theo truc x 
-    sound_text.rect.topleft = (text_start_x + text_width + text_spacing, 150) #(100, text_start_y + text_height + text_spacing)        (text_start_x + text_width + text_spacing, 150)
-    resolution_text.rect.topleft = (text_start_x + 2 * (text_width + text_spacing), 150) #(text_start_x + 2 * (text_width + text_spacing), 150)      (100, text_start_y + 2 * (text_height + text_spacing)) 
+    video_text.rect.topleft = (text_start_x, 150)
+    sound_text.rect.topleft = (text_start_x + text_width + text_spacing, 150)
+    resolution_text.rect.topleft = (text_start_x + 2 * (text_width + text_spacing), 150)
     
     settings_menu_surface.blit(video_text.image, video_text.rect.topleft)
     settings_menu_surface.blit(sound_text.image, sound_text.rect.topleft)
     settings_menu_surface.blit(resolution_text.image, resolution_text.rect.topleft)
 
+    screen.blit(background_image, (0, 0))
+    screen.blit(overlay, (0, 0))
     screen.blit(settings_menu_surface, (settings_menu_x, settings_menu_y))
+    pygame.display.flip()  # Update the display
 
-    return settings_menu_surface, close_button_rect, button_close
+    # Xử lý sự kiện trong vòng lặp
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    return  # Thoát khỏi hàm nếu nhấn ESC
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if close_button_rect.collidepoint(event.pos):
+                    return  # Thoát khỏi hàm nếu nút đóng được nhấp
 
 
 def Run_User_Interface():
     screen, background_image, button_play, button_settings, button_quit, button_play_rect, button_settings_rect, button_quit_rect, button_play_text, button_setting_text, button_exit_text = initialize_screen()
-
-    play_button = Button(button_play, button_play_rect.center)
-    settings_button = Button(button_settings, button_settings_rect.center)
-    quit_button = Button(button_quit, button_quit_rect.center)
 
     running = True
     settings_menu_visible = False
@@ -138,22 +140,12 @@ def Run_User_Interface():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
-            if play_button.is_clicked(event):
-                pass
-            elif settings_button.is_clicked(event):
-                settings_menu_surface, close_button_rect, button_close = show_settings_menu(screen, background_image)
-                settings_menu_visible = True
-                while settings_menu_visible:
-                    pygame.display.update()  # Update display to show settings menu
-                    for event in pygame.event.get():
-                        if event.type == pygame.MOUSEBUTTONUP:
-                            if close_button_rect.collidepoint(event.pos):
-                                settings_menu_visible = False  # Close settings menu
-                                break
-
-            elif quit_button.is_clicked(event):
-                running = False
-
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_ESCAPE:
+                    running = False
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if button_settings_rect.collidepoint(event.pos):
+                    show_settings_menu(screen, background_image)
 
         screen.blit(background_image, (0, 0))
         screen.blit(button_play, button_play_rect)
@@ -169,5 +161,6 @@ def Run_User_Interface():
     pygame.quit()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     Run_User_Interface()
+    
