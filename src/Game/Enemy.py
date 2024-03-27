@@ -85,8 +85,8 @@ class Elite_1(pygame.sprite.Sprite):
     def __init__(self, player):
         self.size = 100
         self.color = Purple
-        self.speed = 20
-        self.hp = 1000
+        self.speed = 15
+        self.hp = 5000
         self.shoot_flag = 0
         super(Elite_1, self).__init__()
         
@@ -144,16 +144,17 @@ class Elite_1(pygame.sprite.Sprite):
             dx_normalized = 0
             dy_normalized = 0
         # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
-        self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
+        if float(self.rect.centerx) != float(player_new_pos[0]) and float(self.rect.centery) != float(player_new_pos[1]):
+            self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
         
-    def shoot(self, player_new_pos, bullets, all_sprites):
+    def shoot(self, player_new_pos, elite_bullets, all_sprites):
         bullet = Bullet(self, player_new_pos)
         bullet.size = 200
-        bullets.add(bullet)
+        elite_bullets.add(bullet)
         all_sprites.add(bullet)
     
-    def update(self, player_new_pos, bullets, all_sprites):
+    def update(self, player_new_pos, elite_bullets, all_sprites):
         self.move(player_new_pos)
-        if self.shoot_flag % 3 == 0:
-            self.shoot(player_new_pos, bullets, all_sprites)
+        if self.shoot_flag % 4 == 0:
+            self.shoot(player_new_pos, elite_bullets, all_sprites)
             self.shoot_flag += 1

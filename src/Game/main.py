@@ -5,18 +5,7 @@ from Player import *
 from Enemy import *
 from Items import *
 from Collision import *
-from pygame.locals import (
-    RLEACCEL,
-    USEREVENT,
-    FULLSCREEN,
-    K_w,
-    K_a, 
-    K_s, 
-    K_d,
-    K_ESCAPE,
-    KEYDOWN,
-    QUIT,
-)
+
 
 # Init âm thanh, pygame
 pygame.mixer.init()
@@ -30,7 +19,9 @@ if __name__ == '__main__':
     
     enemies = pygame.sprite.Group()
     elites = pygame.sprite.Group()
-    bullets = pygame.sprite.Group()
+    player_bullets = pygame.sprite.Group()
+    elite_bullets = pygame.sprite.Group()
+    boss_bullets = pygame.sprite.Group()
     exp_items = pygame.sprite.Group()
     energy_items = pygame.sprite.Group()
     all_sprites = pygame.sprite.Group()
@@ -61,13 +52,15 @@ if __name__ == '__main__':
             # Các sự kiện nhấn phím
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False    
+                    running = False
+                # elif event.key == K_q and player.energy == 100:
+                    
             elif event.type == QUIT:
                 running = False
                 
             # Các sự kiện của Enemy
             if event.type == ADD_ENEMY:
-                for _ in range(5):  # Tạo 10 kẻ địch
+                for _ in range(10):  # Tạo 10 kẻ địch
                     new_enemy = Enemy(player.rect)
                     new_enemy.set_size(enemy_new_size)
                     new_enemy.set_speed(enemy_new_speed)
@@ -93,10 +86,10 @@ if __name__ == '__main__':
                     
                  
             # Tốc độ bắn đạn
-            if event.type == FIRE_RATE:
+            if event.type == PLAYER_FIRE_RATE:
                 mouse = pygame.mouse.get_pos()
                 new_bullet = Bullet(player, mouse)
-                bullets.add(new_bullet)
+                player_bullets.add(new_bullet)
                 all_sprites.add(new_bullet)
         
         # Phát hiện va chạm, debug:
@@ -107,14 +100,18 @@ if __name__ == '__main__':
         if player_collide_with(player, energy_items) == True:
             print('yesYES')
         for enemy in enemies:
-            if enemy_collide_with(enemy, bullets, exp_items, energy_items, all_sprites) == True:
+            if enemy_collide_with(enemy, player_bullets, exp_items, energy_items, all_sprites) == True:
                 print('killed')
+        for elite in elites:
+            if elite_collide_with(elite, player_bullets) == True:
+                print('Elite slain!')
         
         # Cập nhật màn hình trò chơi
         player.update(pressed_keys)
+        player_bullets.update()
         enemies.update(player.rect)
-        bullets.update()
-        elites.update(player_new_pos, bullets, all_sprites)
+        elites.update(player_new_pos, elite_bullets, all_sprites)
+        elite_bullets.update()
 
         
         # Vẽ tất cả các sprite ra màn hình

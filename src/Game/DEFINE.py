@@ -1,16 +1,27 @@
 import pygame
 
 from pygame.locals import (
-    USEREVENT
+    RLEACCEL,
+    USEREVENT,
+    FULLSCREEN,
+    RESIZABLE,
+    K_w,
+    K_a, 
+    K_s, 
+    K_d,
+    K_q,
+    K_ESCAPE,
+    KEYDOWN,
+    QUIT,
 )
 
 # Set FPS cho game
 FPS = 60
 
 # Screen resolution
-SCREEN_WIDTH    = 1366
-SCREEN_HEIGHT   = 768
-SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+SCREEN_WIDTH    = 1400
+SCREEN_HEIGHT   = 720
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), RESIZABLE)
 # BACKGROUND = pygame.image.load("")
 
 # Mã màu
@@ -36,13 +47,13 @@ ADD_ENEMY = USEREVENT + 1
 pygame.time.set_timer(ADD_ENEMY, 5000)
 INCREASE_STAT = USEREVENT + 2
 pygame.time.set_timer(INCREASE_STAT, 20000)
-FIRE_RATE = USEREVENT + 3
-pygame.time.set_timer(FIRE_RATE, 300)
+PLAYER_FIRE_RATE = USEREVENT + 3
+pygame.time.set_timer(PLAYER_FIRE_RATE, 300)
 ADD_ELITE = USEREVENT + 10
 pygame.time.set_timer(ADD_ELITE, 3000, 1)
 ELITE_CHANGE_DIRECTION = USEREVENT + 11
 pygame.time.set_timer(ELITE_CHANGE_DIRECTION, 3000)
-ELITE_FIRE = USEREVENT + 12
-pygame.time.set_timer(ELITE_FIRE, 5000)
+ELITE_FIRE_RATE = USEREVENT + 12
+pygame.time.set_timer(ELITE_FIRE_RATE, 5000)
 ADD_BOSS = USEREVENT + 20
 pygame.time.set_timer(ADD_BOSS, 300000, 1)

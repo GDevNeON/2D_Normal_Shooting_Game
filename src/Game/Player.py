@@ -16,24 +16,24 @@ class Player(pygame.sprite.Sprite):
         self.size = 25
         self.color = Red
         self.speed = 5
-        self.energy = 0
+        self.exp = 0
         super(Player, self).__init__()
         
         # Player's health attr 
-        self.current_health = 200
-        self.maximum_health = 1000
-        self.health_bar_length = 400
+        self.current_health = 100
+        self.maximum_health = 100
+        self.health_bar_length = 300
         self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 500
-        self.health_change_speed = 5
+        self.target_health = 100
+        self.health_change_speed = 4
         
-        # Health attr
-        self.current_health = 200
-        self.maximum_health = 1000
-        self.health_bar_length = 400
-        self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 500
-        self.health_change_speed = 5
+        # Player's energy attr 
+        self.current_energy = 0
+        self.maximum_energy = 3
+        self.energy_bar_length = 200
+        self.energy_ratio = self.maximum_energy / self.energy_bar_length
+        self.energy = 0
+        self.energy_change_speed = 4
         
         # Player's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -94,12 +94,32 @@ class Player(pygame.sprite.Sprite):
             transition_width = int((self.target_health - self.current_health)/self.health_ratio)
             transition_color = (255,255,0)
             
-        health_bar_rect = pygame.Rect(10,45,self.current_health/self.health_ratio,25)
-        transition_bar_rect = pygame.Rect(health_bar_rect.right,45,transition_width,25)
+        health_bar_rect = pygame.Rect(10,10,self.current_health/self.health_ratio,25)
+        transition_bar_rect = pygame.Rect(health_bar_rect.right,10,transition_width,25)
         
         pygame.draw.rect(SCREEN, (255,0,0), health_bar_rect)
         pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
-        pygame.draw.rect(SCREEN, (255,255,255), (10,45,self.health_bar_length,25), 4)
+        pygame.draw.rect(SCREEN, (255,255,255), (10,10,self.health_bar_length,25), 4)
+        
+    def advanced_energy(self):
+        transition_width = 0
+        transition_color = (255,0,0)
+        
+        if self.current_energy < self.energy:
+            self.current_energy += self.energy_change_speed
+            transition_width = int((self.energy - self.current_energy)/self.energy_ratio)
+            transition_color = (0,255,0)
+        if self.current_energy > self.energy:
+            self.current_energy -= self.energy_change_speed
+            transition_width = int((self.energy - self.current_energy)/self.energy_ratio)
+            transition_color = (255,255,0)
+            
+        energy_bar_rect = pygame.Rect(10,32,self.current_energy/self.energy_ratio,20)
+        transition_bar_rect = pygame.Rect(energy_bar_rect.right,32,transition_width,20)
+        
+        pygame.draw.rect(SCREEN, (0,0,255), energy_bar_rect)
+        pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
+        pygame.draw.rect(SCREEN, (255,255,255), (10,32,self.energy_bar_length,20), 4)
                 
     def update_player(self):
         self.surf = pygame.Surface((self.size, self.size))
@@ -111,8 +131,9 @@ class Player(pygame.sprite.Sprite):
         self.update_player()
         
         # Health_bar
-        self.basic_health()
+        # self.basic_health()
         self.advanced_health()
+        self.advanced_energy()
         
         # Movement
         if pressed_keys[K_w]:
