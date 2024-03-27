@@ -52,6 +52,7 @@ class Bullet(pygame.sprite.Sprite):
         self.size = 20
         self.color = Yellow
         self.speed = 20
+        self.damage = 100
         super(Bullet, self).__init__()
           
         # Bullet's position attr
