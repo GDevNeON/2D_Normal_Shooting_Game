@@ -20,20 +20,20 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         
         # Player's health attr 
-        self.current_health = 100
-        self.maximum_health = 100
+        self.current_health = 1000
+        self.maximum_health = 1000
         self.health_bar_length = 300
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 100
-        self.health_change_speed = 4
+        self.health_change_speed = 5
         
         # Player's energy attr 
-        self.current_energy = 0
-        self.maximum_energy = 3
+        self.current_energy = 100
+        self.maximum_energy = 100
         self.energy_bar_length = 200
         self.energy_ratio = self.maximum_energy / self.energy_bar_length
-        self.energy = 0
-        self.energy_change_speed = 4
+        self.energy = 10
+        self.energy_change_speed = 1
         
         # Player's surf attr
         self.surf = pygame.Surface((self.size, self.size))
