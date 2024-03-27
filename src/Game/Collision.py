@@ -8,20 +8,20 @@ from Enemy import *
 from Items import *
 from Collision import *
 
-def player_collide_with(player, enemies):
+def player_collide_with_enemies(player, enemies):
     if pygame.sprite.spritecollideany(player, enemies):
         player.kill()
         return True
     return False
     
-def player_collide_with(player, exp_items):
+def player_collide_with_exp_items(player, exp_items):
     for exp in exp_items:
         if pygame.sprite.collide_rect(player, exp):
             exp.kill()
             return True
     return False
 
-def player_collide_with(player, energy_items):
+def player_collide_with_energy_items(player, energy_items):
     for ener in energy_items:
         if pygame.sprite.collide_rect(player, ener):
             if player.energy < 100:
@@ -32,7 +32,7 @@ def player_collide_with(player, energy_items):
             return True
     return False
 
-def enemy_collide_with(enemy, player_bullets, exp_items, energy_items, all_sprites):
+def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, energy_items, all_sprites):
     for bullet in player_bullets:
         if pygame.sprite.collide_rect(enemy, bullet):
             new_exp_item = ExpItem(enemy)
@@ -51,7 +51,7 @@ def enemy_collide_with(enemy, player_bullets, exp_items, energy_items, all_sprit
             return True
     return False
 
-def elite_collide_with(elite, player_bullets):
+def elite_collide_with_player_bullets(elite, player_bullets):
     for bullet in player_bullets:
         if elite.hp <= 0:
             elite.kill()
