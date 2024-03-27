@@ -17,6 +17,7 @@ class Player(pygame.sprite.Sprite):
         self.color = Red
         self.speed = 5
         self.energy = 0
+        self.exp = 0
         super(Player, self).__init__()
         
         # Player's health attr 
