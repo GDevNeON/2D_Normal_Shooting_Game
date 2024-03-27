@@ -38,9 +38,9 @@ class Player(pygame.sprite.Sprite):
         # Player's exp attr 
         self.current_exp = 100
         self.maximum_exp = 100
-        self.exp_bar_length = 200
+        self.exp_bar_length = 500
         self.exp_ratio = self.maximum_exp / self.exp_bar_length
-        self.exp = 10
+        self.exp = 5
         self.exp_change_speed = 1
         
         # Player's surf attr
@@ -107,7 +107,7 @@ class Player(pygame.sprite.Sprite):
         
         pygame.draw.rect(SCREEN, (255,0,0), health_bar_rect)
         pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
-        pygame.draw.rect(SCREEN, (255,255,255), (10,10,self.health_bar_length,25), 4)
+        pygame.draw.rect(SCREEN, (255,255,255), (10,10,self.health_bar_length,25), 3)
         
     def advanced_energy(self):
         transition_width = 0
@@ -127,7 +127,27 @@ class Player(pygame.sprite.Sprite):
         
         pygame.draw.rect(SCREEN, (0,0,255), energy_bar_rect)
         pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
-        pygame.draw.rect(SCREEN, (255,255,255), (10,32,self.energy_bar_length,20), 4)
+        pygame.draw.rect(SCREEN, (255,255,255), (10,32,self.energy_bar_length,20), 3)
+        
+    def advanced_exp(self):
+        transition_width = 0
+        transition_color = (255,0,0)
+        
+        if self.current_exp < self.exp:
+            self.current_exp += self.exp_change_speed
+            transition_width = int((self.exp - self.current_exp)/self.exp_ratio)
+            transition_color = Yellow
+        if self.current_exp > self.exp:
+            self.current_exp -= self.exp_change_speed
+            transition_width = int((self.exp - self.current_exp)/self.exp_ratio)
+            transition_color = (255,255,0)
+            
+        exp_bar_rect = pygame.Rect(400,670,self.current_exp/self.exp_ratio,15)
+        transition_bar_rect = pygame.Rect(exp_bar_rect.right,670,transition_width,15)
+        
+        pygame.draw.rect(SCREEN, (0,255,0), exp_bar_rect)
+        pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
+        pygame.draw.rect(SCREEN, (255,255,255), (400,670,self.exp_bar_length,15), 2)
                 
     def update_player(self):
         self.surf = pygame.Surface((self.size, self.size))
@@ -142,6 +162,7 @@ class Player(pygame.sprite.Sprite):
         # self.basic_health()
         self.advanced_health()
         self.advanced_energy()
+        self.advanced_exp()
         
         # Movement
         if pressed_keys[K_w]:

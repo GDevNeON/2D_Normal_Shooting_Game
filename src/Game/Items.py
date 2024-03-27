@@ -7,7 +7,7 @@ class ExpItem(pygame.sprite.Sprite):
     def __init__(self, enemy):
         #ExpItem's base attr
         self.size = 10
-        self.color = Blue
+        self.color = Lime
         self.x = enemy.get_position_x()
         self.y = enemy.get_position_y()
         super(ExpItem, self).__init__()
@@ -31,7 +31,7 @@ class EnergyItem(pygame.sprite.Sprite):
     def __init__(self, enemy):
         # EnergyItem's base attr
         self.size = 15
-        self.color = Lime
+        self.color = Blue
         self.x = enemy.get_position_x()
         self.y = enemy.get_position_y()
         super(EnergyItem, self).__init__()
