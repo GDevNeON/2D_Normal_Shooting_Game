@@ -24,8 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.maximum_health = 1000
         self.health_bar_length = 300
         self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 500
-        self.hp = self.target_health
+        self.health = 500
         self.health_change_speed = 5
         
         # Player's energy attr 
@@ -33,8 +32,7 @@ class Player(pygame.sprite.Sprite):
         self.maximum_energy = 100
         self.energy_bar_length = 200
         self.energy_ratio = self.maximum_energy / self.energy_bar_length
-        self.target_energy = 10
-        self.energy = self.target_energy
+        self.energy = 10
         self.energy_change_speed = 1
         
         # Player's exp attr 
@@ -95,13 +93,13 @@ class Player(pygame.sprite.Sprite):
         transition_width = 0
         transition_color = (255,0,0)
         
-        if self.current_health < self.target_health:
+        if self.current_health < self.health:
             self.current_health += self.health_change_speed
-            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
+            transition_width = int((self.health - self.current_health)/self.health_ratio)
             transition_color = (0,255,0)
-        if self.current_health > self.target_health:
+        if self.current_health > self.health:
             self.current_health -= self.health_change_speed
-            transition_width = int((self.target_health - self.current_health)/self.health_ratio)
+            transition_width = int((self.health - self.current_health)/self.health_ratio)
             transition_color = (255,255,0)
             
         health_bar_rect = pygame.Rect(10,10,self.current_health/self.health_ratio,25)
@@ -115,13 +113,13 @@ class Player(pygame.sprite.Sprite):
         transition_width = 0
         transition_color = (255,0,0)
         
-        if self.current_energy < self.target_energy:
+        if self.current_energy < self.energy:
             self.current_energy += self.energy_change_speed
-            transition_width = int((self.target_energy - self.current_energy)/self.energy_ratio)
+            transition_width = int((self.energy - self.current_energy)/self.energy_ratio)
             transition_color = (0,255,0)
-        if self.current_energy > self.target_energy:
+        if self.current_energy > self.energy:
             self.current_energy -= self.energy_change_speed
-            transition_width = int((self.target_energy - self.current_energy)/self.energy_ratio)
+            transition_width = int((self.energy - self.current_energy)/self.energy_ratio)
             transition_color = (255,255,0)
             
         energy_bar_rect = pygame.Rect(10,32,self.current_energy/self.energy_ratio,20)
