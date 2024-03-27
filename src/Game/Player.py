@@ -26,7 +26,15 @@ class Player(pygame.sprite.Sprite):
         self.health_bar_length = 400
         self.health_ratio = self.maximum_health / self.health_bar_length
         self.target_health = 1000
-        self.health_change_speed = 5
+        self.health_change_speed = 4
+        
+        # Player's mana attr 
+        self.current_mana = 200
+        self.maximum_mana = 800
+        self.mana_bar_length = 300
+        self.mana_ratio = self.maximum_mana / self.mana_bar_length
+        self.target_mana = 800
+        self.mana_change_speed = 4
         
         # Player's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -87,12 +95,32 @@ class Player(pygame.sprite.Sprite):
             transition_width = int((self.target_health - self.current_health)/self.health_ratio)
             transition_color = (255,255,0)
             
-        health_bar_rect = pygame.Rect(10,45,self.current_health/self.health_ratio,25)
-        transition_bar_rect = pygame.Rect(health_bar_rect.right,45,transition_width,25)
+        health_bar_rect = pygame.Rect(10,10,self.current_health/self.health_ratio,25)
+        transition_bar_rect = pygame.Rect(health_bar_rect.right,10,transition_width,25)
         
         pygame.draw.rect(SCREEN, (255,0,0), health_bar_rect)
         pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
-        pygame.draw.rect(SCREEN, (255,255,255), (10,45,self.health_bar_length,25), 4)
+        pygame.draw.rect(SCREEN, (255,255,255), (10,10,self.health_bar_length,25), 4)
+        
+    def advanced_mana(self):
+        transition_width = 0
+        transition_color = (255,0,0)
+        
+        if self.current_mana < self.target_mana:
+            self.current_mana += self.mana_change_speed
+            transition_width = int((self.target_mana - self.current_mana)/self.mana_ratio)
+            transition_color = (0,255,0)
+        if self.current_mana > self.target_mana:
+            self.current_mana -= self.mana_change_speed
+            transition_width = int((self.target_mana - self.current_mana)/self.mana_ratio)
+            transition_color = (255,255,0)
+            
+        mana_bar_rect = pygame.Rect(10,32,self.current_mana/self.mana_ratio,20)
+        transition_bar_rect = pygame.Rect(mana_bar_rect.right,32,transition_width,20)
+        
+        pygame.draw.rect(SCREEN, (0,0,255), mana_bar_rect)
+        pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
+        pygame.draw.rect(SCREEN, (255,255,255), (10,32,self.mana_bar_length,20), 4)
                 
     def update_player(self):
         self.surf = pygame.Surface((self.size, self.size))
@@ -104,8 +132,9 @@ class Player(pygame.sprite.Sprite):
         self.update_player()
         
         # Health_bar
-        #self.basic_health()
+        # self.basic_health()
         self.advanced_health()
+        self.advanced_mana()
         
         # Movement
         if pressed_keys[K_w]:
