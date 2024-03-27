@@ -24,12 +24,16 @@ def player_collide_with(player, exp_items):
 def player_collide_with(player, energy_items):
     for ener in energy_items:
         if pygame.sprite.collide_rect(player, ener):
+            if player.energy <= 100:
+                player.energy += 50
+            else:
+                player.energy = 100
             ener.kill()
             return True
     return False
 
-def enemy_collide_with(enemy, bullets, exp_items, energy_items, all_sprites):
-    for bullet in bullets:
+def enemy_collide_with(enemy, player_bullets, exp_items, energy_items, all_sprites):
+    for bullet in player_bullets:
         if pygame.sprite.collide_rect(enemy, bullet):
             new_exp_item = ExpItem(enemy)
             exp_items.add(new_exp_item)
@@ -45,4 +49,19 @@ def enemy_collide_with(enemy, bullets, exp_items, energy_items, all_sprites):
             bullet.kill()
             enemy.kill()
             return True
+    return False
+
+def elite_collide_with(elite, player_bullets):
+    for bullet in player_bullets:
+        if elite.hp <= 0:
+            elite.kill()
+            return True
+        else:
+            if pygame.sprite.collide_rect(bullet, elite):
+                print('HP remaining: ', elite.hp)
+                if elite.get_color() == Purple:
+                    elite.set_color(White)
+                else:
+                    elite.set_color(Purple)
+                elite.hp -= bullet.damage
     return False
