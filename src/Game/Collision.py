@@ -64,4 +64,5 @@ def elite_collide_with(elite, player_bullets):
                 else:
                     elite.set_color(Purple)
                 elite.hp -= bullet.damage
+                bullet.kill()
     return False
