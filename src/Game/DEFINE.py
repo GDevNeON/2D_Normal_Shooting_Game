@@ -4,6 +4,7 @@ from pygame.locals import (
     RLEACCEL,
     USEREVENT,
     FULLSCREEN,
+    RESIZABLE,
     K_w,
     K_a, 
     K_s, 
@@ -20,7 +21,7 @@ FPS = 60
 # Screen resolution
 SCREEN_WIDTH    = 1366
 SCREEN_HEIGHT   = 768
-SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
+SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), RESIZABLE)
 # BACKGROUND = pygame.image.load("")
 
 # Mã màu
