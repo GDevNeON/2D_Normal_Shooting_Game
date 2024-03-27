@@ -24,15 +24,7 @@ class Player(pygame.sprite.Sprite):
         self.maximum_health = 1000
         self.health_bar_length = 400
         self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 500
-        self.health_change_speed = 5
-        
-        # Health attr
-        self.current_health = 200
-        self.maximum_health = 1000
-        self.health_bar_length = 400
-        self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 500
+        self.target_health = 1000
         self.health_change_speed = 5
         
         # Player's surf attr
@@ -111,7 +103,7 @@ class Player(pygame.sprite.Sprite):
         self.update_player()
         
         # Health_bar
-        self.basic_health()
+        #self.basic_health()
         self.advanced_health()
         
         # Movement
