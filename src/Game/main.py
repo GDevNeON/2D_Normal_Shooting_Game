@@ -64,6 +64,14 @@ if __name__ == '__main__':
                     running = False    
             elif event.type == QUIT:
                 running = False
+            
+            # Mất hp    
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_UP:
+                    player.sprite.get_health(200)
+            if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_DOWN:
+                    player.sprite.get_damage(200)
                 
             # Các sự kiện của Enemy
             if event.type == ADD_ENEMY:
