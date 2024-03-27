@@ -19,8 +19,8 @@ from pygame.locals import (
 FPS = 60
 
 # Screen resolution
-SCREEN_WIDTH    = 1400
-SCREEN_HEIGHT   = 720
+SCREEN_WIDTH    = 1300
+SCREEN_HEIGHT   = 700
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), RESIZABLE)
 # BACKGROUND = pygame.image.load("")
 
