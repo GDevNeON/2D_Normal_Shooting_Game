@@ -16,7 +16,6 @@ class Player(pygame.sprite.Sprite):
         self.size = 25
         self.color = Red
         self.speed = 5
-        self.exp = 0
         super(Player, self).__init__()
         
         # Player's health attr 
@@ -24,7 +23,7 @@ class Player(pygame.sprite.Sprite):
         self.maximum_health = 1000
         self.health_bar_length = 300
         self.health_ratio = self.maximum_health / self.health_bar_length
-        self.target_health = 1000
+        self.target_health = 500
         self.health_change_speed = 5
         
         # Player's energy attr 

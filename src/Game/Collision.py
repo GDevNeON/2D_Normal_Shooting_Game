@@ -10,8 +10,9 @@ from Collision import *
 
 def player_collide_with_enemies(player, enemies):
     if pygame.sprite.spritecollideany(player, enemies):
-        player.kill()
-        return True
+        player.target_health -= 10
+        if player.target_health == 0:
+            return True
     return False
     
 def player_collide_with_exp_items(player, exp_items):
