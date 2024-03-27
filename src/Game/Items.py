@@ -76,7 +76,7 @@ class Bullet(pygame.sprite.Sprite):
             )
         )
     
-    def update(self):
+    def update(self, player):
         self.surf = pygame.Surface((self.size, self.size))
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect(center = self.rect.center)
