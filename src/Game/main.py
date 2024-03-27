@@ -94,10 +94,10 @@ if __name__ == '__main__':
                 all_sprites.add(new_bullet)
         
         # Phát hiện va chạm, debusg:
-        # if player_collide_with_enemies(player, enemies) == True:
-        #     player.target_health -= 100
-        #     if player.target_health == 0:
-        #         running = False
+        if player_collide_with_enemies(player, enemies) == True:
+            player.target_health -= 100
+            if player.target_health == 0:
+                running = False
         if player_collide_with_exp_items(player, exp_items) == True:
             print('yes')
         if player_collide_with_energy_items(player, energy_items) == True:

@@ -17,10 +17,10 @@ def player_collide_with_enemies(player, enemies):
 def player_collide_with_exp_items(player, exp_items):
     for exp in exp_items:
         if pygame.sprite.collide_rect(player, exp):
-            if player.exp < 100:
-                player.exp += 5
+            if player.target_exp < 100:
+                player.target_exp += 5
             else:
-                player.exp = 100
+                player.target_exp = 100
             exp.kill()
             return True
     return False
@@ -28,10 +28,10 @@ def player_collide_with_exp_items(player, exp_items):
 def player_collide_with_energy_items(player, energy_items):
     for ener in energy_items:
         if pygame.sprite.collide_rect(player, ener):
-            if player.energy < 100:
-                player.energy += 10
+            if player.target_energy < 100:
+                player.target_energy += 10
             else:
-                player.energy = 100
+                player.target_energy = 100
             ener.kill()
             return True
     return False
@@ -39,10 +39,10 @@ def player_collide_with_energy_items(player, energy_items):
 def player_collide_with_hp_items(player, hp_items):
     for hp in hp_items:
         if pygame.sprite.collide_rect(player, hp):
-            if player.health < 1000:
-                player.health += 100
+            if player.target_health < 1000:
+                player.target_health += 100
             else:
-                player.health = 1000
+                player.target_health = 1000
             hp.kill()
             return True
     return False
