@@ -6,8 +6,13 @@ from DEFINE import *
 from Player import *
 from Enemy import *
 from Items import *
-from Collision import *
+from Functions import *
 
+# Các hàm di chuyển
+def items_move_towards_player(player, exp_items, energy_items, hp_items):
+    pass
+
+# Các hàm phát hiện va chạm
 def player_collide_with_enemies(player, enemies):
     if pygame.sprite.spritecollideany(player, enemies):
         player.target_health -= 10

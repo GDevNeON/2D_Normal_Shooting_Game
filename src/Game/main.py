@@ -1,10 +1,11 @@
 import pygame
 
-from DEFINE import *
-from Player import *
-from Enemy import *
-from Items import *
-from Collision import *
+from DEFINE     import *
+from Camera     import *
+from Player     import *
+from Enemy      import *
+from Items      import *
+from Functions  import *
 
 
 # Init âm thanh, pygame
@@ -17,17 +18,19 @@ if __name__ == '__main__':
     
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     
-    enemies = pygame.sprite.Group()
-    elites = pygame.sprite.Group()
-    player_bullets = pygame.sprite.Group()
-    elite_bullets = pygame.sprite.Group()
-    boss_bullets = pygame.sprite.Group()
-    exp_items = pygame.sprite.Group()
-    energy_items = pygame.sprite.Group()
-    hp_items = pygame.sprite.Group()
-    all_sprites = pygame.sprite.Group()
+    enemies         = pygame.sprite.Group()
+    elites          = pygame.sprite.Group()
+    player_bullets  = pygame.sprite.Group()
+    elite_bullets   = pygame.sprite.Group()
+    boss_bullets    = pygame.sprite.Group()
+    exp_items       = pygame.sprite.Group()
+    energy_items    = pygame.sprite.Group()
+    hp_items        = pygame.sprite.Group()
+    all_sprites     = pygame.sprite.Group()
     
     # Tạo ra 1 object
+    camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
+    
     player = Player()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
@@ -84,12 +87,15 @@ if __name__ == '__main__':
                 for elite in elites:
                     elite.shoot_flag += 1
                     player_new_pos = (player.get_position_x(), player.get_position_y())
-                    
-                 
+                       
             # Tốc độ bắn đạn
             if event.type == PLAYER_FIRE_RATE:
+                 # Lấy tọa độ chuột trên màn hình
                 mouse = pygame.mouse.get_pos()
-                new_bullet = Bullet(player, mouse)
+                # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
+                mouse_world_pos = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
+                # Tạo viên đạn với vị trí đã chuyển đổi
+                new_bullet = Bullet(player, mouse_world_pos)
                 player_bullets.add(new_bullet)
                 all_sprites.add(new_bullet)
         
@@ -110,6 +116,7 @@ if __name__ == '__main__':
                 print('Elite slain!')
         
         # Cập nhật màn hình trò chơi
+        camera.update(player)
         player.update(pressed_keys)
         player_bullets.update()
         enemies.update(player.rect)
@@ -119,7 +126,7 @@ if __name__ == '__main__':
         
         # Vẽ tất cả các sprite ra màn hình
         for entity in all_sprites:
-            SCREEN.blit(entity.surf, entity.rect) 
+            SCREEN.blit(entity.surf, camera.apply(entity)) 
 
         # Cập nhật màn hình
         pygame.display.update()
