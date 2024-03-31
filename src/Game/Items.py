@@ -112,4 +112,6 @@ class Bullet(pygame.sprite.Sprite):
             self.dy_normalized = 0
 
         self.rect.move_ip(self.dx_normalized * self.speed, self.dy_normalized * self.speed)    
+        if self.dx_normalized >= SCREEN_WIDTH or self.dy_normalized >= SCREEN_HEIGHT:
+            self.kill()
         

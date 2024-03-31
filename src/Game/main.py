@@ -26,6 +26,7 @@ if __name__ == '__main__':
     exp_items       = pygame.sprite.Group()
     energy_items    = pygame.sprite.Group()
     hp_items        = pygame.sprite.Group()
+    items_group     = pygame.sprite.Group()
     all_sprites     = pygame.sprite.Group()
     
     # Tạo ra 1 object
@@ -57,8 +58,8 @@ if __name__ == '__main__':
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False
-                # elif event.key == K_q and player.energy == 100:
-                    
+                elif event.key == K_q and player.energy >= player.bar_maximum_energy:
+                    player.energy = 0
             elif event.type == QUIT:
                 running = False
                 
@@ -83,23 +84,9 @@ if __name__ == '__main__':
                 new_elite_1 = Elite_1(player)
                 elites.add(new_elite_1)
                 all_sprites.add(new_elite_1)
-            elif event.type == ELITE_CHANGE_DIRECTION:
-                for elite in elites:
-                    elite.shoot_flag += 1
-                    player_new_pos = (player.get_position_x(), player.get_position_y())
-                       
-            # Tốc độ bắn đạn
-            if event.type == PLAYER_FIRE_RATE:
-                 # Lấy tọa độ chuột trên màn hình
-                mouse = pygame.mouse.get_pos()
-                # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
-                mouse_world_pos = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
-                # Tạo viên đạn với vị trí đã chuyển đổi
-                new_bullet = Bullet(player, mouse_world_pos)
-                player_bullets.add(new_bullet)
-                all_sprites.add(new_bullet)
         
         # Phát hiện va chạm, debusg:
+        items_move_towards_player(player, items_group)
         if player_collide_with_enemies(player, enemies) == True:
             print('play die')
         if player_collide_with_exp_items(player, exp_items) == True:
@@ -109,7 +96,7 @@ if __name__ == '__main__':
         if player_collide_with_hp_items(player, hp_items) == True:
             print('Heal')
         for enemy in enemies:
-            if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, all_sprites) == True:
+            if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites) == True:
                 print('killed')
         for elite in elites:
             if elite_collide_with_player_bullets(elite, player_bullets) == True:
@@ -117,10 +104,11 @@ if __name__ == '__main__':
         
         # Cập nhật màn hình trò chơi
         camera.update(player)
-        player.update(pressed_keys)
+        player.update(clock, camera, pressed_keys, player_bullets, all_sprites)
         player_bullets.update()
         enemies.update(player.rect)
-        elites.update(player_new_pos, elite_bullets, all_sprites)
+        player_new_pos = (player.get_position_x(), player.get_position_y())
+        elites.update(camera, clock, player_new_pos, elite_bullets, all_sprites)
         elite_bullets.update()
 
         

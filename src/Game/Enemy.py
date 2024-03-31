@@ -11,6 +11,7 @@ class Enemy(pygame.sprite.Sprite):
         self.size = 20
         self.color = White
         self.speed = 1.5
+        self.health = 10
         super(Enemy, self).__init__()
 
         # Enemy's surf attr
@@ -86,13 +87,17 @@ class Elite_1(pygame.sprite.Sprite):
         self.size = 100
         self.color = Purple
         self.speed = 15
-        self.hp = 1000
-        self.shoot_flag = 0
+        self.hp = 100000
         super(Elite_1, self).__init__()
         
         self.surf = pygame.Surface((self.size, self.size))
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect()
+        
+        self.fire_rate = 1  # Thời gian giữa các lần bắn đạn (tính bằng giây)
+        self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
+        self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
+        self.time_since_last_moved = 0
         
         self.generate_random_position(player)
         
@@ -131,30 +136,44 @@ class Elite_1(pygame.sprite.Sprite):
         # Cập nhật vị trí của kẻ địch
         self.rect.center = (random_x, random_y)
         
-    def move(self, player_new_pos):
-        # Tính toán hướng vector từ kẻ địch đến người chơi
-        dx = player_new_pos[0] - self.rect.centerx
-        dy = player_new_pos[1] - self.rect.centery
-        distance = math.sqrt(dx ** 2 + dy ** 2)
-        # Chuẩn hóa hướng vector
-        if distance != 0:
-            dx_normalized = dx / distance
-            dy_normalized = dy / distance
-        else:
-            dx_normalized = 0
-            dy_normalized = 0
-        # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
-        if float(self.rect.centerx) != float(player_new_pos[0]) and float(self.rect.centery) != float(player_new_pos[1]):
-            self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
+    def move(self, clock, player_new_pos):
+        self.time_since_last_moved += clock.get_time() / 1000
         
-    def shoot(self, player_new_pos, elite_bullets, all_sprites):
-        bullet = Bullet(self, player_new_pos)
-        bullet.size = 200
-        elite_bullets.add(bullet)
-        all_sprites.add(bullet)
+        if self.time_since_last_shot % 10 == 0:
+            # Tính toán hướng vector từ kẻ địch đến người chơi
+            dx = player_new_pos[0] - self.rect.centerx
+            dy = player_new_pos[1] - self.rect.centery
+            distance = math.sqrt(dx ** 2 + dy ** 2)
+            # Chuẩn hóa hướng vector
+            if distance != 0:
+                dx_normalized = dx / distance
+                dy_normalized = dy / distance
+            else:
+                dx_normalized = 0
+                dy_normalized = 0
+            # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
+            if float(self.rect.centerx) != float(player_new_pos[0]) and float(self.rect.centery) != float(player_new_pos[1]):
+                self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
+        
+    def fire_bullets(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
+        # Cập nhật thời gian giữa các lần bắn đạn
+        self.time_since_last_shot += clock.get_time() / 1000  # Đổi từ mili-giây sang giây
+
+        # Kiểm tra nếu đủ thời gian để bắn đạn
+        if self.time_since_last_shot >= self.fire_rate:
+            # Chuyển đổi tọa độ Player sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
+            player_new_pos = (player_new_pos[0] - camera.camera.x, 
+                              player_new_pos[1] - camera.camera.y)
+            # Tạo viên đạn với vị trí đã chuyển đổi
+            new_bullet = Bullet(self, player_new_pos)
+            new_bullet.size = 100
+            elite_bullets.add(new_bullet)
+            all_sprites.add(new_bullet)
+            # Đặt lại thời gian giữa các lần bắn đạn
+            self.time_since_last_shot = 0  
     
-    def update(self, player_new_pos, elite_bullets, all_sprites):
-        self.move(player_new_pos)
-        if self.shoot_flag % 4 == 0:
-            self.shoot(player_new_pos, elite_bullets, all_sprites)
-            self.shoot_flag += 1
+
+    
+    def update(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
+        self.move(clock, player_new_pos)
+        self.fire_bullets(camera, clock, player_new_pos, elite_bullets, all_sprites)

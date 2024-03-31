@@ -24,7 +24,6 @@ LEVEL_HEIGHT    = 6000
 SCREEN_WIDTH    = 1300
 SCREEN_HEIGHT   = 700
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), RESIZABLE)
-# BACKGROUND = pygame.image.load("")
 
 # Mã màu
 Black   = (0,0,0)
@@ -49,8 +48,6 @@ ADD_ENEMY = USEREVENT + 1
 pygame.time.set_timer(ADD_ENEMY, 5000)
 INCREASE_STAT = USEREVENT + 2
 pygame.time.set_timer(INCREASE_STAT, 20000)
-PLAYER_FIRE_RATE = USEREVENT + 3
-pygame.time.set_timer(PLAYER_FIRE_RATE, 300)
 ADD_ELITE = USEREVENT + 10
 pygame.time.set_timer(ADD_ELITE, 3000, 1)
 ELITE_CHANGE_DIRECTION = USEREVENT + 11
