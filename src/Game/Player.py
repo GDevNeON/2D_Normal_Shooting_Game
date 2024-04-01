@@ -16,7 +16,7 @@ class Player(pygame.sprite.Sprite):
         # Player's base attr
         self.size = 25
         self.color = Red
-        self.speed = 5
+        self.speed = 4
         super(Player, self).__init__()
         
         # Player's health attr 
@@ -174,7 +174,7 @@ class Player(pygame.sprite.Sprite):
     def level_up(self):
         if self.exp >= self.bar_maximum_exp:
             self.exp = math.fabs(self.exp - self.bar_maximum_exp)
-            self.bar_maximum_exp += 0.2*self.bar_maximum_exp
+            self.bar_current_exp = 0.2*self.bar_current_exp
             self.level += 1
             print('Player lv ', self.level)
             

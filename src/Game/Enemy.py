@@ -86,7 +86,7 @@ class Elite_1(pygame.sprite.Sprite):
     def __init__(self, player):
         self.size = 100
         self.color = Purple
-        self.speed = 15
+        self.speed = 20
         self.hp = 100000
         super(Elite_1, self).__init__()
         
@@ -94,7 +94,9 @@ class Elite_1(pygame.sprite.Sprite):
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect()
         
-        self.fire_rate = 1  # Thời gian giữa các lần bắn đạn (tính bằng giây)
+        self.target_pos = (player.get_position_x(), player.get_position_y())
+        
+        self.fire_rate = 2  # Thời gian giữa các lần bắn đạn (tính bằng giây)
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
         self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
         self.time_since_last_moved = 0
@@ -139,11 +141,17 @@ class Elite_1(pygame.sprite.Sprite):
     def move(self, clock, player_new_pos):
         self.time_since_last_moved += clock.get_time() / 1000
         
-        if self.time_since_last_shot % 10 == 0:
+        if self.time_since_last_moved >= self.move_rate:
             # Tính toán hướng vector từ kẻ địch đến người chơi
-            dx = player_new_pos[0] - self.rect.centerx
-            dy = player_new_pos[1] - self.rect.centery
-            distance = math.sqrt(dx ** 2 + dy ** 2)
+            self.target_pos = player_new_pos
+            self.time_since_last_moved = 0
+            
+        dx = self.target_pos[0] - self.rect.centerx
+        dy = self.target_pos[1] - self.rect.centery
+        distance = math.sqrt(dx ** 2 + dy ** 2)
+        
+        stopping_distance = 10
+        if distance > stopping_distance:
             # Chuẩn hóa hướng vector
             if distance != 0:
                 dx_normalized = dx / distance
@@ -152,8 +160,7 @@ class Elite_1(pygame.sprite.Sprite):
                 dx_normalized = 0
                 dy_normalized = 0
             # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
-            if float(self.rect.centerx) != float(player_new_pos[0]) and float(self.rect.centery) != float(player_new_pos[1]):
-                self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
+            self.rect.move_ip(dx_normalized * self.speed, dy_normalized * self.speed)
         
     def fire_bullets(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
         # Cập nhật thời gian giữa các lần bắn đạn
@@ -162,17 +169,15 @@ class Elite_1(pygame.sprite.Sprite):
         # Kiểm tra nếu đủ thời gian để bắn đạn
         if self.time_since_last_shot >= self.fire_rate:
             # Chuyển đổi tọa độ Player sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
-            player_new_pos = (player_new_pos[0] - camera.camera.x, 
-                              player_new_pos[1] - camera.camera.y)
+            player_new_pos = (player_new_pos[0], 
+                              player_new_pos[1])
             # Tạo viên đạn với vị trí đã chuyển đổi
             new_bullet = Bullet(self, player_new_pos)
             new_bullet.size = 100
             elite_bullets.add(new_bullet)
             all_sprites.add(new_bullet)
             # Đặt lại thời gian giữa các lần bắn đạn
-            self.time_since_last_shot = 0  
-    
-
+            self.time_since_last_shot = 0
     
     def update(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
         self.move(clock, player_new_pos)
