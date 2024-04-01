@@ -58,7 +58,7 @@ if __name__ == '__main__':
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False
-                elif event.key == K_q and player.energy >= player.bar_maximum_energy:
+                elif event.key == K_q and player.energy >= player.maximum_energy:
                     player.energy = 0
             elif event.type == QUIT:
                 running = False

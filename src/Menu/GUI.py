@@ -47,9 +47,6 @@ class Button_image():
     def draw(self):
         screen.blit(self.img, (self.rect.x, self.rect.y))
 
-    def draw(self, screen):
-        screen.blit(self.img, (self.rect.x, self.rect.y))
-
     def is_clicked(self):
         pos = pygame.mouse.get_pos()
         button_rect = self.rect

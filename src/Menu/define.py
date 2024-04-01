@@ -1,7 +1,7 @@
 import os
 
-WIDTH_SCREEN            = 1920 
-HEIGHT_SCREEN           = 1080
+WIDTH_SCREEN            = 1300
+HEIGHT_SCREEN           = 700
 
 PATH_DIRECTORY                      = os.path.dirname(__file__)
 PATH_TO_BUTTON                      = os.path.join(PATH_DIRECTORY, "assets/imgs/button.png")
