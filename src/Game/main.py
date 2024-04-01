@@ -88,19 +88,25 @@ if __name__ == '__main__':
         # Phát hiện va chạm, debusg:
         items_move_towards_player(player, items_group)
         if player_collide_with_enemies(player, enemies) == True:
-            print('play die')
+            # print('play die')
+            pass
         if player_collide_with_exp_items(player, exp_items) == True:
-            print('yes')
+            # print('yes')
+            pass
         if player_collide_with_energy_items(player, energy_items) == True:
-            print('yesYES')
+            # print('yesYES')
+            pass
         if player_collide_with_hp_items(player, hp_items) == True:
-            print('Heal')
+            # print('Heal')
+            pass
         for enemy in enemies:
             if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites) == True:
-                print('killed')
+                # print('killed')
+                pass
         for elite in elites:
             if elite_collide_with_player_bullets(elite, player_bullets) == True:
-                print('Elite slain!')
+                # print('Elite slain!')
+                pass
         
         # Cập nhật màn hình trò chơi
         camera.update(player)
@@ -111,7 +117,6 @@ if __name__ == '__main__':
         elites.update(camera, clock, player_new_pos, elite_bullets, all_sprites)
         elite_bullets.update()
 
-        
         # Vẽ tất cả các sprite ra màn hình
         for entity in all_sprites:
             SCREEN.blit(entity.surf, camera.apply(entity)) 

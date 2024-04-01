@@ -44,7 +44,7 @@ def player_collide_with_enemies(player, enemies):
 def player_collide_with_exp_items(player, exp_items):
     for exp in exp_items:
         if pygame.sprite.collide_rect(player, exp):
-            player.exp += 25
+            player.exp += 1
             exp.kill()
             return True
     return False
@@ -53,8 +53,8 @@ def player_collide_with_energy_items(player, energy_items):
     for ener in energy_items:
         if pygame.sprite.collide_rect(player, ener):
             player.energy += 25
-            if player.energy >= player.bar_maximum_energy:
-                player.energy = player.bar_maximum_energy
+            if player.energy >= player.maximum_energy:
+                player.energy = player.maximum_energy
             ener.kill()
             return True
     return False
@@ -63,8 +63,8 @@ def player_collide_with_hp_items(player, hp_items):
     for hp in hp_items:
         if pygame.sprite.collide_rect(player, hp):
             player.health += 10
-            if player.health >= player.bar_maximum_health:
-                player.health = player.bar_maximum_health
+            if player.health >= player.maximum_health:
+                player.health = player.maximum_health
             hp.kill()
             return True
     return False
@@ -103,7 +103,7 @@ def elite_collide_with_player_bullets(elite, player_bullets):
             return True
         else:
             if pygame.sprite.collide_rect(bullet, elite):
-                print('HP remaining: ', elite.hp)
+                # print('HP remaining: ', elite.hp)
                 if elite.get_color() == Purple:
                     elite.set_color(White)
                 else:
