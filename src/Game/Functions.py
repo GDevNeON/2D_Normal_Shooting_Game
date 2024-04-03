@@ -26,7 +26,7 @@ def items_move_towards_player(player, items_group):
                 dx_normalized = 0
                 dy_normalized = 0
             # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
-            item.rect.move_ip(dx_normalized * 5, dy_normalized * 5)
+            item.rect.move_ip(dx_normalized * 10, dy_normalized * 10)
 
 # Các hàm phát hiện va chạm
 def player_collide_with_enemies(player, enemies):
@@ -34,7 +34,6 @@ def player_collide_with_enemies(player, enemies):
         if pygame.sprite.collide_rect(player, enemy):
             player.health -= 10
             enemy.health -= 10
-            print(player.health)
             if player.health == 0:
                 return True
             elif enemy.health == 0:

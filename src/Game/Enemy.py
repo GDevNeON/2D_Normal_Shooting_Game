@@ -87,7 +87,7 @@ class Elite_1(pygame.sprite.Sprite):
         self.size = 100
         self.color = Purple
         self.speed = 20
-        self.hp = 100000
+        self.hp = 1000
         super(Elite_1, self).__init__()
         
         self.surf = pygame.Surface((self.size, self.size))
@@ -182,3 +182,13 @@ class Elite_1(pygame.sprite.Sprite):
     def update(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
         self.move(clock, player_new_pos)
         self.fire_bullets(camera, clock, player_new_pos, elite_bullets, all_sprites)
+
+class Boss_1(pygame.sprite.Sprite):
+    def __init__(self):
+        self.size = 200
+        self.color = Silver
+        self.speed = 20
+        self.hp = 100000
+        super(Elite_1, self).__init__()
+        
+        

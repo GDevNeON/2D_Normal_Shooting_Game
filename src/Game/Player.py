@@ -57,6 +57,10 @@ class Player(pygame.sprite.Sprite):
         self.level = 1
         self.fire_rate = 0.1  # Thời gian giữa các lần bắn đạn (tính bằng giây)
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
+        self.burst = False
+        self.time_since_last_burst_shot = 0
+        self.burst_clock = 0
+        self.burst_time = 5
         
     # Các phương thức get/set
     def get_position_x(self):
@@ -170,6 +174,24 @@ class Player(pygame.sprite.Sprite):
             all_sprites.add(new_bullet)
             # Đặt lại thời gian giữa các lần bắn đạn
             self.time_since_last_shot = 0  
+            
+    def burst_skill(self, camera, clock, player_bullets, all_sprites):
+        self.time_since_last_burst_shot += clock.get_time()/1000
+        
+        if self.time_since_last_burst_shot >= 0.1:
+            mouse = pygame.mouse.get_pos()
+            # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
+            mouse_world_pos1 = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
+            mouse_world_pos2 = (mouse[0] - camera.camera.x - 75, mouse[1] - camera.camera.y - 75)
+            mouse_world_pos3 = (mouse[0] - camera.camera.x + 75, mouse[1] - camera.camera.y + 75)
+            # Tạo viên đạn với vị trí đã chuyển đổi
+            new_bullet1 = Bullet(self, mouse_world_pos1)
+            new_bullet2 = Bullet(self, mouse_world_pos2)
+            new_bullet3 = Bullet(self, mouse_world_pos3)
+            player_bullets.add(new_bullet1, new_bullet2, new_bullet3)
+            all_sprites.add(new_bullet1, new_bullet2, new_bullet3)
+            # Đặt lại thời gian giữa các lần bắn đạn
+            self.time_since_last_burst_shot = 0  
         
     def level_up(self):
         if self.exp >= self.maximum_exp:
@@ -216,9 +238,12 @@ class Player(pygame.sprite.Sprite):
         self.advanced_energy()
         self.advanced_exp()
         self.fire_bullets(camera, clock, player_bullets, all_sprites)
+        if self.burst == True:
+            self.burst_clock += clock.get_time()/1000
+            self.burst_skill(camera, clock, player_bullets, all_sprites)
+            if self.burst_clock >= self.burst_time:
+                self.burst = False
+                self.burst_clock = 0
         self.level_up()
         self.movement(pressed_keys)
         self.update_player()
-        self.level_up()
-        
-            

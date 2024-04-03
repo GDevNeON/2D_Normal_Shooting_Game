@@ -60,6 +60,7 @@ if __name__ == '__main__':
                     running = False
                 elif event.key == K_q and player.energy >= player.maximum_energy:
                     player.energy = 0
+                    player.burst = True
             elif event.type == QUIT:
                 running = False
                 
