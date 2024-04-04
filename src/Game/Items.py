@@ -3,14 +3,24 @@ import math
 
 from DEFINE import *
 
-class ExpItem(pygame.sprite.Sprite):
+# Base class
+class Items(pygame.sprite.Sprite):
+    def __init__(self, target):
+        super(Items, self).__init__()
+        self.size = 0
+        self.color = None
+        self.size = 0
+        self.color = None
+        self.x = target.get_position_x()
+        self.y = target.get_position_y()
+
+# Derived class
+class ExpItem(Items):
     def __init__(self, enemy):
+        super(ExpItem, self).__init__(enemy)
         #ExpItem's base attr
         self.size = 10
         self.color = Lime
-        self.x = enemy.get_position_x()
-        self.y = enemy.get_position_y()
-        super(ExpItem, self).__init__()
         
         # ExpItem's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -27,14 +37,12 @@ class ExpItem(pygame.sprite.Sprite):
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect(center = self.rect.center)
         
-class EnergyItem(pygame.sprite.Sprite):
+class EnergyItem(Items):
     def __init__(self, enemy):
+        super(EnergyItem, self).__init__(enemy)
         # EnergyItem's base attr
         self.size = 15
         self.color = Blue
-        self.x = enemy.get_position_x()
-        self.y = enemy.get_position_y()
-        super(EnergyItem, self).__init__()
 
         # EnergyItem's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -46,14 +54,12 @@ class EnergyItem(pygame.sprite.Sprite):
             )
         )
         
-class HpItem(pygame.sprite.Sprite):
+class HpItem(Items):
     def __init__(self, enemy):
+        super(HpItem, self).__init__(enemy)
         # HpItem's base attr
         self.size = 17
         self.color = Red
-        self.x = enemy.get_position_x()
-        self.y = enemy.get_position_y()
-        super(HpItem, self).__init__()
 
         # HpItem's surf attr
         self.surf = pygame.Surface((self.size, self.size))
@@ -67,12 +73,12 @@ class HpItem(pygame.sprite.Sprite):
         
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, current, target):
+        super(Bullet, self).__init__()
         # Bullet's base attr
         self.size = 20
         self.color = Yellow
         self.speed = 20
         self.damage = 100
-        super(Bullet, self).__init__()
           
         # Bullet's position attr
         self.x = current.get_position_x()
