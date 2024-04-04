@@ -32,14 +32,14 @@ if __name__ == '__main__':
     # Tạo ra 1 object
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
-    player = Player()
+    player = Player_Male()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
     player_new_color = player.get_color()
     player_new_pos = (player.get_position_x(), player.get_position_y())
     all_sprites.add(player)
     
-    enemy = Enemy(player.rect)
+    enemy = Normal(player)
     enemy_new_size = enemy.get_size()
     enemy_new_speed = enemy.get_speed()
     enemy_new_color = enemy.get_color()
@@ -67,7 +67,7 @@ if __name__ == '__main__':
             # Các sự kiện của Enemy
             if event.type == ADD_ENEMY:
                 for _ in range(10):  # Tạo 10 kẻ địch
-                    new_enemy = Enemy(player.rect)
+                    new_enemy = Normal(player)
                     new_enemy.set_size(enemy_new_size)
                     new_enemy.set_speed(enemy_new_speed)
                     new_enemy.set_color(enemy_new_color)
@@ -113,7 +113,7 @@ if __name__ == '__main__':
         camera.update(player)
         player.update(clock, camera, pressed_keys, player_bullets, all_sprites)
         player_bullets.update()
-        enemies.update(player.rect)
+        enemies.update(player)
         player_new_pos = (player.get_position_x(), player.get_position_y())
         elites.update(camera, clock, player_new_pos, elite_bullets, all_sprites)
         elite_bullets.update()
