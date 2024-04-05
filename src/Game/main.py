@@ -1,4 +1,7 @@
 import pygame
+import sys
+sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Menu")
+import GUI # type: ignore
 
 from DEFINE     import *
 from Camera     import *
@@ -48,6 +51,7 @@ if __name__ == '__main__':
     # Gameplay chạy trong này
     running = True
     while running:
+        GUI.Run_User_Interface()
         pressed_keys = pygame.key.get_pressed()
         clicked_mouse = pygame.mouse.get_pressed()
         SCREEN.fill(Black)

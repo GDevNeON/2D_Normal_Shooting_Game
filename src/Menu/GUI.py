@@ -1,5 +1,9 @@
 import pygame
 import os
+import sys
+sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Game")
+import main # type: ignore
+
 
 from pygame.locals import *
 from pygame.font import Font
@@ -60,6 +64,10 @@ def draw_text(text, font, text_color, x, y):
     img = font.render(text, True, text_color)
     screen.blit(img, (x, y))
 
+def draw_map(img, scale, x, y):
+    sub_img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
+    screen.blit(sub_img, (x, y))
+
 
 def Run_User_Interface():
     #Đường dẫn của background img
@@ -77,6 +85,8 @@ def Run_User_Interface():
     path_button_settings_close = pygame.image.load(PATH_TO_CLOSE_BUTTON).convert_alpha() 
     path_button_back = pygame.image.load(PATH_TO_BACK_BUTTON).convert_alpha()
     path_button_select = pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha()
+    map_1 = pygame.image.load(PATH_TO_MAP_1).convert_alpha()
+    map_2 = pygame.image.load(PATH_TO_MAP_2).convert_alpha()
     
     #Tính toán vị trí của button
     button_width, button_height = path_button_image.get_width() * 0.4, path_button_image.get_height() * 0.3
@@ -95,16 +105,24 @@ def Run_User_Interface():
     button_audio_setting_menu = Button_image(410, 180, path_button_settings_audio, 0.5)
     button_close_setting_menu = Button_image(1120, 90, path_button_settings_close, 0.1)
 
-    button_back = Button_image(5, 5, path_button_back, 0.1)
-    button_select = Button_Text(0, 0, screen_center_x - button_width / 2, five_six_height - button_height / 2 - button_spacing, "Select", path_button_select, 0.15)
+    button_back = Button_image(0, 0, path_button_back, 0.1)
+    button_select = Button_Text(0, 0, (screen_center_x - button_width / 2) + 10, five_six_height - button_height / 2 - button_spacing, "Select", path_button_select, 0.15)
 
-    #Biến bật/tắt các menu con
+    left = pygame.image.load(PATH_TO_ARROW).convert_alpha()
+    right = pygame.image.load(PATH_TO_ARROW).convert_alpha()
+
+    left_arrow = Button_image(270, 300, pygame.transform.rotate(left, 180), 0.025)
+    right_arrow = Button_image(1000, 300, right, 0.025)
+
+
+    #Biến bật/tắt các menu con, biến đánh dấu
     check_switch_play = False
     check_switch_settings = False
-
+    check_swich_button_in_menu_setting = True
+    current_map_index = 0   
+    
     running = True
     while running:
-
         screen.blit(main_background, (0,0))
 
         if check_switch_play == True:
@@ -116,12 +134,25 @@ def Run_User_Interface():
             button_back.draw()
             button_select.draw_button(BLACK_COLOR)
 
+            left_arrow.draw()
+            right_arrow.draw()
+            
+            if current_map_index == 0:
+                draw_map(map_1, 0.65, 437, 200)
+            else: 
+                draw_map(map_2, 0.5, 442, 150)
+
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_back.is_clicked():
                         check_switch_play = False
                     elif button_select.is_clicked():
-                        print("play button is clicked")
+                        # bỏ hàm run vào đây
+                        print("Select Button is clicked")
+                    if left_arrow.is_clicked():
+                        current_map_index = (current_map_index - 1) % 2
+                    elif right_arrow.is_clicked():
+                        current_map_index = (current_map_index + 1) % 2
 
         elif check_switch_settings == True:
             overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
@@ -138,16 +169,32 @@ def Run_User_Interface():
             pygame.draw.rect(settings_menu_surface, (0, 0, 0), settings_menu_surface.get_rect(), 2)
             screen.blit(settings_menu_surface, (settings_menu_x, settings_menu_y))
             
-            button_audio_setting_menu.draw()
             button_video_setting_menu.draw()
+            button_audio_setting_menu.draw()
             button_close_setting_menu.draw()
 
             draw_text("Setting Menu", font1, WHITE_COLOR, 585, 120)
+            
+            if check_swich_button_in_menu_setting == True:
+                draw_text("Resolution:", font1, WHITE_COLOR, 220, 250)
+                draw_text("Video Mode:", font1, WHITE_COLOR ,220, 450)
+                draw_text("1920 x 1080", font1, WHITE_COLOR, 480, 250)
+                draw_text("1344 x 750", font1, WHITE_COLOR, 480, 350)
+                draw_text("Fullscreen", font1, WHITE_COLOR, 480, 450)
+                draw_text("Window", font1, WHITE_COLOR, 480, 550)
+            else:
+                draw_text("Music:", font1, WHITE_COLOR, 220, 280)
+                draw_text("Mute", font1, WHITE_COLOR, 480,280)
+                draw_text("Unmute", font1, WHITE_COLOR, 480,380)
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_close_setting_menu.is_clicked():
                         check_switch_settings = False
+                    if button_audio_setting_menu.is_clicked():
+                        check_swich_button_in_menu_setting = False
+                    elif button_video_setting_menu.is_clicked():
+                        check_swich_button_in_menu_setting = True
         else:
             button_play.draw_button(WHITE_COLOR)
             button_setting.draw_button(WHITE_COLOR)
