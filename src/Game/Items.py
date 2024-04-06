@@ -9,8 +9,6 @@ class Items(pygame.sprite.Sprite):
         super(Items, self).__init__()
         self.size = 0
         self.color = None
-        self.size = 0
-        self.color = None
         self.x = target.get_position_x()
         self.y = target.get_position_y()
 
@@ -87,6 +85,8 @@ class Bullet(pygame.sprite.Sprite):
         self.dy = 0
         self.dx_normalized = 0
         self.dy_normalized = 0
+        self.distance = 0
+        self.distance_limit = 400
 
         # Bullet's target attr
         self.target_x, self.target_y = target
@@ -96,8 +96,8 @@ class Bullet(pygame.sprite.Sprite):
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect(
             center = (
-                current.get_position_x() + current.get_size()/2, 
-                current.get_position_y() + current.get_size()/2
+                current.get_position_x(),
+                current.get_position_y()
             )
         )
     
@@ -118,6 +118,7 @@ class Bullet(pygame.sprite.Sprite):
             self.dy_normalized = 0
 
         self.rect.move_ip(self.dx_normalized * self.speed, self.dy_normalized * self.speed)    
-        if self.dx_normalized >= SCREEN_WIDTH or self.dy_normalized >= SCREEN_HEIGHT:
+        self.distance = math.sqrt((self.rect.centerx - self.x)**2 + (self.rect.centery - self.y)**2)
+        if self.distance > self.distance_limit:
             self.kill()
         
