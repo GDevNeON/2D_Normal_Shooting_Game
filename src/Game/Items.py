@@ -3,12 +3,18 @@ import math
 import os
 
 from DEFINE import *
+from pathlib import Path
 
-exp_sprite = os.path.join('.', 'exp_item.png')
-energy_sprite = os.path.join('.', 'energy_item.png')
-hp_sprite = os.path.join('.', 'hp_item.png')
-player_bullet_sprite = os.path.join('.', 'player_bullet.png')
-dir_path = os.path.join('.', 'Sprites')
+cwd = Path.cwd()
+mod_path = Path(__file__).parent
+relative_path_1 = "../2D Normal Shooting Game/Sprites/Players/exp_item.png"
+relative_path_2 = "../2D Normal Shooting Game/Sprites/Players/energy_item.png"
+relative_path_3 = "../2D Normal Shooting Game/Sprites/Players/hp_item.png"
+relative_path_4 = "../2D Normal Shooting Game/Sprites/Players/player_bullet.png"
+exp_sprite              = (mod_path / relative_path_1).resolve()
+energy_sprite           = (mod_path / relative_path_2).resolve()
+hp_sprite               = (mod_path / relative_path_3).resolve()
+player_bullet_sprite    = (mod_path / relative_path_4).resolve()
 # Base class
 class Items(pygame.sprite.Sprite):
     def __init__(self, target):
