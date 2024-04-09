@@ -1,5 +1,6 @@
 import pygame
 import math
+import os
 
 from DEFINE import *
 
@@ -8,7 +9,6 @@ class Items(pygame.sprite.Sprite):
     def __init__(self, target):
         super(Items, self).__init__()
         self.size = 0
-        self.color = None
         self.x = target.get_position_x()
         self.y = target.get_position_y()
 
@@ -17,12 +17,15 @@ class ExpItem(Items):
     def __init__(self, enemy):
         super(ExpItem, self).__init__(enemy)
         #ExpItem's base attr
-        self.size = 10
-        self.color = Lime
+        self.image = pygame.image.load("C:\\Users\\Admin\\Downloads\\2D_Normal_Shooting_Game-main (2)\\2D_Normal_Shooting_Game-main\\src\\Game\\item_exp.png").convert()
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+        self.size = self.image.get_size()
+        # create a 2x bigger image than self.image
+        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
+        # draw bigger image to screen at x=100 y=100 position
+        self.surf = self.bigger_img
         
         # ExpItem's surf attr
-        self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -31,8 +34,6 @@ class ExpItem(Items):
         )
         
     def update(self):
-        self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
         self.rect = self.surf.get_rect(center = self.rect.center)
         
 class EnergyItem(Items):
@@ -70,11 +71,11 @@ class HpItem(Items):
         )
         
 class Bullet(pygame.sprite.Sprite):
+    file_path = os.path('.','player_bullet.png')
     def __init__(self, current, target):
         super(Bullet, self).__init__()
         # Bullet's base attr
         self.size = 20
-        self.color = Yellow
         self.speed = 20
         self.damage = 100
           
@@ -92,7 +93,13 @@ class Bullet(pygame.sprite.Sprite):
         self.target_x, self.target_y = target
         
         # Bullet's surf attr
-        self.surf = pygame.Surface((self.size, self.size))
+        self.image = pygame.image.load(file_path).convert()
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+        self.size = self.image.get_size()
+        # create a 2x bigger image than self.image
+        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
+        # draw bigger image to screen at x=100 y=100 position
+        self.surf = self.bigger_img
         self.surf.fill(self.color)
         self.rect = self.surf.get_rect(
             center = (
@@ -103,7 +110,6 @@ class Bullet(pygame.sprite.Sprite):
     
     def update(self):
         self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
         self.rect = self.surf.get_rect(center = self.rect.center)
 
         self.dx = self.target_x - self.x
