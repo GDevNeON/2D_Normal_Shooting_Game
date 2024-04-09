@@ -16,7 +16,7 @@ pygame.mixer.init()
 pygame.init()
 
 
-if __name__ == '__main__':
+def Run_Game():
     clock = pygame.time.Clock()
     
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
@@ -132,3 +132,6 @@ if __name__ == '__main__':
         clock.tick(FPS)
     
     pygame.quit()
+
+if __name__ == '__main__':
+    Run_Game()
