@@ -29,11 +29,10 @@ class ExpItem(Items):
         super(ExpItem, self).__init__(enemy)
         # ExpItem's surf attr
         self.image = pygame.image.load(exp_sprite).convert()
-        self.image.set_colorkey(White, RLEACCEL)
+        self.image.set_colorkey((255,255,255))
         self.size = self.image.get_size()
-        # create a 2x bigger image than self.image
-        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
-        self.surf = self.bigger_img
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/2.3), int(self.size[1]/2.3)))
+        self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -49,11 +48,10 @@ class EnergyItem(Items):
         super(EnergyItem, self).__init__(enemy)
         # EnergyItem's surf attr
         self.image = pygame.image.load(energy_sprite).convert()
-        self.image.set_colorkey(White, RLEACCEL)
+        self.image.set_colorkey((255,255,255))
         self.size = self.image.get_size()
-        # create a 2x bigger image than self.image
-        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
-        self.surf = self.bigger_img
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/1.8), int(self.size[1]/1.8)))
+        self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -66,11 +64,10 @@ class HpItem(Items):
         super(HpItem, self).__init__(enemy)
         # HpItem's surf attr
         self.image = pygame.image.load(hp_sprite).convert()
-        self.image.set_colorkey(White, RLEACCEL)
+        self.image.set_colorkey((255,255,255))
         self.size = self.image.get_size()
-        # create a 2x bigger image than self.image
-        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
-        self.surf = self.bigger_img
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/2.8), int(self.size[1]/2.8)))
+        self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -102,9 +99,8 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.image.load(player_bullet_sprite).convert()
         self.image.set_colorkey(White, RLEACCEL)
         self.size = self.image.get_size()
-        # create a 2x bigger image than self.image
-        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*5), int(self.size[1]*5)))
-        self.surf = self.bigger_img
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/1.5), int(self.size[1]/1.5)))
+        self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
                 current.get_position_x(),
