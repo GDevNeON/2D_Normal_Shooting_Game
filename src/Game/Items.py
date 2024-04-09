@@ -4,6 +4,11 @@ import os
 
 from DEFINE import *
 
+exp_sprite = os.path.join('.', 'exp_item.png')
+energy_sprite = os.path.join('.', 'energy_item.png')
+hp_sprite = os.path.join('.', 'hp_item.png')
+player_bullet_sprite = os.path.join('.', 'player_bullet.png')
+dir_path = os.path.join('.', 'Sprites')
 # Base class
 class Items(pygame.sprite.Sprite):
     def __init__(self, target):
@@ -16,8 +21,8 @@ class Items(pygame.sprite.Sprite):
 class ExpItem(Items):
     def __init__(self, enemy):
         super(ExpItem, self).__init__(enemy)
-        #ExpItem's base attr
-        self.image = pygame.image.load("C:\\Users\\Admin\\Downloads\\2D_Normal_Shooting_Game-main (2)\\2D_Normal_Shooting_Game-main\\src\\Game\\item_exp.png").convert()
+        # ExpItem's surf attr
+        self.image = pygame.image.load(exp_sprite).convert()
         self.image.set_colorkey((255, 255, 255), RLEACCEL)
         self.size = self.image.get_size()
         # create a 2x bigger image than self.image
@@ -25,7 +30,6 @@ class ExpItem(Items):
         # draw bigger image to screen at x=100 y=100 position
         self.surf = self.bigger_img
         
-        # ExpItem's surf attr
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -39,13 +43,15 @@ class ExpItem(Items):
 class EnergyItem(Items):
     def __init__(self, enemy):
         super(EnergyItem, self).__init__(enemy)
-        # EnergyItem's base attr
-        self.size = 15
-        self.color = Blue
-
         # EnergyItem's surf attr
+        self.image = pygame.image.load(energy_sprite).convert()
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+        self.size = self.image.get_size()
+        # create a 2x bigger image than self.image
+        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
+        # draw bigger image to screen at x=100 y=100 position
+        self.surf = self.bigger_img
         self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -56,13 +62,16 @@ class EnergyItem(Items):
 class HpItem(Items):
     def __init__(self, enemy):
         super(HpItem, self).__init__(enemy)
-        # HpItem's base attr
-        self.size = 17
-        self.color = Red
-
         # HpItem's surf attr
+        self.image = pygame.image.load(energy_sprite).convert()
+        self.image.set_colorkey((255, 255, 255), RLEACCEL)
+        self.size = self.image.get_size()
+        # create a 2x bigger image than self.image
+        self.bigger_img = pygame.transform.scale(self.image, (int(self.size[0]*2), int(self.size[1]*2)))
+        # draw bigger image to screen at x=100 y=100 position
+        self.surf = self.bigger_img
+
         self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
         self.rect = self.surf.get_rect(
             center = (
                 self.x + enemy.get_size()/2, 
@@ -71,7 +80,6 @@ class HpItem(Items):
         )
         
 class Bullet(pygame.sprite.Sprite):
-    file_path = os.path('.','player_bullet.png')
     def __init__(self, current, target):
         super(Bullet, self).__init__()
         # Bullet's base attr
@@ -93,7 +101,7 @@ class Bullet(pygame.sprite.Sprite):
         self.target_x, self.target_y = target
         
         # Bullet's surf attr
-        self.image = pygame.image.load(file_path).convert()
+        self.image = pygame.image.load(exp_sprite).convert()
         self.image.set_colorkey((255, 255, 255), RLEACCEL)
         self.size = self.image.get_size()
         # create a 2x bigger image than self.image
