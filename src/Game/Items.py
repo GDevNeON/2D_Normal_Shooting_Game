@@ -1,20 +1,9 @@
 import pygame
 import math
-import os
 
 from DEFINE import *
-from pathlib import Path
+from Image import *
 
-cwd = Path.cwd()
-mod_path = Path(__file__).parent
-exp = "../../Sprites/Players/exp_item.png"
-energy = "../../Sprites/Players/energy_item.png"
-hp = "../../Sprites/Players/hp_item.png"
-bullet_player = "../../Sprites/Players/player_bullet.png"
-exp_sprite              = (mod_path / exp).resolve()
-energy_sprite           = (mod_path / energy).resolve()
-hp_sprite               = (mod_path / hp).resolve()
-player_bullet_sprite    = (mod_path / bullet_player).resolve()
 # Base class
 class Items(pygame.sprite.Sprite):
     def __init__(self, target):
@@ -31,7 +20,8 @@ class ExpItem(Items):
         self.image = pygame.image.load(exp_sprite).convert()
         self.image.set_colorkey((255,255,255))
         self.size = self.image.get_size()
-        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/2.3), int(self.size[1]/2.3)))
+        self.size_ratio = 3.5
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
@@ -50,7 +40,8 @@ class EnergyItem(Items):
         self.image = pygame.image.load(energy_sprite).convert()
         self.image.set_colorkey((255,255,255))
         self.size = self.image.get_size()
-        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/1.8), int(self.size[1]/1.8)))
+        self.size_ratio = 3.5
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
@@ -66,7 +57,8 @@ class HpItem(Items):
         self.image = pygame.image.load(hp_sprite).convert()
         self.image.set_colorkey((255,255,255))
         self.size = self.image.get_size()
-        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/2.8), int(self.size[1]/2.8)))
+        self.size_ratio = 4
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (
@@ -99,7 +91,8 @@ class Bullet(pygame.sprite.Sprite):
         self.image = pygame.image.load(player_bullet_sprite).convert()
         self.image.set_colorkey(White, RLEACCEL)
         self.size = self.image.get_size()
-        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/1.5), int(self.size[1]/1.5)))
+        self.size_ratio = 1.5
+        self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
             center = (

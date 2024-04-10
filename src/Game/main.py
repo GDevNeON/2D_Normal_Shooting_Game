@@ -9,6 +9,7 @@ from Player     import *
 from Enemy      import *
 from Items      import *
 from Functions  import *
+from Image      import *
 
 
 # Init âm thanh, pygame
@@ -54,7 +55,7 @@ def Run_Game():
         # GUI.Run_User_Interface()
         pressed_keys = pygame.key.get_pressed()
         clicked_mouse = pygame.mouse.get_pressed()
-        SCREEN.fill(Black)
+        background = pygame.image.load(background_sprite).convert()
 
         # Xử lý sự kiện (Event Handling)
         for event in pygame.event.get():
@@ -122,6 +123,9 @@ def Run_Game():
         elites.update(camera, clock, player_new_pos, elite_bullets, all_sprites)
         elite_bullets.update()
 
+        for x in range(0, LEVEL_WIDTH, background.get_width()):
+            for y in range(0, LEVEL_HEIGHT, background.get_height()):
+                SCREEN.blit(background, (x, y))
         # Vẽ tất cả các sprite ra màn hình
         for entity in all_sprites:
             SCREEN.blit(entity.surf, camera.apply(entity)) 
