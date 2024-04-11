@@ -179,15 +179,19 @@ class Player(pygame.sprite.Sprite):
             print("max_health", self.maximum_health)
             print("max_ex", self.maximum_exp)
             
-    def movement(self, pressed_keys):
+    def movement(self, pressed_keys, bg):
         if pressed_keys[K_w]:
             self.rect.move_ip(0, -self.speed)
+            bg.y += self.speed
         if pressed_keys[K_s]:
             self.rect.move_ip(0, self.speed)
+            bg.y -= self.speed
         if pressed_keys[K_a]:
             self.rect.move_ip(-self.speed, 0)
+            bg.x += self.speed
         if pressed_keys[K_d]:
             self.rect.move_ip(self.speed, 0)
+            bg.x -= self.speed
         
         if self.rect.left < 0:
             self.rect.left = 0
@@ -199,7 +203,7 @@ class Player(pygame.sprite.Sprite):
             self.rect.bottom = LEVEL_HEIGHT
             
     # Hàm cập nhật trạng thái Player
-    def update(self, clock, camera, pressed_keys, player_bullets, all_sprites):
+    def update(self, clock, camera, pressed_keys, player_bullets, all_sprites, background):
         # self.basic_health()
         self.advanced_health()
         self.advanced_energy()
@@ -214,7 +218,7 @@ class Player(pygame.sprite.Sprite):
                 self.burst = False
                 self.burst_clock = 0
         self.level_up()
-        self.movement(pressed_keys)
+        self.movement(pressed_keys, background)
 
 
 # Derived class
