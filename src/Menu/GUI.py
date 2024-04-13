@@ -119,7 +119,7 @@ def Run_User_Interface():
     check_switch_play = False
     check_switch_settings = False
     check_swich_button_in_menu_setting = True
-    current_map_index = 0   
+    current_map_index = 1   
     
     running = True
     while running:
@@ -147,12 +147,14 @@ def Run_User_Interface():
                     if button_back.is_clicked():
                         check_switch_play = False
                     elif button_select.is_clicked():
-                        # bỏ hàm run vào đây
-                        print("Select Button is clicked")
+                        running = False
+                        # print("Select Button is clicked")
                     if left_arrow.is_clicked():
-                        current_map_index = (current_map_index - 1) % 2
+                        # current_map_index = (current_map_index - 1) % 2
+                        current_map_index = 1
                     elif right_arrow.is_clicked():
-                        current_map_index = (current_map_index + 1) % 2
+                        # current_map_index = (current_map_index + 1) % 2
+                        current_map_index = 0
 
         elif check_switch_settings == True:
             overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
@@ -210,10 +212,10 @@ def Run_User_Interface():
                     check_switch_settings = True
                         
                 if button_quit.is_clicked():
-                    running = False
+                    # running = False
+                    pygame.quit()
         pygame.display.update()
-
-    pygame.quit()
+    main.Run_Game()
 
 if __name__ == "__main__":
     Run_User_Interface()

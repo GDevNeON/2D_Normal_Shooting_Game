@@ -219,6 +219,8 @@ class Player(pygame.sprite.Sprite):
                 self.burst_clock = 0
         self.level_up()
         self.movement(pressed_keys, background)
+    def get_Current_Health(self):
+        return self.current_health
 
 
 # Derived class
