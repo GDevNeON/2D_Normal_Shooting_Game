@@ -4,7 +4,7 @@ cwd = Path.cwd()
 
 mod_path = Path(__file__).parent
 
-background      = "../../Sprites/Backgrounds/grassfield.png"
+background      = "../../Sprites/Backgrounds/dungeon.png"
 exp             = "../../Sprites/Players/exp_item.png"
 energy          = "../../Sprites/Players/energy_item.png"
 hp              = "../../Sprites/Players/hp_item.png"

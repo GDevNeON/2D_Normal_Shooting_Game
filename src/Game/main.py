@@ -58,7 +58,7 @@ def Run_Game():
         # GUI.Run_User_Interface()
         pressed_keys = pygame.key.get_pressed()
         clicked_mouse = pygame.mouse.get_pressed()
-        
+        SCREEN.fill(Black)
 
         # Xử lý sự kiện (Event Handling)
         for event in pygame.event.get():
@@ -118,11 +118,6 @@ def Run_Game():
                 pass
         
         background.blitting(SCREEN)
-        # if i + (SCREEN_WIDTH - background.get_width()) <= -(background.get_width() + (SCREEN_WIDTH - background.get_width())):
-        #     SCREEN.blit(background, (i + background.get_width(), 0))
-        #     i = 0
-        # i -= 5
-        # Vẽ tất cả các sprite ra màn hình
         for entity in all_sprites:
             SCREEN.blit(entity.surf, camera.apply(entity)) 
 

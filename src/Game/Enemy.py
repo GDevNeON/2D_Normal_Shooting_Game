@@ -160,3 +160,6 @@ class Elite_1(Enemy):
         self.move(clock, player_new_pos)
         self.fire_bullets(camera, clock, player_new_pos, elite_bullets, all_sprites)
                
+class Boss(Enemy):
+    def __init__(self, player):
+        super(Boss, self).__init__(player)

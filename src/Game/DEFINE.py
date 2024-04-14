@@ -1,26 +1,17 @@
 import pygame
 
 from pygame.locals import (
-    RLEACCEL,
-    USEREVENT,
-    FULLSCREEN,
-    RESIZABLE,
-    K_w,
-    K_a, 
-    K_s, 
-    K_d,
-    K_q,
-    K_ESCAPE,
-    KEYDOWN,
-    QUIT,
+    RLEACCEL, USEREVENT, FULLSCREEN, RESIZABLE,
+    K_w, K_a, K_s, K_d, K_q,
+    K_ESCAPE, KEYDOWN, QUIT,
 )
 
 # Set FPS cho game
 FPS = 60
 
 # Screen resolution
-LEVEL_WIDTH     = 10000
-LEVEL_HEIGHT    = 6000
+LEVEL_WIDTH     = 5000
+LEVEL_HEIGHT    = 5000
 SCREEN_WIDTH    = 1344
 SCREEN_HEIGHT   = 750
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), RESIZABLE)
