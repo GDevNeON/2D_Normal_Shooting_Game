@@ -182,19 +182,23 @@ class Player(pygame.sprite.Sprite):
     def movement(self, pressed_keys, bg):
         if pressed_keys[K_w]:
             self.rect.move_ip(0, -self.speed)
-            if self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2:
+            if (self.get_position_y() >= SCREEN_HEIGHT/2
+                and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
                 bg.y += self.speed
         if pressed_keys[K_s]:
             self.rect.move_ip(0, self.speed)
-            if self.get_position_y() >= -(LEVEL_HEIGHT - SCREEN_HEIGHT/2):
+            if (self.get_position_y() >= SCREEN_HEIGHT/2
+                and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
                 bg.y -= self.speed
         if pressed_keys[K_a]:
             self.rect.move_ip(-self.speed, 0)
-            if self.get_position_x() >= -(LEVEL_WIDTH - SCREEN_WIDTH/2):
+            if (self.get_position_x() >= SCREEN_WIDTH/2
+                and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
                 bg.x += self.speed
         if pressed_keys[K_d]:
             self.rect.move_ip(self.speed, 0)
-            if self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2:
+            if (self.get_position_x() >= SCREEN_WIDTH/2
+                and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
                 bg.x -= self.speed
         
         if self.rect.left < 0:
