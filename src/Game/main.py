@@ -1,7 +1,7 @@
 import pygame
-# import sys
-# sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Menu")
-# import GUI # type: ignore
+import sys
+sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Menu")
+import GUI # type: ignore
 
 from DEFINE     import *
 from Camera     import *
@@ -132,9 +132,13 @@ def Run_Game():
         pygame.display.update()
         
         clock.tick(FPS)
-    
+        if player.get_Current_Health() == 0:
+            running = False
+
+    GUI.Run_User_Interface()
     pygame.quit()
 
 
 if __name__ == '__main__':
-    Run_Game()
+    # Run_Game()
+    GUI.Run_User_Interface()
