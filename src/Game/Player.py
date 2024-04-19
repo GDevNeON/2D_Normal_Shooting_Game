@@ -19,7 +19,7 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         # Player's base attr
         self.size = 25
-        self.speed = 4
+        self.speed = 2
         
         # Player's health attr 
         self.current_health = 100
@@ -262,11 +262,8 @@ class Player_Male(Player):
             self.idle_index = 0
             
         if self.idle_time >= 250:
-            if self.move_left == True:
+            if self.move_left == False and self.move_right == False:
                 self.surf = male_idle_sprite[self.idle_index]
-            elif self.move_right == True:
-                reverse = pygame.transform.flip(male_idle_sprite[self.idle_index], True, False)
-                self.surf = reverse
             self.idle_index += 1
             self.idle_time = 0
         
@@ -325,7 +322,7 @@ class Player_Male(Player):
             
     def burst_(self, camera, clock, player_bullets, all_sprites):
         if self.burst == True:
-            self.fire_rate = 400
+            self.fire_rate = 200
             self.burst_clock += clock.get_time()
             self.burst_skill(camera, clock, player_bullets, all_sprites)
             if self.burst_clock >= self.burst_time:
@@ -352,11 +349,8 @@ class Player_Female(Player):
             self.idle_index = 0
             
         if self.idle_time >= 250:
-            if self.move_left == True:
+            if self.move_left == False and self.move_right == False:
                 self.surf = female_idle_sprite[self.idle_index]
-            elif self.move_right == True:
-                reverse = pygame.transform.flip(female_idle_sprite[self.idle_index], True, False)
-                self.surf = reverse
             self.idle_index += 1
             self.idle_time = 0
         
@@ -365,7 +359,7 @@ class Player_Female(Player):
         if self.run_index == len(female_run_sprite):
             self.run_index = 0
             
-        if self.run_time >= 100:
+        if self.run_time >= 50:
             if self.move_left == True:
                 self.surf = female_run_sprite[self.run_index]
             elif self.move_right == True:

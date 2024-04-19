@@ -18,11 +18,11 @@ class ExpItem(Items):
     def __init__(self, enemy):
         super(ExpItem, self).__init__(enemy)
         # ExpItem's surf attr
-        self.image = pygame.image.load(exp_sprite).convert()
+        self.image = exp_sprite
         # set_colorkey được dùng để làm cho vùng màu trên sprite trùng với màu đc truyền vào hàm trở thành trong suốt
         self.image.set_colorkey(White)
         self.size = self.image.get_size()
-        self.size_ratio = 3.5
+        self.size_ratio = 4.5
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
@@ -39,10 +39,10 @@ class EnergyItem(Items):
     def __init__(self, enemy):
         super(EnergyItem, self).__init__(enemy)
         # EnergyItem's surf attr
-        self.image = pygame.image.load(energy_sprite).convert()
+        self.image = energy_sprite
         self.image.set_colorkey(White)
         self.size = self.image.get_size()
-        self.size_ratio = 3.5
+        self.size_ratio = 4.5
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
@@ -56,10 +56,10 @@ class HpItem(Items):
     def __init__(self, enemy):
         super(HpItem, self).__init__(enemy)
         # HpItem's surf attr
-        self.image = pygame.image.load(hp_sprite).convert()
+        self.image = hp_sprite
         self.image.set_colorkey(White)
         self.size = self.image.get_size()
-        self.size_ratio = 4
+        self.size_ratio = 5
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(
@@ -97,11 +97,11 @@ class Bullet(pygame.sprite.Sprite):
             return angle_to_mouse
         
         # Bullet's surf attr
-        self.image = pygame.image.load(player_bullet_sprite).convert()
+        self.image = player_bullet_sprite
         self.image = pygame.transform.rotate(self.image, angle(self))
         self.image.set_colorkey(White, RLEACCEL)
         self.size = self.image.get_size()
-        self.size_ratio = 1.5
+        self.size_ratio = 2
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
         self.surf = self.smaller_img
         self.rect = self.surf.get_rect(

@@ -12,17 +12,17 @@ from Items      import *
 from Functions  import *
 from Image      import *
 from Background import *
+from Sounds     import grassplain_boss
 
-
-# Init âm thanh, pygame
-pygame.mixer.init()
 pygame.init()
 
 
 def Run_Game():
     clock = pygame.time.Clock()
-    
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
+    pygame.mixer.music.load(grassplain_boss)
+    pygame.mixer.music.play(loops=-1)
+    
     
     enemies         = pygame.sprite.Group()
     elites          = pygame.sprite.Group()
@@ -38,7 +38,7 @@ def Run_Game():
     # Tạo ra 1 object
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
-    player = Player_Female()
+    player = Player_Male()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
     player_new_pos = (player.get_position_x(), player.get_position_y())
@@ -47,7 +47,6 @@ def Run_Game():
     enemy = Normal(player)
     enemy_new_size = enemy.get_size()
     enemy_new_speed = enemy.get_speed()
-    enemy_new_color = enemy.get_color()
     enemy_new_pos = (enemy.get_position_x(), enemy.get_position_y())
     background = Background(background_sprite)
     
@@ -78,15 +77,10 @@ def Run_Game():
                     new_enemy = Normal(player)
                     new_enemy.set_size(enemy_new_size)
                     new_enemy.set_speed(enemy_new_speed)
-                    new_enemy.set_color(enemy_new_color)
                     enemies.add(new_enemy)
                     all_sprites.add(new_enemy)
             elif event.type == INCREASE_STAT:
                 enemy_new_speed += 1
-                if enemy_new_color == White:
-                    enemy_new_color = Cyan
-                else:
-                    enemy_new_color = White
                  
             # Các sự kiện của enemy Elite
             if event.type == ADD_ELITE:
@@ -125,7 +119,7 @@ def Run_Game():
         camera.update(player)
         player.update(clock, camera, pressed_keys, player_bullets, all_sprites, background)
         player_bullets.update()
-        enemies.update(player)
+        enemies.update(player, clock)
         player_new_pos = (player.get_position_x(), player.get_position_y())
         elites.update(camera, clock, player_new_pos, elite_bullets, all_sprites)
         elite_bullets.update()

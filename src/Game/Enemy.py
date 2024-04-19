@@ -11,14 +11,15 @@ class Enemy(pygame.sprite.Sprite):
         super(Enemy, self).__init__()
         # Enemy's base attr
         self.size = 20
-        self.color = White
+        self.color = None
         self.speed = 1.5
         self.health = 10
 
         # Enemy's surf attr
         self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
         self.rect = self.surf.get_rect()
+        self.sprite_time = 0
+        self.sprite_index = 0
         
         # Tính toán vị trí ngẫu nhiên xung quanh người chơi
         self.generate_random_position(player)
@@ -30,17 +31,17 @@ class Enemy(pygame.sprite.Sprite):
     def get_position_y(self):
         return self.rect.y
     
+    def set_color(self, value):
+        self.color = value
+    
+    def get_color(self):
+        return self.color
+    
     def set_size(self, value):
         self.size = value
         
     def get_size(self):
         return self.size
-    
-    def set_color(self, value):
-        self.color = value
-        
-    def get_color(self):
-        return self.color
     
     def set_speed(self, value):
         self.speed = value
@@ -83,6 +84,43 @@ class Enemy(pygame.sprite.Sprite):
 class Normal(Enemy):
     def __init__(self, player):
         super(Normal, self).__init__(player)
+        self.old_x = self.get_position_x()
+        
+        rand = random.randint(0, 3)
+        if rand == 0:
+            self.sprite = ghost_sprite
+            self.surf = ghost_sprite[0]
+        elif rand == 1:
+            self.sprite = goblin_sprite
+            self.surf = goblin_sprite[0]
+        elif rand == 2:
+            self.sprite = skeleton_sprite
+            self.surf = skeleton_sprite[0]
+        else:
+            self.sprite = slime_sprite
+            self.surf = slime_sprite[0]
+        
+    def load_sprite(self, clock):
+        new_x = self.get_position_x()
+        
+        self.sprite_time += clock.get_time()
+        if self.sprite_index == len(self.sprite):
+            self.sprite_index = 0
+        
+        if self.sprite_time >= 250:
+            if new_x >= self.old_x:
+                self.surf = self.sprite[self.sprite_index]
+            else:
+                reverse = pygame.transform.flip(self.sprite[self.sprite_index], True, False)
+                self.surf = reverse
+            self.sprite_index += 1
+            self.sprite_time = 0
+            
+        self.old_x = new_x
+            
+    def update(self, player, clock):
+        self.load_sprite(clock)
+        self.move_towards_player(player)
 
 class Elite_1(Enemy):
     def __init__(self, player):

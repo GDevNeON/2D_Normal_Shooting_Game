@@ -8,7 +8,7 @@ class Background:
     def __init__(self, background_sprite):
         self.x = 0
         self.y = 0
-        self.background = pygame.image.load(background_sprite).convert()
+        self.background = background_sprite
 
     def blitting(self, screen):
         WIDTH_RATIO = LEVEL_WIDTH / self.background.get_width()
