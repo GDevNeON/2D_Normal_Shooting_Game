@@ -1,3 +1,4 @@
+
 import pygame
 # import sys
 # sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Menu")
@@ -37,10 +38,9 @@ def Run_Game():
     # Tạo ra 1 object
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
-    player = Player_Male()
+    player = Player_Female()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
-    player_new_color = player.get_color()
     player_new_pos = (player.get_position_x(), player.get_position_y())
     all_sprites.add(player)
     

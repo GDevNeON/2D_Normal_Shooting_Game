@@ -1,3 +1,4 @@
+
 import pygame
 import math
 
@@ -18,7 +19,8 @@ class ExpItem(Items):
         super(ExpItem, self).__init__(enemy)
         # ExpItem's surf attr
         self.image = pygame.image.load(exp_sprite).convert()
-        self.image.set_colorkey((255,255,255))
+        # set_colorkey được dùng để làm cho vùng màu trên sprite trùng với màu đc truyền vào hàm trở thành trong suốt
+        self.image.set_colorkey(White)
         self.size = self.image.get_size()
         self.size_ratio = 3.5
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
@@ -38,7 +40,7 @@ class EnergyItem(Items):
         super(EnergyItem, self).__init__(enemy)
         # EnergyItem's surf attr
         self.image = pygame.image.load(energy_sprite).convert()
-        self.image.set_colorkey((255,255,255))
+        self.image.set_colorkey(White)
         self.size = self.image.get_size()
         self.size_ratio = 3.5
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
@@ -55,7 +57,7 @@ class HpItem(Items):
         super(HpItem, self).__init__(enemy)
         # HpItem's surf attr
         self.image = pygame.image.load(hp_sprite).convert()
-        self.image.set_colorkey((255,255,255))
+        self.image.set_colorkey(White)
         self.size = self.image.get_size()
         self.size_ratio = 4
         self.smaller_img = pygame.transform.scale(self.image, (int(self.size[0]/self.size_ratio), int(self.size[1]/self.size_ratio)))
@@ -81,14 +83,22 @@ class Bullet(pygame.sprite.Sprite):
         self.dy = 0
         self.dx_normalized = 0
         self.dy_normalized = 0
+
+        # Bullet's fire range attr
         self.distance = 0
-        self.distance_limit = 400
+        self.distance_limit = 0
 
         # Bullet's target attr
         self.target_x, self.target_y = target
+
+        def angle(self):
+            vector_to_mouse = pygame.math.Vector2(self.target_x - self.x, self.target_y - self.y)
+            angle_to_mouse = math.degrees(math.atan2(*vector_to_mouse)) - 90
+            return angle_to_mouse
         
         # Bullet's surf attr
         self.image = pygame.image.load(player_bullet_sprite).convert()
+        self.image = pygame.transform.rotate(self.image, angle(self))
         self.image.set_colorkey(White, RLEACCEL)
         self.size = self.image.get_size()
         self.size_ratio = 1.5

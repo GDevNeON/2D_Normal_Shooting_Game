@@ -1,7 +1,9 @@
 import pygame
 import math
+import random
 
 from DEFINE import *
+from Image import *
 from Items import *
 from pygame.locals import (
     K_w,
@@ -17,7 +19,6 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         # Player's base attr
         self.size = 25
-        self.color = Red
         self.speed = 4
         
         # Player's health attr 
@@ -45,14 +46,12 @@ class Player(pygame.sprite.Sprite):
         self.exp_change_speed = 1
         
         # Player's surf attr
-        self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
-        self.rect = self.surf.get_rect(
-            center = (
-                (LEVEL_WIDTH-self.surf.get_width())/2,
-                (LEVEL_HEIGHT-self.surf.get_height())/2
-            ) 
-        )
+        self.idle_time = 0
+        self.idle_index = 0
+        self.run_time = 0
+        self.run_index = 0
+        self.surf = None
+        self.rect = None
         
         # Other player's attr
         self.level = 1
@@ -76,17 +75,18 @@ class Player(pygame.sprite.Sprite):
     def get_size(self):
         return self.size
     
-    def set_color(self, value):
-        self.color = value
-        
-    def get_color(self):
-        return self.color
-    
     def set_speed(self, value):
         self.speed = value
         
     def get_speed(self):
         return self.speed
+    
+    # Các hàm animation
+    def idle_anim(self, clock):
+        pass
+    
+    def run_anim(self, clock):
+        pass
     
     # Các hàm phụ cho Player
     def get_damage(self, amount):
@@ -164,6 +164,9 @@ class Player(pygame.sprite.Sprite):
             
     def burst_skill(self, camera, clock, player_bullets, all_sprites):
         pass
+    
+    def burst_(self, camera, clock, player_bullets, all_sprites):
+        pass
         
     def level_up(self):
         if self.exp >= self.maximum_exp:
@@ -213,20 +216,18 @@ class Player(pygame.sprite.Sprite):
     # Hàm cập nhật trạng thái Player
     def update(self, clock, camera, pressed_keys, player_bullets, all_sprites, background):
         # self.basic_health()
+        self.idle_anim(clock)
+        #self.run_anim(clock)
+        
         self.advanced_health()
         self.advanced_energy()
         self.advanced_exp()
+        
         self.fire_bullets(camera, clock, player_bullets, all_sprites)
-        if self.burst == True:
-            self.fire_rate = 100
-            self.burst_clock += clock.get_time()
-            self.burst_skill(camera, clock, player_bullets, all_sprites)
-            if self.burst_clock >= self.burst_time:
-                self.fire_rate = 500
-                self.burst = False
-                self.burst_clock = 0
+        self.burst_(camera, clock, player_bullets, all_sprites)
         self.level_up()
         self.movement(pressed_keys, background)
+        
     def get_Current_Health(self):
         return self.current_health
 
@@ -235,93 +236,130 @@ class Player(pygame.sprite.Sprite):
 class Player_Male(Player):
     def __init__(self):
         super(Player_Male, self).__init__()
-        self.fire_rate = 500
-        self.time_since_last_shot = 0
+        self.fire_rate = 1000
+        self.bullet_amount = 5
+        self.spread_range = 45
+        
+        self.surf = male_idle_sprite[0]
+        self.rect = self.surf.get_rect(
+            center = (
+                (LEVEL_WIDTH-self.surf.get_width())/2,
+                (LEVEL_HEIGHT-self.surf.get_height())/2
+            ) 
+        )
+        
+    def idle_anim(self, clock):
+        self.idle_time += clock.get_time()
+        if self.idle_index == len(male_idle_sprite):
+            self.idle_index = 0
+            
+        if self.idle_time >= 250:
+            self.surf = male_idle_sprite[self.idle_index]
+            self.idle_index += 1
+            self.idle_time = 0
+        
+    def run_anim(self, clock):    
+        self.run_time += clock.get_time()
+        if self.run_index == len(male_run_sprite):
+            self.run_index = 0
+            
+        if self.run_time >= 100:
+            self.surf = male_run_sprite[self.run_index]
+            self.run_index += 1
+            self.run_time = 0
 
     def fire_bullets(self, camera, clock, player_bullets, all_sprites):
-        # Cập nhật thời gian giữa các lần bắn đạn
-        self.time_since_last_shot += clock.get_time()
-
-        # Kiểm tra nếu đủ thời gian để bắn đạn
-        if self.time_since_last_shot >= self.fire_rate:
-            # Lấy tọa độ chuột trên màn hình
+        self.time_since_last_burst_shot += clock.get_time()
+        
+        if self.time_since_last_burst_shot >= self.fire_rate:
             mouse = pygame.mouse.get_pos()
-            # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
-            mouse_world_pos = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
-            # Tạo viên đạn với vị trí đã chuyển đổi
-            new_bullet = Bullet(self, mouse_world_pos)
-            player_bullets.add(new_bullet)
-            all_sprites.add(new_bullet)
+            player_to_mouse = (mouse[0] - camera.camera.x - self.rect.centerx, mouse[1] - camera.camera.y - self.rect.centery)
+            angle_to_mouse = - math.atan2(player_to_mouse[1], player_to_mouse[0])
+
+            for b in range(self.bullet_amount):
+                rand_range = angle_to_mouse + math.radians(random.uniform(-self.spread_range, self.spread_range))
+                bullet_pos = (self.rect.centerx, self.rect.centery)
+                bullet_pos = (bullet_pos[0] + 75 * math.cos(rand_range), bullet_pos[1] - 75 * math.sin(rand_range))
+                new_bullet = Bullet(self, bullet_pos)
+                new_bullet.distance_limit = 200
+                player_bullets.add(new_bullet)
+                all_sprites.add(new_bullet)
+            
             # Đặt lại thời gian giữa các lần bắn đạn
-            self.time_since_last_shot = 0  
+            self.time_since_last_burst_shot = 0
             
     def burst_skill(self, camera, clock, player_bullets, all_sprites):
         self.time_since_last_burst_shot += clock.get_time()
         
-        if self.time_since_last_burst_shot >= 100:
+        if self.time_since_last_burst_shot >= self.fire_rate:
             mouse = pygame.mouse.get_pos()
             player_to_mouse = (mouse[0] - camera.camera.x - self.rect.centerx, mouse[1] - camera.camera.y - self.rect.centery)
             angle_to_mouse = - math.atan2(player_to_mouse[1], player_to_mouse[0])
-            
-            # Tính toán hướng mới cho hai viên đạn cách biệt 10 độ với hướng của chuột
-            new_angle1 = angle_to_mouse + math.radians(10)
-            new_angle2 = angle_to_mouse - math.radians(10)
-            
-            # Tạo viên đạn với hướng mới
-            bullet1_pos = (self.rect.centerx, self.rect.centery)
-            bullet2_pos = (self.rect.centerx, self.rect.centery)
-            
-            # Tính toán vị trí mới của viên đạn theo hướng mới
-            bullet1_pos = (bullet1_pos[0] + 75 * math.cos(new_angle1), bullet1_pos[1] - 75 * math.sin(new_angle1))
-            bullet2_pos = (bullet2_pos[0] + 75 * math.cos(new_angle2), bullet2_pos[1] - 75 * math.sin(new_angle2))
-            
-            # Tạo viên đạn với vị trí và hướng mới
-            new_bullet1 = Bullet(self, bullet1_pos)
-            new_bullet2 = Bullet(self, bullet2_pos)
-            
-            player_bullets.add(new_bullet1, new_bullet2)
-            all_sprites.add(new_bullet1, new_bullet2)
+
+            for b in range(self.bullet_amount):
+                rand_range = angle_to_mouse + math.radians(random.uniform(-self.spread_range, self.spread_range))
+                bullet_pos = (self.rect.centerx, self.rect.centery)
+                bullet_pos = (bullet_pos[0] + 75 * math.cos(rand_range), bullet_pos[1] - 75 * math.sin(rand_range))
+                new_bullet = Bullet(self, bullet_pos)
+                player_bullets.add(new_bullet)
+                all_sprites.add(new_bullet)
             
             # Đặt lại thời gian giữa các lần bắn đạn
             self.time_since_last_burst_shot = 0
-
-    def fire_bullets(self, camera, clock, player_bullets, all_sprites):
-        # Cập nhật thời gian giữa các lần bắn đạn
-        self.time_since_last_shot += clock.get_time()
-        # Kiểm tra nếu đủ thời gian để bắn đạn
-        if self.time_since_last_shot >= self.fire_rate:
-            # Lấy tọa độ chuột trên màn hình
-            mouse = pygame.mouse.get_pos()
-            # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
-            mouse_world_pos = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
-            # Tạo viên đạn với vị trí đã chuyển đổi
-            new_bullet = Bullet(self, mouse_world_pos)
-            player_bullets.add(new_bullet)
-            all_sprites.add(new_bullet)
-            # Đặt lại thời gian giữa các lần bắn đạn
-            self.time_since_last_shot = 0
+            
+    def burst_(self, camera, clock, player_bullets, all_sprites):
+        if self.burst == True:
+            self.fire_rate = 400
+            self.burst_clock += clock.get_time()
+            self.burst_skill(camera, clock, player_bullets, all_sprites)
+            if self.burst_clock >= self.burst_time:
+                self.fire_rate = 1000
+                self.burst = False
+                self.burst_clock = 0
 
 class Player_Female(Player):
     def __init__(self):
         super(Player_Female, self).__init__()
-        self.fire_rate = 1000
-        self.time_since_last_shot = 0
+        self.fire_rate = 400
+        
+        self.surf = female_idle_sprite[0]
+        self.rect = self.surf.get_rect(
+            center = (
+                (LEVEL_WIDTH-self.surf.get_width())/2,
+                (LEVEL_HEIGHT-self.surf.get_height())/2
+            ) 
+        )
+        
+    def idle_anim(self, clock):
+        self.idle_time += clock.get_time()
+        if self.idle_index == len(female_idle_sprite):
+            self.idle_index = 0
+            
+        if self.idle_time >= 250:
+            self.surf = female_idle_sprite[self.idle_index]
+            self.idle_index += 1
+            self.idle_time = 0
+        
+    def run_anim(self, clock):    
+        self.run_time += clock.get_time()
+        if self.run_index == len(female_run_sprite):
+            self.run_index = 0
+            
+        if self.run_time >= 100:
+            self.surf = female_run_sprite[self.run_index]
+            self.run_index += 1
+            self.run_time = 0
 
     def fire_bullets(self, camera, clock, player_bullets, all_sprites):
-        # Cập nhật thời gian giữa các lần bắn đạn
         self.time_since_last_shot += clock.get_time()
 
-        # Kiểm tra nếu đủ thời gian để bắn đạn
         if self.time_since_last_shot >= self.fire_rate:
-            # Lấy tọa độ chuột trên màn hình
             mouse = pygame.mouse.get_pos()
-            # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
             mouse_world_pos = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
-            # Tạo viên đạn với vị trí đã chuyển đổi
             new_bullet = Bullet(self, mouse_world_pos)
+            new_bullet.distance_limit = 400
             player_bullets.add(new_bullet)
             all_sprites.add(new_bullet)
-            # Đặt lại thời gian giữa các lần bắn đạn
             self.time_since_last_shot = 0  
             
     def burst_skill(self, camera, clock, player_bullets, all_sprites):
@@ -346,26 +384,22 @@ class Player_Female(Player):
             
             # Tạo viên đạn với vị trí và hướng mới
             new_bullet1 = Bullet(self, bullet1_pos)
+            new_bullet1.distance_limit = 400
             new_bullet2 = Bullet(self, bullet2_pos)
+            new_bullet2.distance_limit = 400
             
             player_bullets.add(new_bullet1, new_bullet2)
             all_sprites.add(new_bullet1, new_bullet2)
             
             # Đặt lại thời gian giữa các lần bắn đạn
             self.time_since_last_burst_shot = 0
-
-    def fire_bullets(self, camera, clock, player_bullets, all_sprites):
-        # Cập nhật thời gian giữa các lần bắn đạn
-        self.time_since_last_shot += clock.get_time()
-        # Kiểm tra nếu đủ thời gian để bắn đạn
-        if self.time_since_last_shot >= self.fire_rate:
-            # Lấy tọa độ chuột trên màn hình
-            mouse = pygame.mouse.get_pos()
-            # Chuyển đổi tọa độ chuột sang tọa độ trong thế giới game và áp dụng sự di chuyển của Camera
-            mouse_world_pos = (mouse[0] - camera.camera.x, mouse[1] - camera.camera.y)
-            # Tạo viên đạn với vị trí đã chuyển đổi
-            new_bullet = Bullet(self, mouse_world_pos)
-            player_bullets.add(new_bullet)
-            all_sprites.add(new_bullet)
-            # Đặt lại thời gian giữa các lần bắn đạn
-            self.time_since_last_shot = 0
+        
+    def burst_(self, camera, clock, player_bullets, all_sprites):
+        if self.burst == True:
+            self.fire_rate = 100
+            self.burst_clock += clock.get_time()
+            self.burst_skill(camera, clock, player_bullets, all_sprites)
+            if self.burst_clock >= self.burst_time:
+                self.fire_rate = 400
+                self.burst = False
+                self.burst_clock = 0

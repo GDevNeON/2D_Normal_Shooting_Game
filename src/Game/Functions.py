@@ -78,7 +78,7 @@ def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items
             all_sprites.add(new_exp_item)
             
             # Có khả năng rót
-            rand = numpy.random.choice(numpy.arange(0, 3), p=[0.33, 0.33, 0.34])
+            rand = numpy.random.choice(numpy.arange(0, 3), p=[1, 0, 0])
             if rand == 0:
                 new_energy_item = EnergyItem(enemy)
                 energy_items.add(new_energy_item)

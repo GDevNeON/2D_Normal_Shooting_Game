@@ -12,8 +12,8 @@ FPS = 60
 # Screen resolution
 LEVEL_WIDTH     = 5000
 LEVEL_HEIGHT    = 5000
-SCREEN_WIDTH    = 1344
-SCREEN_HEIGHT   = 750
+SCREEN_WIDTH    = 1366
+SCREEN_HEIGHT   = 768
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), RESIZABLE)
 
 # Mã màu
@@ -36,7 +36,7 @@ Navy    = (0,0,128)
 
 # Tạo sự kiện
 ADD_ENEMY = USEREVENT + 1
-pygame.time.set_timer(ADD_ENEMY, 5000)
+pygame.time.set_timer(ADD_ENEMY, 3000)
 INCREASE_STAT = USEREVENT + 2
 pygame.time.set_timer(INCREASE_STAT, 20000)
 ADD_ELITE = USEREVENT + 10
