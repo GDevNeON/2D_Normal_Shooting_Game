@@ -52,6 +52,8 @@ class Player(pygame.sprite.Sprite):
         self.run_index = 0
         self.surf = None
         self.rect = None
+        self.move_left = False
+        self.move_right = False
         
         # Other player's attr
         self.level = 1
@@ -194,11 +196,15 @@ class Player(pygame.sprite.Sprite):
                 and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
                 bg.y -= self.speed
         if pressed_keys[K_a]:
+            self.move_left = False
+            self.move_right = True
             self.rect.move_ip(-self.speed, 0)
             if (self.get_position_x() >= SCREEN_WIDTH/2
                 and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
                 bg.x += self.speed
         if pressed_keys[K_d]:
+            self.move_left = True
+            self.move_right = False
             self.rect.move_ip(self.speed, 0)
             if (self.get_position_x() >= SCREEN_WIDTH/2
                 and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
@@ -216,8 +222,10 @@ class Player(pygame.sprite.Sprite):
     # Hàm cập nhật trạng thái Player
     def update(self, clock, camera, pressed_keys, player_bullets, all_sprites, background):
         # self.basic_health()
-        self.idle_anim(clock)
-        #self.run_anim(clock)
+        if self.move_left == True or self.move_right == True:
+            self.run_anim(clock)
+        if self.move_left == False and self.move_right == False:
+            self.idle_anim(clock)
         
         self.advanced_health()
         self.advanced_energy()
@@ -254,7 +262,11 @@ class Player_Male(Player):
             self.idle_index = 0
             
         if self.idle_time >= 250:
-            self.surf = male_idle_sprite[self.idle_index]
+            if self.move_left == True:
+                self.surf = male_idle_sprite[self.idle_index]
+            elif self.move_right == True:
+                reverse = pygame.transform.flip(male_idle_sprite[self.idle_index], True, False)
+                self.surf = reverse
             self.idle_index += 1
             self.idle_time = 0
         
@@ -264,7 +276,11 @@ class Player_Male(Player):
             self.run_index = 0
             
         if self.run_time >= 100:
-            self.surf = male_run_sprite[self.run_index]
+            if self.move_left == True:
+                self.surf = male_run_sprite[self.run_index]
+            elif self.move_right == True:
+                reverse = pygame.transform.flip(male_run_sprite[self.run_index], True, False)
+                self.surf = reverse
             self.run_index += 1
             self.run_time = 0
 
@@ -336,7 +352,11 @@ class Player_Female(Player):
             self.idle_index = 0
             
         if self.idle_time >= 250:
-            self.surf = female_idle_sprite[self.idle_index]
+            if self.move_left == True:
+                self.surf = female_idle_sprite[self.idle_index]
+            elif self.move_right == True:
+                reverse = pygame.transform.flip(female_idle_sprite[self.idle_index], True, False)
+                self.surf = reverse
             self.idle_index += 1
             self.idle_time = 0
         
@@ -346,7 +366,11 @@ class Player_Female(Player):
             self.run_index = 0
             
         if self.run_time >= 100:
-            self.surf = female_run_sprite[self.run_index]
+            if self.move_left == True:
+                self.surf = female_run_sprite[self.run_index]
+            elif self.move_right == True:
+                reverse = pygame.transform.flip(female_run_sprite[self.run_index], True, False)
+                self.surf = reverse
             self.run_index += 1
             self.run_time = 0
 
@@ -403,3 +427,5 @@ class Player_Female(Player):
                 self.fire_rate = 400
                 self.burst = False
                 self.burst_clock = 0
+                
+                
