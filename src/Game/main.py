@@ -1,7 +1,7 @@
 
 import pygame
 import sys
-sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Menu")
+sys.path.insert(0, r"D:\WorkSpace\python_project\2D_Normal_Shooting_Game\src\Menu")
 import GUI
 
 from DEFINE     import *

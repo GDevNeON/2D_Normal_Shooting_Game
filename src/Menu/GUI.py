@@ -1,8 +1,8 @@
 import pygame
 import os
 import sys
-sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Game")
-import main # type: ignore
+sys.path.insert(0, r"D:\WorkSpace\python_project\2D_Normal_Shooting_Game\src\Game")
+import main 
 
 
 from pygame.locals import *
@@ -102,7 +102,7 @@ def Run_User_Interface():
 
     button_video_setting_menu = Button_image(210, 180, pygame.image.load(PATH_TO_VIDEO_SETTING_BUTTON).convert_alpha(), 0.5)
     button_audio_setting_menu = Button_image(410, 180, pygame.image.load(PATH_TO_AUDIO_BUTTON).convert_alpha(), 0.5)
-    button_close_setting_menu = Button_image(1120, 90, pygame.image.load(PATH_TO_CLOSE_BUTTON).convert_alpha(), 0.1)
+    button_close_setting_menu = Button_image(1120, 90, pygame.image.load(PATH_TO_CLOSE_BUTTON).convert_alpha(), 0.1) 
 
     button_back = Button_image(10, 10, pygame.image.load(PATH_TO_BACK_BUTTON).convert_alpha(), 0.6)
     button_select = Button_Text(0, 0, (screen_center_x - button_width_select), (five_six_height - button_height / 1) + button_spacing, "Select", pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha(), 0.3)
