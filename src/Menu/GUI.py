@@ -1,8 +1,8 @@
 import pygame
 import os
 import sys
-sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Game")
-import main # type: ignore
+sys.path.insert(0, r"D:\WorkSpace\python_project\2D_Normal_Shooting_Game\src\Game")
+import main 
 
 
 from pygame.locals import *
@@ -73,47 +73,47 @@ def Run_User_Interface():
     #Đường dẫn của background img
     background_img = pygame.image.load(PATH_TO_BACKGROUND).convert_alpha()
     background_selection_menu_img = pygame.image.load(PATH_TO_BACKGROUND_SELECTION_MENU).convert_alpha()
+
+    pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     
     #Giảm scale của img xuống
     main_background = pygame.transform.scale(background_img, (int(background_img.get_width() * 0.7), int(background_img.get_height() * 0.7)))
     sub_background = pygame.transform.scale(background_selection_menu_img, (int(background_selection_menu_img.get_width() * 0.7), int(background_selection_menu_img.get_height() * 0.7)))
     
     #Đường dẫn của button img
-    path_button_image = pygame.image.load(PATH_TO_BUTTON).convert_alpha()
-    path_button_settings_video = pygame.image.load(PATH_TO_VIDEO_SETTING_BUTTON).convert_alpha()
-    path_button_settings_audio = pygame.image.load(PATH_TO_AUDIO_BUTTON).convert_alpha()
-    path_button_settings_close = pygame.image.load(PATH_TO_CLOSE_BUTTON).convert_alpha() 
-    path_button_back = pygame.image.load(PATH_TO_BACK_BUTTON).convert_alpha()
-    path_button_select = pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha()
+    path_button_image = pygame.image.load(PATH_TO_START_BUTTON).convert_alpha()
+    path_button = pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha()
     map_1 = pygame.image.load(PATH_TO_MAP_1).convert_alpha()
     map_2 = pygame.image.load(PATH_TO_MAP_2).convert_alpha()
     
     #Tính toán vị trí của button
+    button_width_select, button_height_select = path_button.get_width() * 0.15, path_button.get_height() * 0.3
     button_width, button_height = path_button_image.get_width() * 0.4, path_button_image.get_height() * 0.3
     screen_center_x = screen.get_width() // 2
 
     three_fourth_height = int(screen.get_height() * 0.7)
-    five_six_height = int(screen.get_height() * 0.9)
+    five_six_height = int(screen.get_height() * 0.7)
 
-    button_spacing = 120
+    button_spacing = 110
 
-    button_play = Button_Text(0, 0, screen_center_x - button_width / 2, three_fourth_height - button_height / 2 - button_spacing, "Play", path_button_image, 0.3)
-    button_setting = Button_Text(0, 0, screen_center_x - button_width / 2, three_fourth_height - button_height / 2, "Setting", path_button_image, 0.3)
-    button_quit = Button_Text(0, 0, screen_center_x - button_width / 2, three_fourth_height - button_height / 2 + button_spacing, "Exit", path_button_image, 0.3)
+    button_play = Button_Text(0, 0, screen_center_x - button_width, three_fourth_height - button_height / 2 - button_spacing, "", pygame.image.load(PATH_TO_START_BUTTON).convert_alpha(), 0.9)
+    button_setting = Button_Text(0, 0, screen_center_x - button_width, three_fourth_height - button_height / 2, "", pygame.image.load(PATH_TO_SETTING_BUTTON).convert_alpha(), 0.9)
+    button_quit = Button_Text(0, 0, screen_center_x - button_width, three_fourth_height - button_height / 2 + button_spacing, "", pygame.image.load(PATH_TO_QUIT_BUTTON).convert_alpha(), 0.9)
 
-    button_video_setting_menu = Button_image(210, 180, path_button_settings_video, 0.5)
-    button_audio_setting_menu = Button_image(410, 180, path_button_settings_audio, 0.5)
-    button_close_setting_menu = Button_image(1120, 90, path_button_settings_close, 0.1)
+    button_video_setting_menu = Button_image(210, 180, pygame.image.load(PATH_TO_VIDEO_SETTING_BUTTON).convert_alpha(), 0.5)
+    button_audio_setting_menu = Button_image(410, 180, pygame.image.load(PATH_TO_AUDIO_BUTTON).convert_alpha(), 0.5)
+    button_close_setting_menu = Button_image(1120, 90, pygame.image.load(PATH_TO_CLOSE_BUTTON).convert_alpha(), 0.1) 
 
-    button_back = Button_image(0, 0, path_button_back, 0.1)
-    button_select = Button_Text(0, 0, (screen_center_x - button_width / 2) + 10, five_six_height - button_height / 2 - button_spacing, "Select", path_button_select, 0.15)
+    button_back = Button_image(10, 10, pygame.image.load(PATH_TO_BACK_BUTTON).convert_alpha(), 0.6)
+    button_select = Button_Text(0, 0, (screen_center_x - button_width_select), (five_six_height - button_height / 1) + button_spacing, "Select", pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha(), 0.3)
 
     left = pygame.image.load(PATH_TO_ARROW).convert_alpha()
     right = pygame.image.load(PATH_TO_ARROW).convert_alpha()
 
-    left_arrow = Button_image(270, 300, pygame.transform.rotate(left, 180), 0.025)
-    right_arrow = Button_image(1000, 300, right, 0.025)
+    left_arrow = Button_image(270, 300, pygame.transform.rotate(left, 180), 0.8)
+    right_arrow = Button_image(1000, 300, right, 0.8)
 
+    title = Button_image(screen_center_x - (pygame.image.load(PATH_TO_TITLE).convert_alpha().get_width()* 0.5), 90, pygame.image.load(PATH_TO_TITLE).convert_alpha(), 1)
 
     #Biến bật/tắt các menu con, biến đánh dấu
     check_switch_play = False
@@ -132,11 +132,13 @@ def Run_User_Interface():
             screen.blit(overlay, (0, 0))
 
             button_back.draw()
-            button_select.draw_button(BLACK_COLOR)
+            button_select.draw_button(WHITE_COLOR)
 
             left_arrow.draw()
             right_arrow.draw()
             
+            # but.draw()
+
             if current_map_index == 0:
                 draw_map(map_1, 0.65, 437, 200)
             else: 
@@ -148,7 +150,6 @@ def Run_User_Interface():
                         check_switch_play = False
                     elif button_select.is_clicked():
                         running = False
-                        # print("Select Button is clicked")
                     if left_arrow.is_clicked():
                         # current_map_index = (current_map_index - 1) % 2
                         current_map_index = 1
@@ -198,6 +199,10 @@ def Run_User_Interface():
                     elif button_video_setting_menu.is_clicked():
                         check_swich_button_in_menu_setting = True
         else:
+            overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 128))
+            screen.blit(overlay, (0, 0))
+            title.draw()
             button_play.draw_button(WHITE_COLOR)
             button_setting.draw_button(WHITE_COLOR)
             button_quit.draw_button(WHITE_COLOR)
@@ -209,10 +214,8 @@ def Run_User_Interface():
                 if button_play.is_clicked():
                     check_switch_play = True
                 if button_setting.is_clicked():
-                    check_switch_settings = True
-                        
+                    check_switch_settings = True  
                 if button_quit.is_clicked():
-                    # running = False
                     pygame.quit()
         pygame.display.update()
     main.Run_Game()
