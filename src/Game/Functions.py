@@ -7,7 +7,6 @@ from DEFINE import *
 from Player import *
 from Enemy import *
 from Items import *
-from Functions import *
 
 # Các hàm di chuyển
 def items_move_towards_player(player, items_group):
@@ -29,10 +28,10 @@ def items_move_towards_player(player, items_group):
             item.rect.move_ip(dx_normalized * 10, dy_normalized * 10)
 
 # Các hàm phát hiện va chạm
-def player_collide_with_enemies(player, enemies):
+def player_collide_with_enemies(player, enemies, clock):
     for enemy in enemies:
         if pygame.sprite.collide_rect(player, enemy):
-            player.health -= 10
+            player.health -= enemy.collide_damage
             enemy.health -= 10
             if player.health == 0:
                 return True
@@ -71,27 +70,28 @@ def player_collide_with_hp_items(player, hp_items):
 def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites):
     for bullet in player_bullets:
         if pygame.sprite.collide_rect(enemy, bullet):
-            # Chắc chắn rớt
-            new_exp_item = ExpItem(enemy)
-            exp_items.add(new_exp_item)
-            items_group.add(new_exp_item)
-            all_sprites.add(new_exp_item)
-            
-            # Có khả năng rót
-            rand = numpy.random.choice(numpy.arange(0, 3), p=[0.2, 0.2, 0.6])
-            if rand == 0:
-                new_energy_item = EnergyItem(enemy)
-                energy_items.add(new_energy_item)
-                all_sprites.add(new_energy_item)
-                items_group.add(new_energy_item)
-            elif rand == 1:
-                new_hp_item = HpItem(enemy)
-                hp_items.add(new_hp_item)
-                all_sprites.add(new_hp_item)
-                items_group.add(new_hp_item)
+            enemy.health -= bullet.damage
+            if enemy.health == 0:
+                enemy.kill()
+                # Chắc chắn rớt
+                new_exp_item = ExpItem(enemy)
+                exp_items.add(new_exp_item)
+                items_group.add(new_exp_item)
+                all_sprites.add(new_exp_item)
+                # Có khả năng rớt
+                rand = numpy.random.choice(numpy.arange(0, 3), p=[0.2, 0.2, 0.6])
+                if rand == 0:
+                    new_energy_item = EnergyItem(enemy)
+                    energy_items.add(new_energy_item)
+                    all_sprites.add(new_energy_item)
+                    items_group.add(new_energy_item)
+                elif rand == 1:
+                    new_hp_item = HpItem(enemy)
+                    hp_items.add(new_hp_item)
+                    all_sprites.add(new_hp_item)
+                    items_group.add(new_hp_item)
 
             bullet.kill()
-            enemy.kill()
             return True
     return False
 

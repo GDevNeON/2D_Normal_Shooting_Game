@@ -74,7 +74,8 @@ class Bullet(pygame.sprite.Sprite):
         super(Bullet, self).__init__()
         # Bullet's base attr
         self.speed = 20
-        self.damage = 100
+        # Set up sát thương của đạn dựa trên sát thương của người bắn
+        self.damage = current.normal_bullet_damage
           
         # Bullet's position attr
         self.x = current.get_position_x()

@@ -1,3 +1,4 @@
+from networkx import is_distance_regular
 import pygame
 import math
 import random
@@ -19,7 +20,7 @@ class Player(pygame.sprite.Sprite):
         super(Player, self).__init__()
         # Player's base attr
         self.size = 25
-        self.speed = 2
+        self.speed = 5
         
         # Player's health attr 
         self.current_health = 100
@@ -55,7 +56,17 @@ class Player(pygame.sprite.Sprite):
         self.move_left = False
         self.move_right = False
         
+        # Level upgrades
+        self.inc_hp = 0
+        self.inc_spd = 0
+        self.inc_frate = 0
+        self.inc_frange = 0
+        self.inc_bullsize = 0
+        self.inc_bullspd = 0
+        self.bull_pierce = False
+        
         # Other player's attr
+        self.normal_bullet_damage = 10
         self.level = 1
         self.fire_rate = 500
         self.time_since_last_shot = 0  
@@ -251,7 +262,8 @@ class Player(pygame.sprite.Sprite):
 class Player_Male(Player):
     def __init__(self):
         super(Player_Male, self).__init__()
-        self.fire_rate = 1000
+        self.normal_bullet_damage = 10
+        self.fire_rate = 500
         self.bullet_amount = 5
         self.spread_range = 45
         
@@ -333,13 +345,14 @@ class Player_Male(Player):
             self.burst_clock += clock.get_time()
             self.burst_skill(camera, clock, player_bullets, all_sprites)
             if self.burst_clock >= self.burst_time:
-                self.fire_rate = 1000
+                self.fire_rate = 500
                 self.burst = False
                 self.burst_clock = 0
 
 class Player_Female(Player):
     def __init__(self):
         super(Player_Female, self).__init__()
+        self.normal_bullet_damage = 5
         self.fire_rate = 400
         
         self.surf = female_idle_sprite[0]
@@ -429,4 +442,42 @@ class Player_Female(Player):
                 self.burst = False
                 self.burst_clock = 0
                 
-                
+# Các hàm buff khi lên lv của Player
+def increase_hp(player):
+    if player.inc_hp == 5:
+        print("max hp reached")
+    else:
+        player.health += int(20/100 * player.health)
+    
+def increase_speed(player):
+    if player.inc_spd == 5:
+        print("max speed reached")
+    else:
+        player.speed += int(10/100 * player.speed)
+    
+def increase_fire_rate(player):
+    if player.inc_frate == 5:
+        print("max fire rate reached")
+    else:
+        player.fire_rate += int(10/100 * player.fire_rate)
+    
+def increase_fire_range(player, target):
+    if player.inc_frange == 5:
+        print("max fire range reached")
+    else:
+        bullet = Bullet(player, target)
+        bullet.distance_limit += int(10/100 * bullet.distance_limit)
+        
+def increase_bullet_size(player, target):
+    if player.inc_bullsize == 5:
+        print("max bullet size reached")
+    else:
+        bullet = Bullet(player, target)
+        bullet.distance_limit += int(10/100 * bullet.distance_limit)
+    
+def increase_bullet_speed(player, target):    
+    if player.inc_bullspd == 5:
+        print("max bullet speed reached")
+    else:
+        bullet = Bullet(player, target)
+        bullet.distance_limit += int(10/100 * bullet.distance_limit)
