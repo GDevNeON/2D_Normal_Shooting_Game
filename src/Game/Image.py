@@ -52,6 +52,22 @@ slime1                  = "../../Sprites/Enemies/Normal/slime1.png"
 slime2                  = "../../Sprites/Enemies/Normal/slime2.png"
 slime_path = [slime1, slime2]
 
+eghost1                 = "../../Sprites/Enemies/Elite/eghost1.png"
+eghost2                 = "../../Sprites/Enemies/Elite/eghost2.png"
+eghost_path = [eghost1, eghost2]
+
+egoblin1                 = "../../Sprites/Enemies/Elite/egoblin1.png"
+egoblin2                 = "../../Sprites/Enemies/Elite/egoblin2.png"
+egoblin_path = [egoblin1, egoblin2]
+
+eskeleton1                 = "../../Sprites/Enemies/Elite/eskeleton1.png"
+eskeleton2                 = "../../Sprites/Enemies/Elite/eskeleton2.png"
+eskeleton_path = [eskeleton1, eskeleton2]
+
+eslime1                 = "../../Sprites/Enemies/Elite/eslime1.png"
+eslime2                 = "../../Sprites/Enemies/Elite/eslime2.png"
+eslime_path = [eslime1, eslime2]
+
 player_bullet           = "../../Sprites/Items/player_bullet.png"
 
 
@@ -66,12 +82,11 @@ exp_sprite              = pygame.image.load(exp_path).convert()
 energy_sprite           = pygame.image.load(energy_path).convert()
 hp_sprite               = pygame.image.load(hp_path).convert()
 
-def convert_to_img(img_group_sprite, img_group_path):
+def convert_to_img(img_group_sprite, img_group_path, size_ratio):
     for s in img_group_path:
         sprite = (mod_path / s).resolve()
         image = pygame.image.load(sprite).convert()
         size = image.get_size()
-        size_ratio = 2
         image = pygame.transform.scale(image, (int(size[0]/size_ratio), int(size[1]/size_ratio)))
         image.set_colorkey((0, 0, 0, 0), RLEACCEL)
         img_group_sprite.append(image)
@@ -81,26 +96,39 @@ player_bullet_path      = (mod_path / player_bullet).resolve()
 player_bullet_sprite    = pygame.image.load(player_bullet_path).convert()
 
 male_idle_sprite = []
-convert_to_img(male_idle_sprite, male_idle_path)
+convert_to_img(male_idle_sprite, male_idle_path, 1.5)
 
 male_run_sprite = []
-convert_to_img(male_run_sprite, male_run_path)
+convert_to_img(male_run_sprite, male_run_path, 1.5)
 
 female_idle_sprite = []
-convert_to_img(female_idle_sprite, female_idle_path)
+convert_to_img(female_idle_sprite, female_idle_path, 1.5)
 
 female_run_sprite = []
-convert_to_img(female_run_sprite, female_run_path)
+convert_to_img(female_run_sprite, female_run_path, 1.5)
    
 # Normal enemies 
 ghost_sprite = []
-convert_to_img(ghost_sprite, ghost_path)
+convert_to_img(ghost_sprite, ghost_path, 2)
     
 goblin_sprite = []
-convert_to_img(goblin_sprite, goblin_path)
+convert_to_img(goblin_sprite, goblin_path, 2)
     
 skeleton_sprite = []
-convert_to_img(skeleton_sprite, skeleton_path)
+convert_to_img(skeleton_sprite, skeleton_path, 2.5)
     
 slime_sprite = []
-convert_to_img(slime_sprite, slime_path)
+convert_to_img(slime_sprite, slime_path, 2)
+
+# Elite enemies
+eghost_sprite = []
+convert_to_img(eghost_sprite, eghost_path, 0.75)
+
+egoblin_sprite = []
+convert_to_img(egoblin_sprite, egoblin_path, 0.75)
+
+eskeleton_sprite = []
+convert_to_img(eskeleton_sprite, eskeleton_path, 0.75)
+
+eslime_sprite = []
+convert_to_img(eslime_sprite, eslime_path, 0.75)

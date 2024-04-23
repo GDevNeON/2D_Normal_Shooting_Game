@@ -1,5 +1,6 @@
 
 import pygame
+import random
 # import sys
 # sys.path.insert(0, r"D:\WorkSpace\python_project\python_game_project\2D_Normal_Shooting_Game\src\Menu")
 # import GUI # type: ignore
@@ -38,12 +39,12 @@ def Run_Game():
     # Tạo ra 1 object
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
-    player = Player_Male()
+    player = Player_Female()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
     player_new_pos = (player.get_position_x(), player.get_position_y())
     all_sprites.add(player)
-    
+
     enemy = Normal(player)
     enemy_new_size = enemy.get_size()
     enemy_new_speed = enemy.get_speed()
@@ -65,7 +66,7 @@ def Run_Game():
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
                     running = False
-                elif event.key == K_q and player.energy >= player.maximum_energy:
+                elif event.key == K_q and player.energy >= player.maximum_energy and player.burst_clock < player.burst_time:
                     player.energy = 0
                     player.burst = True
             elif event.type == QUIT:
@@ -84,9 +85,17 @@ def Run_Game():
                  
             # Các sự kiện của enemy Elite
             if event.type == ADD_ELITE:
-                new_elite_1 = Elite_1(player)
-                elites.add(new_elite_1)
-                all_sprites.add(new_elite_1)
+                rand = random.randint(1, 4)
+                if rand == 1:
+                    new_elite = Elite_1(player)
+                elif rand == 2:
+                    new_elite = Elite_2(player)
+                elif rand == 3:
+                    new_elite = Elite_3(player)
+                else:
+                    new_elite = Elite_4(player)
+                elites.add(new_elite)
+                all_sprites.add(new_elite)
         
         # Phát hiện va chạm, debusg:
         items_move_towards_player(player, items_group)

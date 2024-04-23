@@ -16,12 +16,15 @@ class Enemy(pygame.sprite.Sprite):
         self.health = 10
 
         # Enemy's surf attr
+        self.sprite = None
         self.surf = pygame.Surface((self.size, self.size))
         self.rect = self.surf.get_rect()
         self.sprite_time = 0
         self.sprite_index = 0
+        self.old_x = self.get_position_x()
         
         # Tính toán vị trí ngẫu nhiên xung quanh người chơi
+        self.spawn_radius = 400
         self.generate_random_position(player)
         
     # Các phương thức get/set
@@ -50,13 +53,29 @@ class Enemy(pygame.sprite.Sprite):
         return self.speed
     
     # Các hàm phụ cho lớp Enemy
+    def load_sprite(self, clock):
+        new_x = self.get_position_x()
+        
+        self.sprite_time += clock.get_time()
+        if self.sprite_index == len(self.sprite):
+            self.sprite_index = 0
+        
+        if self.sprite_time >= 250:
+            if new_x >= self.old_x:
+                self.surf = self.sprite[self.sprite_index]
+            else:
+                reverse = pygame.transform.flip(self.sprite[self.sprite_index], True, False)
+                self.surf = reverse
+            self.sprite_index += 1
+            self.sprite_time = 0
+            
+        self.old_x = new_x
+        
     def generate_random_position(self, player):
-        # Bán kính của vùng phát sinh ngẫu nhiên
-        radius = 350
         # Tạo một vị trí ngẫu nhiên xung quanh người chơi
         angle = random.uniform(0, 2 * math.pi)
-        random_x = player.get_position_x() + radius * math.cos(angle)
-        random_y = player.get_position_y() + radius * math.sin(angle)
+        random_x = player.get_position_x() + self.spawn_radius * math.cos(angle)
+        random_y = player.get_position_y() + self.spawn_radius * math.sin(angle)
         # Cập nhật vị trí của kẻ địch
         self.rect.center = (random_x, random_y)
 
@@ -84,7 +103,6 @@ class Enemy(pygame.sprite.Sprite):
 class Normal(Enemy):
     def __init__(self, player):
         super(Normal, self).__init__(player)
-        self.old_x = self.get_position_x()
         
         rand = random.randint(0, 3)
         if rand == 0:
@@ -100,24 +118,6 @@ class Normal(Enemy):
             self.sprite = slime_sprite
             self.surf = slime_sprite[0]
         
-    def load_sprite(self, clock):
-        new_x = self.get_position_x()
-        
-        self.sprite_time += clock.get_time()
-        if self.sprite_index == len(self.sprite):
-            self.sprite_index = 0
-        
-        if self.sprite_time >= 250:
-            if new_x >= self.old_x:
-                self.surf = self.sprite[self.sprite_index]
-            else:
-                reverse = pygame.transform.flip(self.sprite[self.sprite_index], True, False)
-                self.surf = reverse
-            self.sprite_index += 1
-            self.sprite_time = 0
-            
-        self.old_x = new_x
-            
     def update(self, player, clock):
         self.load_sprite(clock)
         self.move_towards_player(player)
@@ -130,11 +130,12 @@ class Elite_1(Enemy):
         self.speed = 20
         self.hp = 1000
         
-        self.surf = pygame.Surface((self.size, self.size))
-        self.surf.fill(self.color)
+        self.sprite = eghost_sprite
+        self.surf = eghost_sprite[0]
         self.rect = self.surf.get_rect()
         
         self.target_pos = (player.get_position_x(), player.get_position_y())
+        self.spawn_radius = 600
         
         self.fire_rate = 2  # Thời gian giữa các lần bắn đạn (tính bằng giây)
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
@@ -142,16 +143,6 @@ class Elite_1(Enemy):
         self.time_since_last_moved = 0
         
         self.generate_random_position(player)
-
-    def generate_random_position(self, player):
-        # Bán kính của vùng phát sinh ngẫu nhiên
-        radius = 500
-        # Tạo một vị trí ngẫu nhiên xung quanh người chơi
-        angle = random.uniform(0, 2 * math.pi)
-        random_x = player.get_position_x() + radius * math.cos(angle)
-        random_y = player.get_position_y() + radius * math.sin(angle)
-        # Cập nhật vị trí của kẻ địch
-        self.rect.center = (random_x, random_y)
         
     def move(self, clock, player_new_pos):
         self.time_since_last_moved += clock.get_time() / 1000
@@ -197,6 +188,24 @@ class Elite_1(Enemy):
     def update(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
         self.move(clock, player_new_pos)
         self.fire_bullets(camera, clock, player_new_pos, elite_bullets, all_sprites)
+        
+class Elite_2(Elite_1):
+    def __init__(self, player):
+        super(Elite_2, self).__init__(player)
+        self.sprite = egoblin_sprite
+        self.surf = egoblin_sprite[0]
+    
+class Elite_3(Elite_1):
+    def __init__(self, player):
+        super(Elite_3, self).__init__(player)
+        self.sprite = eskeleton_sprite
+        self.surf = eskeleton_sprite[0]
+        
+class Elite_4(Elite_1):
+    def __init__(self, player):
+        super(Elite_4, self).__init__(player)
+        self.sprite = eslime_sprite
+        self.surf = eslime_sprite[0]
                
 class Boss(Enemy):
     def __init__(self, player):

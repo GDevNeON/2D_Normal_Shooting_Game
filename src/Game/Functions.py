@@ -43,7 +43,7 @@ def player_collide_with_enemies(player, enemies):
 def player_collide_with_exp_items(player, exp_items):
     for exp in exp_items:
         if pygame.sprite.collide_rect(player, exp):
-            player.exp += 1
+            player.exp += 2
             exp.kill()
             return True
     return False

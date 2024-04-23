@@ -176,7 +176,7 @@ class Player(pygame.sprite.Sprite):
             self.health_ratio = self.maximum_health / self.health_bar_length
             
             self.exp = math.fabs(self.exp - self.maximum_exp)
-            self.maximum_exp += 10
+            self.maximum_exp += int(20/100 * self.maximum_exp)
             self.exp_ratio = self.maximum_exp / self.exp_bar_length
             self.level += 1
             
@@ -185,31 +185,38 @@ class Player(pygame.sprite.Sprite):
             print("max_ex", self.maximum_exp)
             
     def movement(self, pressed_keys, bg):
-        if pressed_keys[K_w]:
-            self.rect.move_ip(0, -self.speed)
-            if (self.get_position_y() >= SCREEN_HEIGHT/2
-                and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
-                bg.y += self.speed
-        if pressed_keys[K_s]:
-            self.rect.move_ip(0, self.speed)
-            if (self.get_position_y() >= SCREEN_HEIGHT/2
-                and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
-                bg.y -= self.speed
-        if pressed_keys[K_a]:
+        if pressed_keys[K_w] == False and pressed_keys[K_a] == False and pressed_keys[K_s] == False and pressed_keys[K_d] == False:
             self.move_left = False
-            self.move_right = True
-            self.rect.move_ip(-self.speed, 0)
-            if (self.get_position_x() >= SCREEN_WIDTH/2
-                and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
-                bg.x += self.speed
-        if pressed_keys[K_d]:
-            self.move_left = True
             self.move_right = False
-            self.rect.move_ip(self.speed, 0)
-            if (self.get_position_x() >= SCREEN_WIDTH/2
-                and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
-                bg.x -= self.speed
-        
+        else:
+            if pressed_keys[K_w]:
+                self.rect.move_ip(0, -self.speed)
+                if (self.get_position_y() >= SCREEN_HEIGHT/2
+                    and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
+                    bg.y += self.speed
+                    
+            if pressed_keys[K_s]:
+                self.rect.move_ip(0, self.speed)
+                if (self.get_position_y() >= SCREEN_HEIGHT/2
+                    and self.get_position_y() <= LEVEL_HEIGHT - SCREEN_HEIGHT/2):
+                    bg.y -= self.speed
+                    
+            if pressed_keys[K_a]:
+                self.move_left = False
+                self.move_right = True
+                self.rect.move_ip(-self.speed, 0)
+                if (self.get_position_x() >= SCREEN_WIDTH/2
+                    and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
+                    bg.x += self.speed
+                    
+            if pressed_keys[K_d]:
+                self.move_left = True
+                self.move_right = False
+                self.rect.move_ip(self.speed, 0)
+                if (self.get_position_x() >= SCREEN_WIDTH/2
+                    and self.get_position_x() <= LEVEL_WIDTH - SCREEN_WIDTH/2):
+                    bg.x -= self.speed
+            
         if self.rect.left < 0:
             self.rect.left = 0
         if self.rect.right > LEVEL_WIDTH:
@@ -224,7 +231,7 @@ class Player(pygame.sprite.Sprite):
         # self.basic_health()
         if self.move_left == True or self.move_right == True:
             self.run_anim(clock)
-        if self.move_left == False and self.move_right == False:
+        elif self.move_left == False and self.move_right == False:
             self.idle_anim(clock)
         
         self.advanced_health()
