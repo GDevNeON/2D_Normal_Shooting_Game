@@ -12,11 +12,15 @@ PATH_TO_CLOSE_BUTTON                = os.path.join(PATH_DIRECTORY, "assets/imgs/
 PATH_TO_VIDEO_SETTING_BUTTON        = os.path.join(PATH_DIRECTORY, "assets/imgs/button_video.png")
 PATH_TO_AUDIO_BUTTON                = os.path.join(PATH_DIRECTORY, "assets/imgs/button_audio.png")
 PATH_TO_BACKGROUND_SELECTION_MENU   = os.path.join(PATH_DIRECTORY, "assets/imgs/br2.jpg")
-PATH_TO_SELECT_BUTTON               = os.path.join(PATH_DIRECTORY, "assets/imgs/button.png")
+PATH_TO_SELECT_BUTTON               = os.path.join(PATH_DIRECTORY, "assets/imgs/selectbutton.png")
 PATH_TO_BACK_BUTTON                 = os.path.join(PATH_DIRECTORY, "assets/imgs/xbutton.png")
 PATH_TO_ARROW                       = os.path.join(PATH_DIRECTORY, "assets/imgs/arrowbutton.png") 
 PATH_TO_MAP_1                       = os.path.join(PATH_DIRECTORY, "../../Sprites/Backgrounds/dungeon.png")
-PATH_TO_MAP_2                       = os.path.join(PATH_DIRECTORY, "../../Sprites/Backgrounds/grassfield.png")
+PATH_TO_MAP                         = os.path.join(PATH_DIRECTORY, "../../Sprites/Backgrounds/grassfield.png")
+PATH_TO_GAME_OVER_TITLE             = os.path.join(PATH_DIRECTORY, "assets/imgs/game_over.png")
+PATH_TO_TRY_AGAIN_BUTTON            = os.path.join(PATH_DIRECTORY, "assets/imgs/back button.png")
+PATH_TO_GAME_MODE_NM                = os.path.join(PATH_DIRECTORY, "assets/imgs/normalbutton.png")
+PATH_TO_GAME_MODE_EL                = os.path.join(PATH_DIRECTORY, "assets/imgs/endlessbutton.png")
 
 
 WHITE_COLOR                         = (255,  255,  255)

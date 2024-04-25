@@ -2,7 +2,7 @@
 import pygame
 import random
 import sys
-sys.path.insert(0, r"D:\WorkSpace\python_project\2D_Normal_Shooting_Game\src\Menu")
+sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Menu")
 import GUI
 
 from DEFINE     import *
@@ -51,14 +51,13 @@ def Run_Game():
     enemy_new_pos = (enemy.get_position_x(), enemy.get_position_y())
     background = Background(background_sprite)
     
-
     # Gameplay chạy trong này
     running = True
     while running:
         # GUI.Run_User_Interface()
         pressed_keys = pygame.key.get_pressed()
         clicked_mouse = pygame.mouse.get_pressed()
-        SCREEN.fill(Black)
+        SCREEN.fill(Black)            
 
         # Xử lý sự kiện (Event Handling)
         for event in pygame.event.get():
@@ -99,7 +98,7 @@ def Run_Game():
         
         # Phát hiện va chạm, debusg:
         items_move_towards_player(player, items_group)
-        if player_collide_with_enemies(player, enemies) == True:
+        if player_collide_with_enemies(player, enemies, clock) == True:
             # print('play die')
             pass
         if player_collide_with_exp_items(player, exp_items) == True:
@@ -136,9 +135,10 @@ def Run_Game():
         
         clock.tick(FPS)
         if player.get_Current_Health() == 0:
+            pygame.mixer.music.stop()
             running = False
 
-    GUI.Run_User_Interface()
+    GUI.Run_Gameover_Interface()
     pygame.quit()
 
 

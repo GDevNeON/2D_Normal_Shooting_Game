@@ -1,7 +1,7 @@
 import pygame
 import os
 import sys
-sys.path.insert(0, r"D:\WorkSpace\python_project\2D_Normal_Shooting_Game\src\Game")
+sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Game")
 import main 
 
 
@@ -13,9 +13,26 @@ pygame.init()
 
 font1 = pygame.font.SysFont("Constantia", 30)
 font2 = pygame.font.SysFont("None", 20)
-
-# screen = pygame.display.set_mode((WIDTH_SCREEN * 0.7, HEIGHT_SCREEN * 0.7))
 screen = pygame.display.set_mode((1344, 750))
+
+class Screen():
+    def __init__(self, width, height):
+        self.width = width
+        self.height = height
+        self.SCREEN = pygame.display.set_mode((width, height))
+    
+    def blitt(self, x, y, img):
+        self.SCREEN.blit(img, (x, y))
+    
+    def get_Size(self):
+        return [self.SCREEN.get_width(), self.SCREEN.get_height()]
+    
+    def get_Width(self):
+        return self.SCREEN.get_width()
+
+    def get_Height(self):
+        return self.SCREEN.get_height()
+
 class Button_Text():
     def __init__(self, x_text, y_text, x_img, y_img, text, img, scale):
         self.x_text = x_text
@@ -68,6 +85,29 @@ def draw_map(img, scale, x, y):
     sub_img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
     screen.blit(sub_img, (x, y))
 
+def Run_Gameover_Interface():
+    game_over_title = pygame.image.load(PATH_TO_GAME_OVER_TITLE).convert_alpha()
+    path_button_image = pygame.image.load(PATH_TO_TRY_AGAIN_BUTTON).convert_alpha()
+    screen_center_x_1 = screen.get_width() / 3.1
+    screen_center_x_2 = screen.get_width() / 1.91
+    five_six_height = int(screen.get_height() * 0.8)
+    button_width, button_height = path_button_image.get_width() * 0.4, path_button_image.get_height() * 0.3
+    back_to_menu = Button_image(screen_center_x_2 - button_width, five_six_height - button_height / 2, path_button_image, 0.6)
+    running = True
+    while running:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_to_menu.is_clicked():
+                    running = False
+
+        screen.fill(BLACK_COLOR)
+        draw_map(game_over_title, 0.3, screen_center_x_1, -20)
+        back_to_menu.draw()
+        pygame.display.update()
+    Run_User_Interface()
+
 
 def Run_User_Interface():
     #Đường dẫn của background img
@@ -83,8 +123,11 @@ def Run_User_Interface():
     #Đường dẫn của button img
     path_button_image = pygame.image.load(PATH_TO_START_BUTTON).convert_alpha()
     path_button = pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha()
-    map_1 = pygame.image.load(PATH_TO_MAP_1).convert_alpha()
-    map_2 = pygame.image.load(PATH_TO_MAP_2).convert_alpha()
+    # map_1 = pygame.image.load(PATH_TO_MAP_1).convert_alpha()
+    map = pygame.image.load(PATH_TO_MAP).convert_alpha()
+    endless_mode = pygame.image.load(PATH_TO_GAME_MODE_EL).convert_alpha()
+    normal_mode = pygame.image.load(PATH_TO_GAME_MODE_NM).convert_alpha()
+
     
     #Tính toán vị trí của button
     button_width_select, button_height_select = path_button.get_width() * 0.15, path_button.get_height() * 0.3
@@ -92,7 +135,7 @@ def Run_User_Interface():
     screen_center_x = screen.get_width() // 2
 
     three_fourth_height = int(screen.get_height() * 0.7)
-    five_six_height = int(screen.get_height() * 0.7)
+    five_six_height = int(screen.get_height() * 0.75)
 
     button_spacing = 110
 
@@ -105,7 +148,7 @@ def Run_User_Interface():
     button_close_setting_menu = Button_image(1120, 90, pygame.image.load(PATH_TO_CLOSE_BUTTON).convert_alpha(), 0.1) 
 
     button_back = Button_image(10, 10, pygame.image.load(PATH_TO_BACK_BUTTON).convert_alpha(), 0.6)
-    button_select = Button_Text(0, 0, (screen_center_x - button_width_select), (five_six_height - button_height / 1) + button_spacing, "Select", pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha(), 0.3)
+    button_select = Button_Text(0, 0, (screen_center_x - button_width_select) / 1.15, (five_six_height - button_height / 1) + button_spacing, "", pygame.image.load(PATH_TO_SELECT_BUTTON).convert_alpha(), 1.5)
 
     left = pygame.image.load(PATH_TO_ARROW).convert_alpha()
     right = pygame.image.load(PATH_TO_ARROW).convert_alpha()
@@ -119,7 +162,7 @@ def Run_User_Interface():
     check_switch_play = False
     check_switch_settings = False
     check_swich_button_in_menu_setting = True
-    current_map_index = 1   
+    current_mode = 1   
     
     running = True
     while running:
@@ -137,12 +180,12 @@ def Run_User_Interface():
             left_arrow.draw()
             right_arrow.draw()
             
-            # but.draw()
-
-            if current_map_index == 0:
-                draw_map(map_1, 0.65, 437, 200)
+            if current_mode == 0:
+                draw_map(endless_mode, 1.2, 585, 120)
+                draw_map(map, 0.4, 490, 260)
             else: 
-                draw_map(map_2, 0.5, 442, 150)
+                draw_map(normal_mode, 1.2, 585, 120)
+                draw_map(map, 0.4, 490, 260)
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
@@ -152,10 +195,10 @@ def Run_User_Interface():
                         running = False
                     if left_arrow.is_clicked():
                         # current_map_index = (current_map_index - 1) % 2
-                        current_map_index = 1
+                        current_mode = 1
                     elif right_arrow.is_clicked():
                         # current_map_index = (current_map_index + 1) % 2
-                        current_map_index = 0
+                        current_mode = 0
 
         elif check_switch_settings == True:
             overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
@@ -209,7 +252,7 @@ def Run_User_Interface():
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                pygame.quit()
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if button_play.is_clicked():
                     check_switch_play = True
@@ -218,7 +261,11 @@ def Run_User_Interface():
                 if button_quit.is_clicked():
                     pygame.quit()
         pygame.display.update()
-    main.Run_Game()
+    if current_mode == 1:
+        print("normal mode")
+    else:
+        main.Run_Game()
 
 if __name__ == "__main__":
     Run_User_Interface()
+    # Run_Gameover_Interface()
