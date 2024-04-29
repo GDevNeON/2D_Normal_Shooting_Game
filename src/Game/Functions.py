@@ -1,4 +1,5 @@
 
+from turtle import Screen
 import pygame
 import random
 import numpy
@@ -110,3 +111,7 @@ def elite_collide_with_player_bullets(elite, player_bullets):
                 elite.hp -= bullet.damage
                 bullet.kill()
     return False
+
+def draw_img(img, scale, x, y):
+    sub_img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
+    Screen.blit(sub_img, (x, y))

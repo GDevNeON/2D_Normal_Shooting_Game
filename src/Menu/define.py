@@ -21,6 +21,8 @@ PATH_TO_GAME_OVER_TITLE             = os.path.join(PATH_DIRECTORY, "assets/imgs/
 PATH_TO_TRY_AGAIN_BUTTON            = os.path.join(PATH_DIRECTORY, "assets/imgs/back button.png")
 PATH_TO_GAME_MODE_NM                = os.path.join(PATH_DIRECTORY, "assets/imgs/normalbutton.png")
 PATH_TO_GAME_MODE_EL                = os.path.join(PATH_DIRECTORY, "assets/imgs/endlessbutton.png")
+PATH_TO_MALE_CHAR                   = os.path.join(PATH_DIRECTORY, "../../Sprites/Players/malemc.png")
+PATH_TO_FEMALE_CHAR                   = os.path.join(PATH_DIRECTORY, "../../Sprites/Players/femalemc.png")
 
 
 WHITE_COLOR                         = (255,  255,  255)

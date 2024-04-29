@@ -5,14 +5,14 @@ sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Game")
 import main 
 
 
-from pygame.locals import *
-from pygame.font import Font
-from define import *
+from pygame.locals  import *
+from pygame.font    import Font
+from define         import *
 
 pygame.init()
 
 font1 = pygame.font.SysFont("Constantia", 30)
-font2 = pygame.font.SysFont("None", 20)
+font2 = pygame.font.SysFont("None", 60)
 screen = pygame.display.set_mode((1344, 750))
 
 class Screen():
@@ -81,7 +81,7 @@ def draw_text(text, font, text_color, x, y):
     img = font.render(text, True, text_color)
     screen.blit(img, (x, y))
 
-def draw_map(img, scale, x, y):
+def draw_img(img, scale, x, y):
     sub_img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
     screen.blit(sub_img, (x, y))
 
@@ -103,7 +103,7 @@ def Run_Gameover_Interface():
                     running = False
 
         screen.fill(BLACK_COLOR)
-        draw_map(game_over_title, 0.3, screen_center_x_1, -20)
+        draw_img(game_over_title, 0.3, screen_center_x_1, -20)
         back_to_menu.draw()
         pygame.display.update()
     Run_User_Interface()
@@ -127,6 +127,9 @@ def Run_User_Interface():
     map = pygame.image.load(PATH_TO_MAP).convert_alpha()
     endless_mode = pygame.image.load(PATH_TO_GAME_MODE_EL).convert_alpha()
     normal_mode = pygame.image.load(PATH_TO_GAME_MODE_NM).convert_alpha()
+
+    male_char = pygame.image.load(PATH_TO_MALE_CHAR).convert_alpha()
+    female_char = pygame.image.load(PATH_TO_FEMALE_CHAR).convert_alpha()
 
     
     #Tính toán vị trí của button
@@ -160,6 +163,7 @@ def Run_User_Interface():
 
     #Biến bật/tắt các menu con, biến đánh dấu
     check_switch_play = False
+    check_switch_character_selection = False
     check_switch_settings = False
     check_swich_button_in_menu_setting = True
     # current_mode = 1: normal, = 0: perma
@@ -184,25 +188,57 @@ def Run_User_Interface():
             right_arrow.draw()
             
             if current_mode == 0:
-                draw_map(endless_mode, 1.2, 585, 120)
-                draw_map(map, 0.4, 490, 260)
+                draw_img(endless_mode, 1.2, 585, 120)
+                draw_img(map, 0.4, 490, 260)
             else: 
-                draw_map(normal_mode, 1.2, 585, 120)
-                draw_map(map, 0.4, 490, 260)
+                draw_img(normal_mode, 1.2, 585, 120)
+                draw_img(map, 0.4, 490, 260)
 
             for event in pygame.event.get():
                 if event.type == pygame.MOUSEBUTTONDOWN:
                     if button_back.is_clicked():
                         check_switch_play = False
                     elif button_select.is_clicked():
-                        running = False
+                        check_switch_character_selection = True
+                        check_switch_play = False
                     if left_arrow.is_clicked():
                         # current_map_index = (current_map_index - 1) % 2
                         current_mode = 1
                     elif right_arrow.is_clicked():
                         # current_map_index = (current_map_index + 1) % 2
                         current_mode = 0
+        elif check_switch_character_selection == True:
+            screen.blit(sub_background, (0, 0))
+            overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
+            overlay.fill((0, 0, 0, 128))
+            screen.blit(overlay, (0, 0))
 
+            button_back.draw()
+            button_select.draw_button(WHITE_COLOR)
+
+            left_arrow.draw()
+            right_arrow.draw()
+
+            draw_text("CHARACTOR SELECTION", font2, WHITE_COLOR, 420, 100)
+
+            if character_select == 1:
+                draw_img(male_char, 0.7, 555, 190)
+            else:
+                draw_img(female_char, 0.7, 542.5, 175)
+
+            for event in pygame.event.get():
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if button_back.is_clicked():
+                        check_switch_play = True
+                        check_switch_character_selection = False
+                    elif button_select.is_clicked():
+                        running = False
+                    if left_arrow.is_clicked():
+                        # current_map_index = (current_map_index - 1) % 2
+                        character_select = 1
+                    elif right_arrow.is_clicked():
+                        # current_map_index = (current_map_index + 1) % 2
+                        character_select = 0
         elif check_switch_settings == True:
             overlay = pygame.Surface(screen.get_size(), pygame.SRCALPHA)
             overlay.fill((0, 0, 0, 128))
@@ -264,11 +300,16 @@ def Run_User_Interface():
                 if button_quit.is_clicked():
                     pygame.quit()
         pygame.display.update()
-    if current_mode == 1:
-        print("normal mode")
+    if current_mode == character_select:
+        if(current_mode == 1):
+            main.Run_Game(current_mode = 1, character_select = 1)
+        else:
+            main.Run_Game(current_mode = 0, character_select = 0)
     else:
-        print("perma mode")
-    main.Run_Game(current_mode, character_select)
+        if(current_mode == 1):
+            main.Run_Game(current_mode = 1, character_select = 0)
+        else:    
+            main.Run_Game(current_mode = 0, character_select = 1)
 
 if __name__ == "__main__":
     Run_User_Interface()

@@ -18,7 +18,7 @@ from Sounds     import grassplain_boss
 pygame.init()
 
 
-def Run_Game(current_mode, character_select):
+def Run_Game(current_mode , character_select):    
     clock = pygame.time.Clock()
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     pygame.mixer.music.load(grassplain_boss)
@@ -59,7 +59,6 @@ def Run_Game(current_mode, character_select):
     # Gameplay chạy trong này
     running = True
     while running:
-        # GUI.Run_User_Interface()
         pressed_keys = pygame.key.get_pressed()
         clicked_mouse = pygame.mouse.get_pressed()
         SCREEN.fill(Black)            
@@ -148,8 +147,8 @@ def Run_Game(current_mode, character_select):
         if player.get_Current_Health() == 0:
             pygame.mixer.music.stop()
             running = False
-        if current_mode == 1 and boss[0].slain_time == 1:
-            running = False    
+        # if current_mode == 1 and boss[0].slain_time == 1:
+        #     running = False    
         
 
     GUI.Run_Gameover_Interface()
@@ -157,5 +156,5 @@ def Run_Game(current_mode, character_select):
 
 
 if __name__ == '__main__':
-    # Run_Game()
-    GUI.Run_User_Interface()
+    Run_Game()
+    # GUI.Run_User_Interface()
