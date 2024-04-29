@@ -46,4 +46,4 @@ pygame.time.set_timer(ELITE_CHANGE_DIRECTION, 3000)
 ELITE_FIRE_RATE = USEREVENT + 12
 pygame.time.set_timer(ELITE_FIRE_RATE, 5000)
 ADD_BOSS = USEREVENT + 20
-pygame.time.set_timer(ADD_BOSS, 300000, 1)
+pygame.time.set_timer(ADD_BOSS, 300000, 0)

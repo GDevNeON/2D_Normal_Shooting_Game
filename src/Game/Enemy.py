@@ -414,3 +414,4 @@ class Elite_4(Enemy):
 class Boss(Enemy):
     def __init__(self, player):
         super(Boss, self).__init__(player)
+        self.slain_time = 0

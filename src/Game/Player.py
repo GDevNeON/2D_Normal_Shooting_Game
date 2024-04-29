@@ -1,4 +1,3 @@
-from networkx import is_distance_regular
 import pygame
 import math
 import random

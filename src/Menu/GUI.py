@@ -162,7 +162,10 @@ def Run_User_Interface():
     check_switch_play = False
     check_switch_settings = False
     check_swich_button_in_menu_setting = True
+    # current_mode = 1: normal, = 0: perma
     current_mode = 1   
+    # character_select = 1: male, = 0: female
+    character_select = 1
     
     running = True
     while running:
@@ -264,7 +267,8 @@ def Run_User_Interface():
     if current_mode == 1:
         print("normal mode")
     else:
-        main.Run_Game()
+        print("perma mode")
+    main.Run_Game(current_mode, character_select)
 
 if __name__ == "__main__":
     Run_User_Interface()
