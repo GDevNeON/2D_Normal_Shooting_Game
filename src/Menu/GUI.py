@@ -1,7 +1,7 @@
 import pygame
 import os
 import sys
-sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Game")
+sys.path.insert(0, r"./src/Game")
 import main 
 
 
