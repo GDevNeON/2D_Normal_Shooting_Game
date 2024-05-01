@@ -104,10 +104,6 @@ def elite_collide_with_player_bullets(elite, player_bullets):
         else:
             if pygame.sprite.collide_rect(bullet, elite):
                 # print('HP remaining: ', elite.hp)
-                if elite.get_color() == Purple:
-                    elite.set_color(White)
-                else:
-                    elite.set_color(Purple)
                 elite.hp -= bullet.damage
                 bullet.kill()
     return False

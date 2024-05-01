@@ -2,8 +2,8 @@
 import pygame
 import random
 import sys
-sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Menu")
-import GUI
+# sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Menu")
+# import GUI
 
 from DEFINE     import *
 from Camera     import *
@@ -18,7 +18,7 @@ from Sounds     import grassplain_boss
 pygame.init()
 
 
-def Run_Game(current_mode , character_select):    
+def Run_Game():    
     clock = pygame.time.Clock()
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     pygame.mixer.music.load(grassplain_boss)
@@ -39,10 +39,8 @@ def Run_Game(current_mode , character_select):
     # Tạo ra 1 object
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
-    if character_select == 1:
-        player = Player_Male()
-    else:
-        player = Player_Female()
+    
+    player = Player_Female()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
     player_new_pos = (player.get_position_x(), player.get_position_y())
@@ -102,7 +100,7 @@ def Run_Game(current_mode , character_select):
                 
             # Các sự kiện của enemy Boss
             if event.type == ADD_BOSS:
-                new_boss = Boss()
+                new_boss = Boss(player)
                 boss.append(new_boss)
                 all_sprites.add(boss)
         
@@ -151,7 +149,7 @@ def Run_Game(current_mode , character_select):
         #     running = False    
         
 
-    GUI.Run_Gameover_Interface()
+    # GUI.Run_Gameover_Interface()
     pygame.quit()
 
 

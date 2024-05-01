@@ -54,6 +54,7 @@ class Player(pygame.sprite.Sprite):
         self.rect = None
         self.move_left = False
         self.move_right = False
+        self.direction = "right"
         
         # Level upgrades
         self.inc_hp = 0
@@ -212,6 +213,7 @@ class Player(pygame.sprite.Sprite):
                     bg.y -= self.speed
                     
             if pressed_keys[K_a]:
+                self.direction = "left"
                 self.move_left = False
                 self.move_right = True
                 self.rect.move_ip(-self.speed, 0)
@@ -220,6 +222,7 @@ class Player(pygame.sprite.Sprite):
                     bg.x += self.speed
                     
             if pressed_keys[K_d]:
+                self.direction = "right"
                 self.move_left = True
                 self.move_right = False
                 self.rect.move_ip(self.speed, 0)
@@ -280,8 +283,10 @@ class Player_Male(Player):
             self.idle_index = 0
             
         if self.idle_time >= 250:
-            if self.move_left == False and self.move_right == False:
+            if self.direction == "right":
                 self.surf = male_idle_sprite[self.idle_index]
+            else:
+                self.surf = pygame.transform.flip(male_idle_sprite[self.idle_index], True, False)
             self.idle_index += 1
             self.idle_time = 0
         
@@ -291,11 +296,10 @@ class Player_Male(Player):
             self.run_index = 0
             
         if self.run_time >= 100:
-            if self.move_left == True:
+            if self.direction == "right":
                 self.surf = male_run_sprite[self.run_index]
-            elif self.move_right == True:
-                reverse = pygame.transform.flip(male_run_sprite[self.run_index], True, False)
-                self.surf = reverse
+            else:
+                self.surf = pygame.transform.flip(male_run_sprite[self.run_index], True, False)
             self.run_index += 1
             self.run_time = 0
 
@@ -368,8 +372,10 @@ class Player_Female(Player):
             self.idle_index = 0
             
         if self.idle_time >= 250:
-            if self.move_left == False and self.move_right == False:
+            if self.direction == "right":
                 self.surf = female_idle_sprite[self.idle_index]
+            else:
+                self.surf = pygame.transform.flip(female_idle_sprite[self.idle_index], True, False)
             self.idle_index += 1
             self.idle_time = 0
         
@@ -379,11 +385,10 @@ class Player_Female(Player):
             self.run_index = 0
             
         if self.run_time >= 50:
-            if self.move_left == True:
+            if self.direction == "right":
                 self.surf = female_run_sprite[self.run_index]
-            elif self.move_right == True:
-                reverse = pygame.transform.flip(female_run_sprite[self.run_index], True, False)
-                self.surf = reverse
+            else:
+                self.surf = pygame.transform.flip(female_run_sprite[self.run_index], True, False)
             self.run_index += 1
             self.run_time = 0
 
