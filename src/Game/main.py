@@ -13,15 +13,15 @@ from Items      import *
 from Functions  import *
 from Image      import *
 from Background import *
-from Sounds     import grassplain_boss
+from Sounds     import grassplain
 
 pygame.init()
 
 
-def Run_Game():    
+def Run_Game(current_mode, character_select):    
     clock = pygame.time.Clock()
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
-    pygame.mixer.music.load(grassplain_boss)
+    pygame.mixer.music.load(grassplain)
     pygame.mixer.music.play(loops=-1)
     
     
@@ -39,8 +39,10 @@ def Run_Game():
     # Tạo ra 1 object
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
-    
-    player = Player_Female()
+    if character_select == 1:
+        player = Player_Male()
+    else:
+        player = Player_Female()
     player_new_size = player.get_size()
     player_new_speed = player.get_speed()
     player_new_pos = (player.get_position_x(), player.get_position_y())
@@ -142,9 +144,9 @@ def Run_Game():
         pygame.display.update()
         
         clock.tick(FPS)
-        if player.get_Current_Health() == 0:
-            pygame.mixer.music.stop()
-            running = False
+        # if player.get_Current_Health() == 0:
+        #     pygame.mixer.music.stop()
+        #     running = False
         # if current_mode == 1 and boss[0].slain_time == 1:
         #     running = False    
         

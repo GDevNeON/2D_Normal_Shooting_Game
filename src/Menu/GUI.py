@@ -4,10 +4,10 @@ import sys
 sys.path.insert(0, r"./src/Game")
 import main 
 
-
 from pygame.locals  import *
 from pygame.font    import Font
 from define         import *
+from Sounds         import menu
 
 pygame.init()
 
@@ -110,6 +110,9 @@ def Run_Gameover_Interface():
 
 
 def Run_User_Interface():
+    pygame.mixer.music.load(menu)
+    pygame.mixer.music.play(loops=-1)
+    
     #Đường dẫn của background img
     background_img = pygame.image.load(PATH_TO_BACKGROUND).convert_alpha()
     background_selection_menu_img = pygame.image.load(PATH_TO_BACKGROUND_SELECTION_MENU).convert_alpha()
