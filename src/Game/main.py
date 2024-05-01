@@ -2,7 +2,7 @@
 import pygame
 import random
 import sys
-sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Menu")
+sys.path.insert(0, r"./src/Menu")
 import GUI
 
 from DEFINE     import *

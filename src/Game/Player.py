@@ -245,7 +245,7 @@ class Player(pygame.sprite.Sprite):
             self.attack_speed_buff_level += 1
             print("Attack Speed buff upgraded to level", self.attack_speed_buff_level)
             
-            self.fire_rate *= 0.1
+            self.fire_rate += 0.1*500
             print("Tốc đánh", self.fire_rate)
         else:
             print("Maximum level reached for Attack Speed buff.")
@@ -255,7 +255,7 @@ class Player(pygame.sprite.Sprite):
             self.damage_buff_level += 1
             print("Damage buff upgraded to level", self.damage_buff_level)
             
-            self.normal_bullet_damage *= 0.05
+            self.normal_bullet_damage += 0.05*10
             print("Sát thương", self.normal_bullet_damage)
         else:
             print("Maximum level reached for Damage buff.")
@@ -276,7 +276,7 @@ class Player(pygame.sprite.Sprite):
             self.movement_speed_buff_level += 1
             print("Movement Speed buff upgraded to level", self.movement_speed_buff_level)
             
-            self.speed *= 0.1
+            self.speed += 0.1*5
             print("Tốc chạy", self.speed)
         else:
             print("Maximum level reached for Movement Speed buff.")
