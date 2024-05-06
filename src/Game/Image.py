@@ -115,12 +115,28 @@ skellyphase2_atk        = "../../Sprites/Enemies/Boss/skellyphase2_atk.png"
 skelly_damaged          = "../../Sprites/Enemies/Boss/skelly_damaged.png"
 skelly_feather          = "../../Sprites/Enemies/Boss/skelly_feather.png"
 
+warning            = "../../Sprites/Backgrounds/warning.png"
 
 # Image conversion
+def change_color(image, color):
+    # Create a copy of the surface
+    new_surface = image.copy()
+    # Iterate through each pixel of the surface
+    for x in range(new_surface.get_width()):
+        for y in range(new_surface.get_height()):
+            # Get the color of the pixel at (x, y)
+            pixel_color = new_surface.get_at((x, y))
+            # Check if the pixel is not transparent (alpha value != 0)
+            if pixel_color.a != 0:
+                # Replace the pixel color with the new color
+                new_surface.set_at((x, y), color)
+    # Return the new surface
+    return new_surface
+
 def convert_to_img(img_group_sprite, img_group_path, size_ratio):
     for s in img_group_path:
         sprite = (mod_path / s).resolve()
-        image = pygame.image.load(sprite).convert()
+        image = pygame.image.load(sprite).convert_alpha()
         size = image.get_size()
         image = pygame.transform.scale(image, (int(size[0]/size_ratio), int(size[1]/size_ratio)))
         image.set_colorkey((0, 0, 0, 0), RLEACCEL)
@@ -143,11 +159,17 @@ player_bullet_sprite    = pygame.image.load(player_bullet_path).convert()
 player_bullet_path      = (mod_path / player_bullet).resolve()
 player_bullet_sprite    = pygame.image.load(player_bullet_path).convert()
 
+male_damaged_path       = (mod_path / male_damaged).resolve()
+male_damaged_sprite     = pygame.image.load(male_damaged_path).convert()
+
 male_idle_sprite = []
 convert_to_img(male_idle_sprite, male_idle_path, 1.5)
 
 male_run_sprite = []
 convert_to_img(male_run_sprite, male_run_path, 1.5)
+
+female_damaged_path      = (mod_path / female_damaged).resolve()
+female_damaged_sprite    = pygame.image.load(female_damaged_path).convert()
 
 female_idle_sprite = []
 convert_to_img(female_idle_sprite, female_idle_path, 1.5)
@@ -170,16 +192,16 @@ convert_to_img(slime_sprite, slime_path, 2)
 
 # Elite enemies
 eghost_sprite = []
-convert_to_img(eghost_sprite, eghost_path, 0.75)
+convert_to_img(eghost_sprite, eghost_path, 1)
 
 egoblin_sprite = []
-convert_to_img(egoblin_sprite, egoblin_path, 0.75)
+convert_to_img(egoblin_sprite, egoblin_path, 1)
 
 eskeleton_sprite = []
-convert_to_img(eskeleton_sprite, eskeleton_path, 0.75)
+convert_to_img(eskeleton_sprite, eskeleton_path, 1)
 
 eslime_sprite = []
-convert_to_img(eslime_sprite, eslime_path, 0.75)
+convert_to_img(eslime_sprite, eslime_path, 1)
 
 # Boss enemies
 skelly_atk_path      = (mod_path / skelly_atk).resolve()
@@ -214,3 +236,7 @@ convert_to_img(skelly_swordcast_sprite, swordcast_path, 1)
 
 skelly_phasetrans_sprite = []
 convert_to_img(skelly_phasetrans_sprite, skele_phasetrans_path, 1)
+
+warning_path      = (mod_path / warning).resolve()
+warning_sprite    = pygame.image.load(warning_path).convert_alpha()
+    

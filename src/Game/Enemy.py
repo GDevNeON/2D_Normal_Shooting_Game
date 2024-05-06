@@ -7,6 +7,8 @@ from Items import *
 
 # Base class
 class Enemy(pygame.sprite.Sprite):
+    elite_slain_time = 0
+    
     def __init__(self, player):
         super(Enemy, self).__init__()
         # Enemy's base attr
@@ -14,6 +16,9 @@ class Enemy(pygame.sprite.Sprite):
         self.speed = 1.5
         self.health = 10
         self.collide_damage = 10
+        self.normal_bullet_damage = 10
+        self.is_hit = False
+        self.hit_time = 0
 
         # Enemy's surf attr
         self.sprite = None
@@ -127,7 +132,7 @@ class Elite_1(Enemy):
     def __init__(self, player):
         super(Elite_1, self).__init__(player)
         self.size = 100
-        self.speed = 20
+        self.speed = 5
         self.hp = 1000
         
         self.sprite = eghost_sprite
@@ -144,6 +149,8 @@ class Elite_1(Enemy):
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
         self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
         self.time_since_last_moved = 0
+        self.is_hitted = False
+        self.hitted_time = 0
         
         self.generate_random_position(player)
         
@@ -183,6 +190,9 @@ class Elite_1(Enemy):
             # Tạo viên đạn với vị trí đã chuyển đổi
             new_bullet = Bullet(self, player_new_pos)
             new_bullet.size = 100
+            new_bullet.surf = pygame.Surface((30, 30))
+            new_bullet.surf.fill(White)
+            new_bullet.rect = self.surf.get_rect()
             elite_bullets.add(new_bullet)
             all_sprites.add(new_bullet)
             # Đặt lại thời gian giữa các lần bắn đạn
@@ -197,7 +207,7 @@ class Elite_2(Enemy):
     def __init__(self, player):
         super(Elite_2, self).__init__(player)
         self.size = 100
-        self.speed = 20
+        self.speed = 5
         self.hp = 1000
         
         self.sprite = egoblin_sprite
@@ -214,6 +224,8 @@ class Elite_2(Enemy):
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
         self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
         self.time_since_last_moved = 0
+        self.is_hitted = False
+        self.hitted_time = 0
         
         self.generate_random_position(player)
         
@@ -253,6 +265,9 @@ class Elite_2(Enemy):
             # Tạo viên đạn với vị trí đã chuyển đổi
             new_bullet = Bullet(self, player_new_pos)
             new_bullet.size = 100
+            new_bullet.surf = pygame.Surface((30, 30))
+            new_bullet.surf.fill(White)
+            new_bullet.rect = self.surf.get_rect()
             elite_bullets.add(new_bullet)
             all_sprites.add(new_bullet)
             # Đặt lại thời gian giữa các lần bắn đạn
@@ -267,7 +282,7 @@ class Elite_3(Enemy):
     def __init__(self, player):
         super(Elite_3, self).__init__(player)
         self.size = 100
-        self.speed = 20
+        self.speed = 5
         self.hp = 1000
         
         self.sprite = eskeleton_sprite
@@ -284,6 +299,8 @@ class Elite_3(Enemy):
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
         self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
         self.time_since_last_moved = 0
+        self.is_hitted = False
+        self.hitted_time = 0
         
         self.generate_random_position(player)
         
@@ -323,6 +340,8 @@ class Elite_3(Enemy):
             # Tạo viên đạn với vị trí đã chuyển đổi
             new_bullet = Bullet(self, player_new_pos)
             new_bullet.size = 100
+            new_bullet.surf.fill(White)
+            new_bullet.rect = self.surf.get_rect()
             elite_bullets.add(new_bullet)
             all_sprites.add(new_bullet)
             # Đặt lại thời gian giữa các lần bắn đạn
@@ -337,7 +356,7 @@ class Elite_4(Enemy):
     def __init__(self, player):
         super(Elite_4, self).__init__(player)
         self.size = 100
-        self.speed = 20
+        self.speed = 5
         self.hp = 1000
         
         self.sprite = eslime_sprite
@@ -353,6 +372,8 @@ class Elite_4(Enemy):
         self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
         self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
         self.time_since_last_moved = 0
+        self.is_hitted = False
+        self.hitted_time = 0
         
         self.generate_random_position(player)
         
@@ -392,6 +413,9 @@ class Elite_4(Enemy):
             # Tạo viên đạn với vị trí đã chuyển đổi
             new_bullet = Bullet(self, player_new_pos)
             new_bullet.size = 100
+            new_bullet.surf = pygame.Surface((30, 30))
+            new_bullet.surf.fill(White)
+            new_bullet.rect = self.surf.get_rect()
             elite_bullets.add(new_bullet)
             all_sprites.add(new_bullet)
             # Đặt lại thời gian giữa các lần bắn đạn
@@ -402,68 +426,3 @@ class Elite_4(Enemy):
         self.move(clock, player_new_pos)
         self.fire_bullets(camera, clock, player_new_pos, elite_bullets, all_sprites)
                
-class Boss(Enemy):
-    def __init__(self, player):
-        super(Boss, self).__init__(player)
-        self.slain_time = 0
-        self.size = 100
-        self.speed = 20
-        self.hp = 10000
-        
-        self.sprite = skelly_walk_sprite
-        self.surf = skelly_walk_sprite[0]
-        self.rect = self.surf.get_rect()
-        
-        self.target_pos = (player.get_position_x(), player.get_position_y())
-        self.spawn_radius = 600
-        
-        # skill_dmg = [collision, slash, s1, s2]
-        self.skill_dmg = [10, 20, 20, 20]
-        self.collide_damage = self.skill_dmg[0]
-        self.fire_rate = 2  # Thời gian giữa các lần bắn đạn (tính bằng giây)
-        self.time_since_last_shot = 0  # Thời gian đã trôi qua kể từ lần bắn đạn cuối cùng
-        self.move_rate = 3  # Thời gian giữa các lần di chuyển (tính bằng giây)
-        self.time_since_last_moved = 0
-        
-        self.generate_random_position(player)
-        
-    def moving_trail(self):
-        trail_positions = []
-        sprite_center = self.rect.center
-        trail_positions.append(sprite_center)
-        trail_positions = trail_positions[-10:]  # Chỉ lưu trữ 10 vị trí gần nhất
-        # Vẽ các bản sao của sprite với độ mờ khác nhau
-        alpha = 255
-        for pos in reversed(trail_positions):
-            trail_sprite = self.surf.copy()
-            trail_sprite.set_alpha(alpha)
-            SCREEN.blit(trail_sprite, trail_sprite.get_rect(center=pos))
-            alpha -= 25  # Giảm độ mờ cho mỗi bản sao
-            
-    def move(self, player_new_pos, clock):
-        self.time_since_last_moved += clock.get_time() / 1000
-        
-        if self.time_since_last_moved >= self.move_rate:
-            # Tính toán hướng vector từ kẻ địch đến người chơi
-            self.target_pos = player_new_pos
-            self.time_since_last_moved = 0
-            
-        dx = self.target_pos[0] - self.rect.centerx
-        dy = self.target_pos[1] - self.rect.centery
-        distance = math.sqrt(dx ** 2 + dy ** 2)
-        
-        stopping_distance = 10
-        if distance > stopping_distance:
-            # Chuẩn hóa hướng vector
-            if distance != 0:
-                dx_normalized = dx / distance
-                dy_normalized = dy / distance
-            else:
-                dx_normalized = 0
-                dy_normalized = 0
-            # Di chuyển kẻ địch theo hướng vector đã chuẩn hóa
-            self.rect.move_ip(dx_normalized * 30, dy_normalized * 30)
-            
-    def update(self, camera, clock, player_new_pos, elite_bullets, all_sprites):
-        self.moving_trail()
-        self.move(player_new_pos, clock)
