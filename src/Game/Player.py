@@ -31,16 +31,16 @@ class Player(pygame.sprite.Sprite):
         self.health_change_speed = 5
         
         # Player's energy attr 
-        self.current_energy = 100
-        self.maximum_energy = 100
+        self.current_energy = 0
+        self.maximum_energy = 3
         self.energy_bar_length = 200
         self.energy_ratio = self.maximum_energy / self.energy_bar_length
         self.energy = 0
         self.energy_change_speed = 1
         
         # Player's exp attr 
-        self.current_exp = 10
-        self.maximum_exp = 10
+        self.current_exp = 100
+        self.maximum_exp = 100
         self.exp_bar_length = 500
         self.exp_ratio = self.maximum_exp / self.exp_bar_length
         self.exp = 0
@@ -200,45 +200,61 @@ class Player(pygame.sprite.Sprite):
             
             print("level", self.level)
             print("max_ex", self.maximum_exp)
-            if self.level < 30:
-                self.choose_buffs()
-      
-    def choose_buffs(self):
-        print("Choose buffs to upgrade:")
-        if self.attack_speed_buff_level < 5:
-            print("1. Increase Attack Speed (Current Level:", self.attack_speed_buff_level, ")")
+
+            self.auto_choose_buff()
+    
+    def auto_choose_buff(self):
+        available_buffs = []
+    
+        if self.attack_speed_buff_level < 1:
+            available_buffs.append(self.upgrade_attack_speed_buff)
         if self.damage_buff_level < 5:
-            print("2. Increase Damage (Current Level:", self.damage_buff_level, ")")
+            available_buffs.append(self.upgrade_damage_buff)
         if self.max_hp_buff_level < 3:
-            print("3. Increase Max HP (Current Level:", self.max_hp_buff_level, ")")
+            available_buffs.append(self.upgrade_max_hp_buff)
         if self.movement_speed_buff_level < 3:
-            print("4. Increase Movement Speed (Current Level:", self.movement_speed_buff_level, ")")
-        if self.defense_buff_level < 3:
-            print("5. Increase Defense (Current Level:", self.defense_buff_level, ")")
-        if self.bullet_size_buff_level < 5:
-            print("6. Increase Bullet Size (Current Level:", self.bullet_size_buff_level, ")")
-        if self.damage_reduction_buff_level == 0:
-            print("7. Reduce Damage Taken (Current Level: Not unlocked)")
+            available_buffs.append(self.upgrade_movement_speed_buff)
+    
+        if available_buffs:
+            chosen_buff = random.choice(available_buffs)
+            chosen_buff()
+          
+    # def choose_buffs(self):
+    #     print("Choose buffs to upgrade:")
+    #     if self.attack_speed_buff_level < 5:
+    #         print("1. Increase Attack Speed (Current Level:", self.attack_speed_buff_level, ")")
+    #     if self.damage_buff_level < 5:
+    #         print("2. Increase Damage (Current Level:", self.damage_buff_level, ")")
+    #     if self.max_hp_buff_level < 3:
+    #         print("3. Increase Max HP (Current Level:", self.max_hp_buff_level, ")")
+    #     if self.movement_speed_buff_level < 3:
+    #         print("4. Increase Movement Speed (Current Level:", self.movement_speed_buff_level, ")")
+    #     if self.defense_buff_level < 3:
+    #         print("5. Increase Defense (Current Level:", self.defense_buff_level, ")")
+    #     if self.bullet_size_buff_level < 5:
+    #         print("6. Increase Bullet Size (Current Level:", self.bullet_size_buff_level, ")")
+    #     if self.damage_reduction_buff_level == 0:
+    #         print("7. Reduce Damage Taken (Current Level: Not unlocked)")
 
-        choice = input("Enter the number of the buff you want to upgrade (1-7): ")
+    #     choice = input("Enter the number of the buff you want to upgrade (1-7): ")
 
-        if choice == '1' and self.attack_speed_buff_level < 5:
-            self.upgrade_attack_speed_buff()
-        elif choice == '2' and self.damage_buff_level < 5:
-            self.upgrade_damage_buff()
-        elif choice == '3' and self.max_hp_buff_level < 3:
-            self.upgrade_max_hp_buff()
-        elif choice == '4' and self.movement_speed_buff_level < 3:
-            self.upgrade_movement_speed_buff()
-        elif choice == '5' and self.defense_buff_level < 3:
-            self.upgrade_defense_buff()
-        elif choice == '6' and self.bullet_size_buff_level < 5:
-            self.upgrade_bullet_size_buff()
-        elif choice == '7' and self.damage_reduction_buff_level == 0:
-            self.upgrade_damage_reduction_buff()
-        else:
-            print("Invalid choice. Please choose again.")
-            self.choose_buffs()
+    #     if choice == '1' and self.attack_speed_buff_level < 5:
+    #         self.upgrade_attack_speed_buff()
+    #     elif choice == '2' and self.damage_buff_level < 5:
+    #         self.upgrade_damage_buff()
+    #     elif choice == '3' and self.max_hp_buff_level < 3:
+    #         self.upgrade_max_hp_buff()
+    #     elif choice == '4' and self.movement_speed_buff_level < 3:
+    #         self.upgrade_movement_speed_buff()
+    #     elif choice == '5' and self.defense_buff_level < 3:
+    #         self.upgrade_defense_buff()
+    #     elif choice == '6' and self.bullet_size_buff_level < 5:
+    #         self.upgrade_bullet_size_buff()
+    #     elif choice == '7' and self.damage_reduction_buff_level == 0:
+    #         self.upgrade_damage_reduction_buff()
+    #     else:
+    #         print("Invalid choice. Please choose again.")
+    #         self.choose_buffs()
 
     # Các hàm dưới đây để tăng cấp các buff tương ứng
     def upgrade_attack_speed_buff(self):
@@ -246,7 +262,7 @@ class Player(pygame.sprite.Sprite):
             self.attack_speed_buff_level += 1
             print("Attack Speed buff upgraded to level", self.attack_speed_buff_level)
             
-            self.fire_rate += 0.1*500
+            self.fire_rate += 0.1*self.fire_rate
             print("Tốc đánh", self.fire_rate)
         else:
             print("Maximum level reached for Attack Speed buff.")
@@ -256,7 +272,7 @@ class Player(pygame.sprite.Sprite):
             self.damage_buff_level += 1
             print("Damage buff upgraded to level", self.damage_buff_level)
             
-            self.normal_bullet_damage += 0.05*10
+            self.normal_bullet_damage += 5
             print("Sát thương", self.normal_bullet_damage)
         else:
             print("Maximum level reached for Damage buff.")
@@ -277,7 +293,7 @@ class Player(pygame.sprite.Sprite):
             self.movement_speed_buff_level += 1
             print("Movement Speed buff upgraded to level", self.movement_speed_buff_level)
             
-            self.speed += 0.1*5
+            self.speed += 0.1*self.speed
             print("Tốc chạy", self.speed)
         else:
             print("Maximum level reached for Movement Speed buff.")

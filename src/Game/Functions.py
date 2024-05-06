@@ -51,7 +51,7 @@ def player_collide_with_exp_items(player, exp_items):
 def player_collide_with_energy_items(player, energy_items):
     for ener in energy_items:
         if pygame.sprite.collide_rect(player, ener):
-            player.energy += 25
+            player.energy += 1
             if player.energy >= player.maximum_energy:
                 player.energy = player.maximum_energy
             ener.kill()
