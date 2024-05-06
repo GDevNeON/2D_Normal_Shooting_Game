@@ -1,7 +1,5 @@
 
-from turtle import Screen
 import pygame
-import random
 import numpy
 
 from DEFINE import *
@@ -32,12 +30,20 @@ def items_move_towards_player(player, items_group):
 def player_collide_with_enemies(player, enemies, clock):
     for enemy in enemies:
         if pygame.sprite.collide_rect(player, enemy):
+            player.is_hit = True
             player.health -= enemy.collide_damage
             enemy.health -= 10
-            if player.health == 0:
+            if player.health <= 0:
                 return True
-            elif enemy.health == 0:
+            elif enemy.health <= 0:
                 enemy.kill()
+    
+    if player.is_hit == True:
+        player.hit_time += clock.get_time()
+        player.surf = change_color(player.surf, White)
+        if player.hit_time >= 50:
+            player.hit_time = 0
+            player.is_hit = False
     return False
     
 def player_collide_with_exp_items(player, exp_items):
@@ -68,11 +74,12 @@ def player_collide_with_hp_items(player, hp_items):
             return True
     return False
 
-def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites):
+def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites, clock):
     for bullet in player_bullets:
         if pygame.sprite.collide_rect(enemy, bullet):
+            enemy.is_hit = True
             enemy.health -= bullet.damage
-            if enemy.health == 0:
+            if enemy.health <= 0:
                 enemy.kill()
                 # Chắc chắn rớt
                 new_exp_item = ExpItem(enemy)
@@ -94,20 +101,47 @@ def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items
 
             bullet.kill()
             return True
+        
+    if enemy.is_hit == True:
+        enemy.hit_time += clock.get_time()
+        enemy.surf = change_color(enemy.surf, White)
+        if enemy.hit_time >= 50:
+            enemy.hit_time = 0
+            enemy.is_hit = False
     return False
 
-def elite_collide_with_player_bullets(elite, player_bullets):
+def elite_collide_with_player_bullets(elite, player_bullets, clock):
     for bullet in player_bullets:
+        elite.is_hitted = True
         if elite.hp <= 0:
             elite.kill()
+            Enemy.elite_slain_time += 1
             return True
         else:
             if pygame.sprite.collide_rect(bullet, elite):
                 # print('HP remaining: ', elite.hp)
                 elite.hp -= bullet.damage
                 bullet.kill()
+                
+    if elite.is_hitted == True:
+        # elite.surf = change_color(elite.surf, White)
+        elite.is_hitted = False
     return False
 
-def draw_img(img, scale, x, y):
-    sub_img = pygame.transform.scale(img, (int(img.get_width() * scale), int(img.get_height() * scale)))
-    Screen.blit(sub_img, (x, y))
+def elite_collide_with_player(elites, player, clock):
+    for elite in elites:
+        if elite.hp <= 0:
+            elite.kill()
+            Enemy.elite_slain_time += 1
+            return True
+        else:
+            if pygame.sprite.collide_rect(player, elite):
+                elite.is_hit = True
+                player.health = 0
+                # print('HP remaining: ', elite.hp)
+                elite.hp -= 10
+            
+    if elite.is_hitted == True:
+        # elite.surf = change_color(elite.surf, White)
+        elite.is_hitted = False
+    return False

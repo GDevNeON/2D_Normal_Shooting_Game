@@ -57,17 +57,8 @@ class Player(pygame.sprite.Sprite):
         self.move_right = False
         self.direction = "right"
         
-        # Level upgrades
-        self.inc_hp = 0
-        self.inc_spd = 0
-        self.inc_frate = 0
-        self.inc_frange = 0
-        self.inc_bullsize = 0
-        self.inc_bullspd = 0
-        self.bull_pierce = False
-        
         # Other player's attr
-        self.normal_bullet_damage = 10
+        self.normal_bullet_damage = 0
         self.level = 1
         self.fire_rate = 500
         self.time_since_last_shot = 0  
@@ -84,6 +75,11 @@ class Player(pygame.sprite.Sprite):
         self.defense_buff_level = 0
         self.bullet_size_buff_level = 0
         self.damage_reduction_buff_level = 0
+        
+        # Sprite clock
+        self.warning_time = 0
+        self.is_hit = False
+        self.hit_time = 0
         
     # Các phương thức get/set
     def get_position_x(self):
@@ -104,11 +100,11 @@ class Player(pygame.sprite.Sprite):
     def get_speed(self):
         return self.speed
     
-    # Các hàm animation
-    def idle_anim(self, clock):
+    # Các hàm animate sprite                    
+    def idle_anim(self):
         pass
     
-    def run_anim(self, clock):
+    def run_anim(self):
         pass
     
     # Các hàm phụ cho Player
@@ -182,13 +178,13 @@ class Player(pygame.sprite.Sprite):
         pygame.draw.rect(SCREEN, transition_color, transition_bar_rect)
         pygame.draw.rect(SCREEN, (255,255,255), (400,670,self.exp_bar_length,15), 2)
         
-    def fire_bullets(self, camera, clock, player_bullets, all_sprites):
+    def fire_bullets(self):
         pass
             
-    def burst_skill(self, camera, clock, player_bullets, all_sprites):
+    def burst_skill(self):
         pass
     
-    def burst_(self, camera, clock, player_bullets, all_sprites):
+    def burst_(self):
         pass
         
     def level_up(self):
@@ -347,25 +343,12 @@ class Player(pygame.sprite.Sprite):
         if self.rect.bottom >= LEVEL_HEIGHT:
             self.rect.bottom = LEVEL_HEIGHT
             
-    # Hàm cập nhật trạng thái Player
-    def update(self, clock, camera, pressed_keys, player_bullets, all_sprites, background):
-        # self.basic_health()
-        if self.move_left == True or self.move_right == True:
-            self.run_anim(clock)
-        elif self.move_left == False and self.move_right == False:
-            self.idle_anim(clock)
-        
-        self.advanced_health()
-        self.advanced_energy()
-        self.advanced_exp()
-        
-        self.fire_bullets(camera, clock, player_bullets, all_sprites)
-        self.burst_(camera, clock, player_bullets, all_sprites)
-        self.level_up()
-        self.movement(pressed_keys, background)
-        
     def get_Current_Health(self):
         return self.current_health
+            
+    # Hàm cập nhật trạng thái Player
+    def update(self):
+        pass
 
 
 # Derived class
@@ -459,11 +442,27 @@ class Player_Male(Player):
                 self.fire_rate = 500
                 self.burst = False
                 self.burst_clock = 0
+                
+    # Hàm cập nhật trạng thái Player
+    def update(self, clock, camera, pressed_keys, player_bullets, all_sprites, background):
+        if self.move_left == True or self.move_right == True:
+            self.run_anim(clock)
+        elif self.move_left == False and self.move_right == False:
+            self.idle_anim(clock)
+        
+        self.advanced_health()
+        self.advanced_energy()
+        self.advanced_exp()
+        
+        self.fire_bullets(camera, clock, player_bullets, all_sprites)
+        self.burst_(camera, clock, player_bullets, all_sprites)
+        self.level_up()
+        self.movement(pressed_keys, background)
 
 class Player_Female(Player):
     def __init__(self):
         super(Player_Female, self).__init__()
-        self.normal_bullet_damage = 5
+        self.normal_bullet_damage = 10
         self.fire_rate = 400
         
         self.surf = female_idle_sprite[0]
@@ -499,7 +498,7 @@ class Player_Female(Player):
                 self.surf = pygame.transform.flip(female_run_sprite[self.run_index], True, False)
             self.run_index += 1
             self.run_time = 0
-
+            
     def fire_bullets(self, camera, clock, player_bullets, all_sprites):
         self.time_since_last_shot += clock.get_time()
 
@@ -554,42 +553,19 @@ class Player_Female(Player):
                 self.burst = False
                 self.burst_clock = 0
                 
-# Các hàm buff khi lên lv của Player
-def increase_hp(player):
-    if player.inc_hp == 5:
-        print("max hp reached")
-    else:
-        player.health += int(20/100 * player.health)
-    
-def increase_speed(player):
-    if player.inc_spd == 5:
-        print("max speed reached")
-    else:
-        player.speed += int(10/100 * player.speed)
-    
-def increase_fire_rate(player):
-    if player.inc_frate == 5:
-        print("max fire rate reached")
-    else:
-        player.fire_rate += int(10/100 * player.fire_rate)
-    
-def increase_fire_range(player, target):
-    if player.inc_frange == 5:
-        print("max fire range reached")
-    else:
-        bullet = Bullet(player, target)
-        bullet.distance_limit += int(10/100 * bullet.distance_limit)
+    # Hàm cập nhật trạng thái Player
+    def update(self, clock, camera, pressed_keys, player_bullets, all_sprites, background):
+        if self.move_left == True or self.move_right == True:
+            self.run_anim(clock)
+        elif self.move_left == False and self.move_right == False:
+            self.idle_anim(clock)
         
-def increase_bullet_size(player, target):
-    if player.inc_bullsize == 5:
-        print("max bullet size reached")
-    else:
-        bullet = Bullet(player, target)
-        bullet.distance_limit += int(10/100 * bullet.distance_limit)
-    
-def increase_bullet_speed(player, target):    
-    if player.inc_bullspd == 5:
-        print("max bullet speed reached")
-    else:
-        bullet = Bullet(player, target)
-        bullet.distance_limit += int(10/100 * bullet.distance_limit)
+        self.advanced_health()
+        self.advanced_energy()
+        self.advanced_exp()
+        
+        self.fire_bullets(camera, clock, player_bullets, all_sprites)
+        self.burst_(camera, clock, player_bullets, all_sprites)
+        self.level_up()
+        self.movement(pressed_keys, background)
+        

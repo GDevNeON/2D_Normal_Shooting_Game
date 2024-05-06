@@ -15,6 +15,7 @@ from Image      import *
 from Background import *
 from Sounds     import grassplain
 
+pygame.mixer.init()
 pygame.init()
 
 
@@ -29,7 +30,6 @@ def Run_Game(current_mode, character_select):
     elites          = pygame.sprite.Group()
     player_bullets  = pygame.sprite.Group()
     elite_bullets   = pygame.sprite.Group()
-    boss_bullets    = pygame.sprite.Group()
     exp_items       = pygame.sprite.Group()
     energy_items    = pygame.sprite.Group()
     hp_items        = pygame.sprite.Group()
@@ -53,8 +53,6 @@ def Run_Game(current_mode, character_select):
     enemy_new_speed = enemy.get_speed()
     enemy_new_pos = (enemy.get_position_x(), enemy.get_position_y())
     background = Background(background_sprite)
-    
-    boss = []
     
     # Gameplay chạy trong này
     running = True
@@ -99,12 +97,6 @@ def Run_Game(current_mode, character_select):
                     new_elite = Elite_4(player)
                 elites.add(new_elite)
                 all_sprites.add(new_elite)
-                
-            # Các sự kiện của enemy Boss
-            if event.type == ADD_BOSS:
-                new_boss = Boss(player)
-                boss.append(new_boss)
-                all_sprites.add(boss)
         
         # Phát hiện va chạm, debusg:
         items_move_towards_player(player, items_group)
@@ -121,12 +113,15 @@ def Run_Game(current_mode, character_select):
             # print('Heal')
             pass
         for enemy in enemies:
-            if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites) == True:
+            if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites, clock) == True:
                 # print('killed')
                 pass
         for elite in elites:
-            if elite_collide_with_player_bullets(elite, player_bullets) == True:
+            if elite_collide_with_player_bullets(elite, player_bullets, clock) == True:
                 # print('Elite slain!')
+                pass
+            
+            if elite_collide_with_player(elites, player, clock) == True:
                 pass
         
         background.blitting(SCREEN)
@@ -144,14 +139,14 @@ def Run_Game(current_mode, character_select):
         pygame.display.update()
         
         clock.tick(FPS)
-        # if player.get_Current_Health() == 0:
-        #     pygame.mixer.music.stop()
-        #     running = False
-        # if current_mode == 1 and boss[0].slain_time == 1:
-        #     running = False    
-        
-
-    # GUI.Run_Gameover_Interface()
+        if player.get_Current_Health() == 0:
+            pygame.mixer.music.stop()
+            running = False
+            GUI.Run_Gameover_Interface()
+        if current_mode == 1 and Enemy.elite_slain_time == 3:   # Chỉnh chế độ normal và endless
+            running = False
+            GUI.Run_Gameover_Interface()    
+            
     pygame.quit()
 
 

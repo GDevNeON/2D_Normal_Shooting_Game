@@ -1,10 +1,11 @@
 import pygame
 import os
 import sys
-sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Game")
-# sys.path.insert(0, r".\src\Game")
+# sys.path.insert(0, r".\python_project\2D_Normal_Shooting_Game\src\Game")
+sys.path.insert(0, r".\src\Game")
 import main 
 
+from Sounds             import menu
 from function_define    import *
 from img                import *
 from class_define       import *
@@ -13,6 +14,7 @@ from pygame.font        import Font
 from define             import *
 from define             import SCREEN 
 
+pygame.mixer.init()
 pygame.init()
 
 font1 = pygame.font.SysFont("Constantia", 30)
@@ -44,6 +46,8 @@ def Run_Gameover_Interface():
 
 
 def Run_User_Interface():
+    pygame.mixer.music.load(menu)
+    pygame.mixer.music.play(loops=-1)
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     
     #Giảm scale của img xuống
