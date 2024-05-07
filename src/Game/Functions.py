@@ -110,12 +110,12 @@ def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items
             enemy.is_hit = False
     return False
 
-def elite_collide_with_player_bullets(elite, player_bullets, clock):
+def elite_collide_with_player_bullets(elite, player_bullets, clock, flag):
     for bullet in player_bullets:
         elite.is_hitted = True
         if elite.hp <= 0:
             elite.kill()
-            Enemy.elite_slain_time += 1
+            flag += 1
             return True
         else:
             if pygame.sprite.collide_rect(bullet, elite):
@@ -123,25 +123,25 @@ def elite_collide_with_player_bullets(elite, player_bullets, clock):
                 elite.hp -= bullet.damage
                 bullet.kill()
                 
-    if elite.is_hitted == True:
-        # elite.surf = change_color(elite.surf, White)
-        elite.is_hitted = False
+    # if elite.is_hitted == True:
+    #     # elite.surf = change_color(elite.surf, White)
+    #     elite.is_hitted = False
     return False
 
-def elite_collide_with_player(elites, player, clock):
+def elite_collide_with_player(elites, player, clock, flag):
     for elite in elites:
         if elite.hp <= 0:
             elite.kill()
-            Enemy.elite_slain_time += 1
+            flag += 1
             return True
         else:
             if pygame.sprite.collide_rect(player, elite):
-                elite.is_hit = True
+                elite.is_hitted = True
                 player.health = 0
                 # print('HP remaining: ', elite.hp)
                 elite.hp -= 10
             
-    if elite.is_hitted == True:
-        # elite.surf = change_color(elite.surf, White)
-        elite.is_hitted = False
+    # if elite.is_hitted == True:
+    #     # elite.surf = change_color(elite.surf, White)
+    #     elite.is_hitted = False
     return False

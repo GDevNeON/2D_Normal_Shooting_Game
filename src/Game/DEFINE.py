@@ -29,4 +29,4 @@ pygame.time.set_timer(ADD_ENEMY, 3000)
 INCREASE_STAT = USEREVENT + 2
 pygame.time.set_timer(INCREASE_STAT, 60000)
 ADD_ELITE = USEREVENT + 3
-pygame.time.set_timer(ADD_ELITE, 60000)
+pygame.time.set_timer(ADD_ELITE, 60000, 3)

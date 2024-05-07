@@ -19,7 +19,7 @@ pygame.mixer.init()
 pygame.init()
 
 
-def Run_Game(current_mode, character_select):    
+def Run_Game(current_mode = 0, character_select = 0):    
     clock = pygame.time.Clock()
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     pygame.mixer.music.load(grassplain)
@@ -53,6 +53,9 @@ def Run_Game(current_mode, character_select):
     enemy_new_speed = enemy.get_speed()
     enemy_new_pos = (enemy.get_position_x(), enemy.get_position_y())
     background = Background(background_sprite)
+    
+    flag = 0
+    c_mode = current_mode
     
     # Gameplay chạy trong này
     running = True
@@ -117,11 +120,11 @@ def Run_Game(current_mode, character_select):
                 # print('killed')
                 pass
         for elite in elites:
-            if elite_collide_with_player_bullets(elite, player_bullets, clock) == True:
+            if elite_collide_with_player_bullets(elite, player_bullets, clock, flag) == True:
                 # print('Elite slain!')
                 pass
             
-            if elite_collide_with_player(elites, player, clock) == True:
+            if elite_collide_with_player(elites, player, clock, flag) == True:
                 pass
         
         background.blitting(SCREEN)
@@ -143,7 +146,7 @@ def Run_Game(current_mode, character_select):
             pygame.mixer.music.stop()
             running = False
             GUI.Run_Gameover_Interface()
-        if current_mode == 1 and Enemy.elite_slain_time == 3:   # Chỉnh chế độ normal và endless
+        if c_mode == 0 and flag == 3:   # Chỉnh chế độ normal và endless
             running = False
             GUI.Run_Gameover_Interface()    
             

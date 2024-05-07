@@ -192,10 +192,10 @@ convert_to_img(slime_sprite, slime_path, 2)
 
 # Elite enemies
 eghost_sprite = []
-convert_to_img(eghost_sprite, eghost_path, 1)
+convert_to_img(eghost_sprite, eghost_path, 3)
 
 egoblin_sprite = []
-convert_to_img(egoblin_sprite, egoblin_path, 1)
+convert_to_img(egoblin_sprite, egoblin_path, 3)
 
 eskeleton_sprite = []
 convert_to_img(eskeleton_sprite, eskeleton_path, 1)

@@ -479,7 +479,7 @@ class Player_Female(Player):
     def __init__(self):
         super(Player_Female, self).__init__()
         self.normal_bullet_damage = 10
-        self.fire_rate = 400
+        self.fire_rate = 200
         
         self.surf = female_idle_sprite[0]
         self.rect = self.surf.get_rect(
@@ -561,11 +561,11 @@ class Player_Female(Player):
         
     def burst_(self, camera, clock, player_bullets, all_sprites):
         if self.burst == True:
-            self.fire_rate = 100
+            self.fire_rate = 200
             self.burst_clock += clock.get_time()
             self.burst_skill(camera, clock, player_bullets, all_sprites)
             if self.burst_clock >= self.burst_time:
-                self.fire_rate = 400
+                self.fire_rate = 200
                 self.burst = False
                 self.burst_clock = 0
                 

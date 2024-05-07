@@ -14,7 +14,7 @@ class Enemy(pygame.sprite.Sprite):
         # Enemy's base attr
         self.size = 20
         self.speed = 1.5
-        self.health = 10
+        self.health = 20
         self.collide_damage = 10
         self.normal_bullet_damage = 10
         self.is_hit = False
@@ -133,7 +133,7 @@ class Elite_1(Enemy):
         super(Elite_1, self).__init__(player)
         self.size = 100
         self.speed = 5
-        self.hp = 1000
+        self.hp = 500
         
         self.sprite = eghost_sprite
         self.surf = eghost_sprite[0]
@@ -208,7 +208,7 @@ class Elite_2(Enemy):
         super(Elite_2, self).__init__(player)
         self.size = 100
         self.speed = 5
-        self.hp = 1000
+        self.hp = 500
         
         self.sprite = egoblin_sprite
         self.surf = egoblin_sprite[0]
@@ -283,7 +283,7 @@ class Elite_3(Enemy):
         super(Elite_3, self).__init__(player)
         self.size = 100
         self.speed = 5
-        self.hp = 1000
+        self.hp = 500
         
         self.sprite = eskeleton_sprite
         self.surf = eskeleton_sprite[0]
@@ -357,7 +357,7 @@ class Elite_4(Enemy):
         super(Elite_4, self).__init__(player)
         self.size = 100
         self.speed = 5
-        self.hp = 1000
+        self.hp = 500
         
         self.sprite = eslime_sprite
         self.surf = eslime_sprite[0]
