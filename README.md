@@ -1,6 +1,6 @@
 # 2D Normal Shooting Game
 
-![Game Screenshot](src/Game/assets/images/screenshot.png)  
+![Game Screenshot](src/Game/assets/screenshot.png)  
 *An absolutely normal 2D shooting game built with Python and Pygame*
 
 ## 📜 Game Description
