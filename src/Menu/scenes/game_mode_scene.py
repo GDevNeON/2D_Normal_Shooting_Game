@@ -26,7 +26,7 @@ class GameModeScene(Scene):
         self.mode = 1  # 1: normal, 0: endless
         self.mode_names = {1: "NORMAL MODE", 0: "ENDLESS MODE"}
         self.mode_descriptions = {
-            1: "Complete 5 levels and defeat the final boss",
+            1: "Survive for 5 minutes and defeat the final boss",
             0: "Survive as long as possible with increasing difficulty"
         }
         

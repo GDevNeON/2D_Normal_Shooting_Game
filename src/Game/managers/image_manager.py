@@ -4,7 +4,6 @@ from pathlib import Path
 
 # Size constants
 BOSS_SIZE = 1.5  # Scale factor for boss sprites
-ELITE_SCALE = 0.1  # Scale factor for elite enemy sprites
 
 # Get current working directory and module path
 cwd = Path.cwd()
@@ -141,41 +140,81 @@ def change_color(image, color):
     # Return the new surface
     return new_surface
 
-def convert_to_img(img_group_sprite, img_group_path, size_ratio):
-    """Convert image paths to pygame surfaces and add to sprite list"""
-    print(f"Starting to load {len(img_group_path)} sprites...")
+def scale_to_size(image, target_size):
+    """Scale image to target size while maintaining aspect ratio"""
+    # Calculate the scaling factor while maintaining aspect ratio
+    width_ratio = target_size[0] / image.get_width()
+    height_ratio = target_size[1] / image.get_height()
+    scale = min(width_ratio, height_ratio)
+    
+    # Calculate new dimensions
+    new_width = int(image.get_width() * scale)
+    new_height = int(image.get_height() * scale)
+    
+    # Create a new surface with target size and transparent background
+    new_surface = pygame.Surface(target_size, pygame.SRCALPHA)
+    
+    # Calculate position to center the scaled image
+    x = (target_size[0] - new_width) // 2
+    y = (target_size[1] - new_height) // 2
+    
+    # Scale and blit the image onto the new surface
+    scaled_image = pygame.transform.scale(image, (new_width, new_height))
+    new_surface.blit(scaled_image, (x, y))
+    
+    return new_surface
+
+def convert_to_img(img_group_sprite, img_group_path, enemy_type="normal"):
+    """
+    Convert image paths to pygame surfaces and add to sprite list
+    
+    Args:
+        img_group_sprite: List to store the loaded sprites
+        img_group_path: List of paths to the sprite images
+        enemy_type: Type of enemy ("normal", "elite", "boss")
+    """
+    print(f"Starting to load {len(img_group_path)} {enemy_type} sprites...")
+    
+    # Define target sizes for different enemy types
+    TARGET_SIZES = {
+        "normal": (64, 64),
+        "elite": (96, 96),  # 1.5x normal size
+        "boss": (192, 192)  # 3x normal size
+    }
+    
+    target_size = TARGET_SIZES.get(enemy_type, (64, 64))
+    
     for i, sprite in enumerate(img_group_path):
         try:
             path = (mod_path / sprite).resolve()
-            print(f"Loading sprite {i+1}: {path}")
+            print(f"Loading {enemy_type} sprite {i+1}: {path}")
             if not path.exists():
                 print(f"  Error: File not found: {path}")
                 continue
                 
+            # Load the image with alpha channel
             image = pygame.image.load(str(path)).convert_alpha()
             if image is None:
                 print(f"  Error: Failed to load image: {path}")
                 continue
-                
-            # Scale the image
-            width = int(image.get_width() * size_ratio)
-            height = int(image.get_height() * size_ratio)
-            image = pygame.transform.scale(image, (width, height))
+            
+            # Scale the image to target size while maintaining aspect ratio
+            scaled_image = scale_to_size(image, target_size)
             
             # If the image has no alpha channel, set black as colorkey
-            if image.get_alpha() is None:
-                image = image.convert()
-                image.set_colorkey((0, 0, 0))  # Black color key if no alpha channel
-                
-            img_group_sprite.append(image)
-            print(f"  Successfully loaded and scaled to {width}x{height}")
+            if scaled_image.get_alpha() is None:
+                scaled_image = scaled_image.convert()
+                scaled_image.set_colorkey((0, 0, 0))
+            
+            img_group_sprite.append(scaled_image)
+            print(f"  Successfully loaded and scaled to {target_size[0]}x{target_size[1]}")
             
         except Exception as e:
             print(f"  Error loading image {sprite}: {str(e)}")
             import traceback
             traceback.print_exc()
     
-    print(f"Finished loading {len(img_group_sprite)}/{len(img_group_path)} sprites")
+    print(f"Finished loading {len(img_group_sprite)}/{len(img_group_path)} {enemy_type} sprites")
         
 # Load background and item sprites
 background_path         = (mod_path / background1).resolve()
@@ -224,99 +263,31 @@ male_run_sprite_left = [pygame.transform.flip(sprite, True, False) for sprite in
 female_idle_sprite_left = [pygame.transform.flip(sprite, True, False) for sprite in female_idle_sprite]
 female_run_sprite_left = [pygame.transform.flip(sprite, True, False) for sprite in female_run_sprite]
    
-# Normal enemies 
+# Normal enemies - using standard 64x64 size
 ghost_sprite = []
-convert_to_img(ghost_sprite, ghost_path, 0.8)
+convert_to_img(ghost_sprite, ghost_path, "normal")
     
 goblin_sprite = []
-convert_to_img(goblin_sprite, goblin_path, 0.8)
+convert_to_img(goblin_sprite, goblin_path, "normal")
     
 skeleton_sprite = []
-convert_to_img(skeleton_sprite, skeleton_path, 0.8)
+convert_to_img(skeleton_sprite, skeleton_path, "normal")
     
 slime_sprite = []
-convert_to_img(slime_sprite, slime_path, 0.8)
+convert_to_img(slime_sprite, slime_path, "normal")
 
-# Elite enemies - scaled to be larger than normal enemies
-ELITE_SCALE = 1.0  # Base scale factor for elite enemies
-
-# Initialize elite sprite lists
+# Elite enemies - using 1.5x size (96x96)
 eghost_sprite = []
+convert_to_img(eghost_sprite, eghost_path, "elite")
+
 egoblin_sprite = []
+convert_to_img(egoblin_sprite, egoblin_path, "elite")
+
 eskeleton_sprite = []
+convert_to_img(eskeleton_sprite, eskeleton_path, "elite")
+
 eslime_sprite = []
-
-def load_elite_sprites():
-    """Load all elite enemy sprites with proper scaling"""
-    global eghost_sprite, egoblin_sprite, eskeleton_sprite, eslime_sprite
-    
-    # Re-initialize sprite lists to ensure they're empty
-    eghost_sprite = []
-    egoblin_sprite = []
-    eskeleton_sprite = []
-    eslime_sprite = []
-    
-    print("\nLoading elite enemy sprites with scale:", ELITE_SCALE)
-    
-    # Load elite ghost sprites
-    print("\nLoading elite ghost sprites...")
-    for path in eghost_path:
-        try:
-            img_path = (mod_path / path).resolve()
-            img = pygame.image.load(str(img_path)).convert_alpha()
-            width = int(img.get_width() * ELITE_SCALE)
-            height = int(img.get_height() * ELITE_SCALE)
-            scaled_img = pygame.transform.scale(img, (width, height))
-            eghost_sprite.append(scaled_img)
-            print(f"  Loaded and scaled {path} to {width}x{height}")
-        except Exception as e:
-            print(f"Error loading elite ghost sprite {path}: {e}")
-    
-    # Load elite goblin sprites
-    print("\nLoading elite goblin sprites...")
-    for path in egoblin_path:
-        try:
-            img_path = (mod_path / path).resolve()
-            img = pygame.image.load(str(img_path)).convert_alpha()
-            width = int(img.get_width() * ELITE_SCALE)
-            height = int(img.get_height() * ELITE_SCALE)
-            scaled_img = pygame.transform.scale(img, (width, height))
-            egoblin_sprite.append(scaled_img)
-            print(f"  Loaded and scaled {path} to {width}x{height}")
-        except Exception as e:
-            print(f"Error loading elite goblin sprite {path}: {e}")
-    
-    # Load elite skeleton sprites
-    print("\nLoading elite skeleton sprites...")
-    for path in eskeleton_path:
-        try:
-            img_path = (mod_path / path).resolve()
-            img = pygame.image.load(str(img_path)).convert_alpha()
-            width = int(img.get_width() * ELITE_SCALE)
-            height = int(img.get_height() * ELITE_SCALE)
-            scaled_img = pygame.transform.scale(img, (width, height))
-            eskeleton_sprite.append(scaled_img)
-            print(f"  Loaded and scaled {path} to {width}x{height}")
-        except Exception as e:
-            print(f"Error loading elite skeleton sprite {path}: {e}")
-    
-    # Load elite slime sprites
-    print("\nLoading elite slime sprites...")
-    for path in eslime_path:
-        try:
-            img_path = (mod_path / path).resolve()
-            img = pygame.image.load(str(img_path)).convert_alpha()
-            # Apply elite scale to the image
-            new_width = int(img.get_width() * ELITE_SCALE)
-            new_height = int(img.get_height() * ELITE_SCALE)
-            scaled_img = pygame.transform.scale(img, (new_width, new_height))
-            eslime_sprite.append(scaled_img)
-            print(f"  Loaded and scaled {path} from {img.get_width()}x{img.get_height()} to {new_width}x{new_height}")
-        except Exception as e:
-            print(f"Error loading elite slime sprite {path}: {e}")
-
-# Load elite sprites when the module is imported
-load_elite_sprites()
+convert_to_img(eslime_sprite, eslime_path, "elite")
 
 def load_boss_sprites():
     """Load all boss sprites with error handling"""

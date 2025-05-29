@@ -21,7 +21,6 @@ from Menu.config.constants import WIDTH_SCREEN, HEIGHT_SCREEN
 
 # Import Game modules
 from Game.core.define import *
-from Game.core.game import Run_Game
 
 def main():
     """Main entry point for the game"""

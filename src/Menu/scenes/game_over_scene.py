@@ -12,7 +12,10 @@ from .base_scene import Scene
 from ..components.button import ImageButton
 from ..utils.asset_loader import AssetLoader
 from ..utils.drawing import draw_image
-from ..config.constants import BLACK_COLOR
+from ..config.constants import BLACK_COLOR, WHITE_COLOR
+
+# Import Game font manager
+from Game.managers.font_manager import FontManager
 
 class GameOverScene(Scene):
     """Game over scene with option to return to main menu"""
@@ -20,50 +23,88 @@ class GameOverScene(Scene):
         super().__init__(screen)
         self.assets = AssetLoader()
         
-    def setup(self):
+        # Use the game's font manager
+        self.font_manager = FontManager()
+        self.title_font = self.font_manager.title_font
+        self.medium_font = self.font_manager.medium_font
+        self.small_font = self.font_manager.small_font
+        
+        # Track button state
+        self.button_hover = False
+        self.back_button = None
+        self.final_score = 0
+        
+    def setup(self, score=0):
         """Initialize game over elements"""
         super().setup()
+        self.final_score = score
         
-        # Load game over title and button images
-        self.game_over_title = self.assets.get_image('game_over_title')
-        back_button_img = self.assets.get_image('try_again_button')
+        # Create back button
+        button_width, button_height = 200, 50
+        self.back_button = pygame.Rect(
+            (self.screen.get_width() - button_width) // 2,
+            self.screen.get_height() * 3 // 4,
+            button_width,
+            button_height
+        )
         
-        # Calculate positions
-        screen_center_x_1 = self.screen.get_width() / 3.1
-        screen_center_x_2 = self.screen.get_width() / 1.91
-        five_six_height = int(self.screen.get_height() * 0.8)
-        
-        # Calculate button dimensions
-        button_width = back_button_img.get_width() * 0.4
-        button_height = back_button_img.get_height() * 0.3
-        
-        # Create back to menu button
-        self.back_to_menu = ImageButton(
-            screen_center_x_2 - button_width, 
-            five_six_height - button_height / 2, 
-            back_button_img, 
-            0.6
-        ).set_callback(self.on_back_clicked)
-        
-        # Add buttons to ui_elements
-        self.ui_elements = [self.back_to_menu]
+        # No need for UI elements list as we're drawing directly
         
     def update(self, dt):
         """Update the game over screen"""
-        super().update(dt)
+        pass  # No animation updates needed
     
     def draw(self):
         """Draw the game over screen"""
-        # Fill background
+        # Fill background with semi-transparent black
         self.screen.fill(BLACK_COLOR)
         
+        # Create overlay for better text visibility
+        overlay = pygame.Surface((self.screen.get_width(), self.screen.get_height()), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 200))  # Semi-transparent black
+        self.screen.blit(overlay, (0, 0))
+        
         # Draw game over title
-        draw_image(self.screen, self.game_over_title, 0.3, self.screen.get_width() / 3.1, -20)
+        title_text = self.title_font.render("GAME OVER", True, (255, 0, 0))
+        title_rect = title_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 3))
+        self.screen.blit(title_text, title_rect)
         
-        # Draw UI elements
-        super().draw()
+        # Draw score
+        score_text = self.medium_font.render(f"Final Score: {self.final_score}", True, WHITE_COLOR)
+        score_rect = score_text.get_rect(center=(self.screen.get_width() // 2, self.screen.get_height() // 2))
+        self.screen.blit(score_text, score_rect)
         
-    def on_back_clicked(self):
-        """Handle back to menu button click"""
-        from .main_menu_scene import MainMenuScene
-        self.switch_to_scene(MainMenuScene(self.screen))
+        # Draw back button
+        button_color = (100, 100, 255) if self.button_hover else (70, 70, 220)
+        pygame.draw.rect(self.screen, button_color, self.back_button, border_radius=10)
+        pygame.draw.rect(self.screen, (200, 200, 255), self.back_button, width=2, border_radius=10)
+        
+        # Draw button text
+        button_text = self.medium_font.render("Back to Menu", True, WHITE_COLOR)
+        button_text_rect = button_text.get_rect(center=self.back_button.center)
+        self.screen.blit(button_text, button_text_rect)
+        
+        # Update display
+        pygame.display.flip()
+        
+    def handle_event(self, event):
+        """Handle pygame events"""
+        if super().handle_event(event):
+            return True
+            
+        if event.type == pygame.KEYDOWN:
+            if event.key == pygame.K_ESCAPE:
+                from .main_menu_scene import MainMenuScene
+                self.next_scene = "menu"  # Use string to match scene_manager implementation
+                self.is_running = False
+                return True
+        elif event.type == pygame.MOUSEBUTTONDOWN:
+            if self.back_button.collidepoint(event.pos):
+                from .main_menu_scene import MainMenuScene
+                self.next_scene = "menu"  # Use string to match scene_manager implementation
+                self.is_running = False
+                return True
+        elif event.type == pygame.MOUSEMOTION:
+            self.button_hover = self.back_button.collidepoint(event.pos)
+            
+        return False

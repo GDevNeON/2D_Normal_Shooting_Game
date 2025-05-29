@@ -93,62 +93,73 @@ def player_collide_with_hp_items(player, hp_items):
     return False
 
 def enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites, clock):
-    for bullet in player_bullets:
-        if pygame.sprite.collide_rect(enemy, bullet):
-            # Play enemy hit sound
-            from ..managers.sound_manager import SoundManager
-            SoundManager.play_enemy_hit()
-            
-            enemy.is_hit = True
-            enemy.health -= bullet.damage
-            if enemy.health <= 0:
-                enemy.kill()
-                # Chắc chắn rớt
-                new_exp_item = ExpItem(enemy)
-                exp_items.add(new_exp_item)
-                items_group.add(new_exp_item)
-                all_sprites.add(new_exp_item)
-                # Có khả năng rớt
-                rand = numpy.random.choice(numpy.arange(0, 3), p=[0.2, 0.2, 0.6])
-                if rand == 0:
-                    new_energy_item = EnergyItem(enemy)
-                    energy_items.add(new_energy_item)
-                    all_sprites.add(new_energy_item)
-                    items_group.add(new_energy_item)
-                elif rand == 1:
-                    new_hp_item = HpItem(enemy)
-                    hp_items.add(new_hp_item)
-                    all_sprites.add(new_hp_item)
-                    items_group.add(new_hp_item)
-
-            bullet.kill()
-            return True
+    enemy_died = False
+    
+    # Create a list of bullets that hit the enemy
+    bullets_hit = [bullet for bullet in player_bullets if pygame.sprite.collide_rect(enemy, bullet)]
+    
+    # Process each bullet that hit the enemy
+    for bullet in bullets_hit:
+        # Play enemy hit sound
+        from ..managers.sound_manager import SoundManager
+        SoundManager.play_enemy_hit()
         
-    if enemy.is_hit == True:
+        enemy.is_hit = True
+        enemy.health -= bullet.damage
+        bullet.kill()  # Remove bullet from all groups
+        
+        # Check if enemy died from this hit
+        if enemy.health <= 0 and not enemy_died:
+            enemy.kill()
+            # Chắc chắn rớt
+            new_exp_item = ExpItem(enemy)
+            exp_items.add(new_exp_item)
+            items_group.add(new_exp_item)
+            all_sprites.add(new_exp_item)
+            # Có khả năng rớt
+            rand = numpy.random.choice(numpy.arange(0, 3), p=[0.2, 0.2, 0.6])
+            if rand == 0:
+                new_energy_item = EnergyItem(enemy)
+                energy_items.add(new_energy_item)
+                all_sprites.add(new_energy_item)
+                items_group.add(new_energy_item)
+            elif rand == 1:
+                new_hp_item = HpItem(enemy)
+                hp_items.add(new_hp_item)
+                all_sprites.add(new_hp_item)
+                items_group.add(new_hp_item)
+            enemy_died = True
+    
+    # Handle hit effect
+    if enemy.is_hit:
         enemy.hit_time += clock.get_time()
         enemy.surf = change_color(enemy.surf, White)
         if enemy.hit_time >= 50:
             enemy.hit_time = 0
             enemy.is_hit = False
-    return False
+    
+    return enemy_died
 
 def elite_collide_with_player_bullets(elite, player_bullets, clock, flag):
-    for bullet in player_bullets:
+    elite_died = False
+    
+    # Create a list of bullets that hit the elite
+    bullets_hit = [bullet for bullet in player_bullets if pygame.sprite.collide_rect(bullet, elite)]
+    
+    # Process each bullet that hit the elite
+    for bullet in bullets_hit:
         elite.is_hitted = True
-        if elite.hp <= 0:
+        elite.hp -= bullet.damage
+        bullet.kill()  # Remove bullet from all groups
+        
+        # Check if elite died from this hit
+        if elite.hp <= 0 and not elite_died:
             elite.kill()
             flag += 1
-            return True
-        else:
-            if pygame.sprite.collide_rect(bullet, elite):
-                # print('HP remaining: ', elite.hp)
-                elite.hp -= bullet.damage
-                bullet.kill()
-                
-    # if elite.is_hitted == True:
-    #     # elite.surf = change_color(elite.surf, White)
-    #     elite.is_hitted = False
-    return False
+            elite_died = True
+            break  # Exit loop if elite is dead
+    
+    return elite_died, flag
 
 def elite_collide_with_player(elites, player, clock, flag):
     for elite in elites:

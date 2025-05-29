@@ -211,9 +211,9 @@ class CharacterSelectionScene(Scene):
         
         # Display character description based on selected character
         if self.character == 1:
-            description = "Strong melee fighter with high HP"
+            description = "Strong spreadshooter with high HP"
         else:
-            description = "Agile ranged fighter with high speed"
+            description = "Agile ranged fighter with machine gun"
             
         draw_text(self.screen, description, desc_font, WHITE_COLOR, self.info_panel["rect"].centerx, desc_y)
         

@@ -1,18 +1,20 @@
 import pygame
 import random
 import sys
-import time
-import os
-from pathlib import Path
+
 sys.path.insert(0, r"./src/Menu")
 
 # Import from our reorganized modules
 from ..core.define import *
 from ..core.camera import *
-from ..entities.player import Player_Male, Player_Female
-from ..entities.elite_enemies import Elite_1, Elite_2, Elite_3, Elite_4
+from ..entities.player_male import Player_Male
+from ..entities.player_female import Player_Female
 from ..entities.enemy import Normal
-from ..entities.boss import SkellyBoss, SwordSkill, SwordCast, SkellyFeather
+from ..entities.enemy_elite1 import Elite_1
+from ..entities.enemy_elite2 import Elite_2
+from ..entities.enemy_elite3 import Elite_3
+from ..entities.enemy_elite4 import Elite_4
+from ..entities.enemy_boss import SkellyBoss
 from ..entities.items import *
 from ..utils.functions import *
 from ..managers.image_manager import *
@@ -69,6 +71,18 @@ def Run_Game(current_mode = 0, character_select = 0):
     is_paused = False  # Thêm biến để kiểm tra trạng thái pause
     game_won = False   # Flag to check if player won the game in normal mode
     
+    # Reset game state and set boss spawn timer based on game mode
+    game_won = False
+    victory_time = 0
+    victory_delay = 5000  # 5 seconds delay before returning to menu
+    
+    if c_mode == 1:  # Normal mode (1 = Normal, 0 = Endless)
+        print("[DEBUG] Setting up NORMAL mode - boss will spawn in 30 seconds")
+        pygame.time.set_timer(ADD_BOSS, 3000)  # 30 seconds for normal mode
+    else:  # Endless mode
+        print("[DEBUG] Setting up ENDLESS mode - boss will spawn in 5 minutes")
+        pygame.time.set_timer(ADD_BOSS, 3000)  # 5 minutes for endless mode
+    
     # Gameplay chạy trong này
     running = True
     while running:
@@ -123,7 +137,7 @@ def Run_Game(current_mode = 0, character_select = 0):
                 
             # Các sự kiện của Enemy
             if event.type == ADD_ENEMY and not player.is_leveling_up and not is_paused:  # Không tạo enemy khi đang level up hoặc pause
-                for _ in range(10):  # Tạo 10 kẻ địch
+                for _ in range(20):  # Tạo 20 kẻ địch
                     new_enemy = Normal(player)
                     new_enemy.set_speed(enemy_new_speed)
                     new_enemy.set_hp(enemy_new_hp)
@@ -152,18 +166,22 @@ def Run_Game(current_mode = 0, character_select = 0):
                 
             # Handle boss events
             if event.type == ADD_BOSS and not is_paused and not player.is_leveling_up and not boss_spawned:
-                if (c_mode == 0 and not game_won) or (c_mode == 1 and pygame.time.get_ticks() - boss_death_time >= boss_respawn_time):
+                print(f"[DEBUG] ADD_BOSS event triggered. Mode: {'NORMAL' if c_mode == 0 else 'ENDLESS'}, Game won: {game_won}, Time since death: {pygame.time.get_ticks() - boss_death_time}ms")
+                if (c_mode == 1 and not game_won) or (c_mode == 0 and pygame.time.get_ticks() - boss_death_time >= boss_respawn_time):
+                    print("[DEBUG] Attempting to spawn boss...")
                     # Switch to boss music
                     SoundManager.play_music(grassplain_boss, loops=-1)
                     # Create the boss
-                    boss = SkellyBoss(player, game_mode="normal" if c_mode == 0 else "endless")
+                    boss = SkellyBoss(player, game_mode="normal" if c_mode == 1 else "endless")
                     bosses.add(boss)
                     all_sprites.add(boss)
                     boss_spawned = True
-                    
+                    print(f"[DEBUG] Boss spawned at {pygame.time.get_ticks()//1000} seconds")
                     # Set up boss timers
                     pygame.time.set_timer(BOSS_DASH, 5000)  # Dash every 5 seconds
                     pygame.time.set_timer(BOSS_SKILL_1, 10000)  # Skill 1 every 10 seconds
+                else:
+                    print(f"[DEBUG] Boss spawn conditions not met. Mode: {c_mode}, Game won: {game_won}, Time since death: {pygame.time.get_ticks() - boss_death_time}ms")
                     
             # Handle boss dash event
             if event.type == BOSS_DASH and boss_spawned:
@@ -233,7 +251,7 @@ def Run_Game(current_mode = 0, character_select = 0):
                     SoundManager.play_game_over()
                     from Menu.scenes.game_over_scene import GameOverScene
                     game_over_scene = GameOverScene(pygame.display.get_surface())
-                    game_over_scene.setup()
+                    game_over_scene.setup(score=player.score)
                     return game_over_scene
                     
             # Handle other collisions
@@ -243,17 +261,32 @@ def Run_Game(current_mode = 0, character_select = 0):
                 pass
             if player_collide_with_hp_items(player, hp_items):
                 pass
-            for enemy in enemies:
-                if enemy_collide_with_player_bullets(enemy, player_bullets, exp_items, hp_items, energy_items, items_group, all_sprites, clock) == True:
-                    player.score += 10  # Tăng điểm khi giết enemy
-                    pass
-            for elite in elites:
-                if elite_collide_with_player_bullets(elite, player_bullets, clock, flag) == True:
-                    player.score += 50  # Tăng điểm khi giết elite
-                    pass
+            # Process regular enemies
+            for enemy in list(enemies):  # Convert to list for safe iteration
+                enemy_died = enemy_collide_with_player_bullets(
+                    enemy, player_bullets, exp_items, hp_items, energy_items, 
+                    items_group, all_sprites, clock
+                )
+                if enemy_died:
+                    player.score += 10  # Increase score when enemy is killed
+                    enemy.kill()  # Remove from all groups
+            
+            # Process elite enemies
+            for elite in list(elites):  # Convert to list for safe iteration
+                elite_died, flag = elite_collide_with_player_bullets(elite, player_bullets, clock, flag)
+                if elite_died:
+                    player.score += 50  # Increase score when elite is killed
+                    elite.kill()  # Remove from all groups
                 
-                if elite_collide_with_player(elites, player, clock, flag) == True:
-                    pass
+                # Check for player collision with elite
+                if elite_collide_with_player(elites, player, clock, flag):
+                    pass  # Handle player collision if needed
+            
+            # Check for elite bullet collisions with player
+            for bullet in list(elite_bullets):
+                if pygame.sprite.collide_rect(player, bullet):
+                    player.take_damage(bullet.damage)
+                    bullet.kill()  # Remove the bullet after hitting the player
                     
             # Handle boss collisions and mechanics
             for boss in bosses:
@@ -271,24 +304,17 @@ def Run_Game(current_mode = 0, character_select = 0):
                         player.take_damage(boss.collide_damage)
                         player.damage_time = pygame.time.get_ticks()
                 
-                # Check for feather collection in phase 2 defeat
-                if boss.defeated:
-                    for feather in boss.feathers[:]:  # Use a copy of the list for iteration
-                        if pygame.sprite.collide_rect(feather, player):
-                            boss.collect_feather(feather)
-                            player.score += 20  # Score for collecting feathers
+                # Check for boss defeat
+                if boss.defeated and c_mode == 1:  # Normal mode
+                    print("[DEBUG] Boss defeated! Showing victory scene...")
+                    # Switch to normal music
+                    SoundManager.play_music(grassplain, loops=-1)
                     
-                    # Check if boss is completely defeated
-                    if boss.feathers_collected == boss.total_feathers:
-                        if c_mode == 0:  # Normal mode
-                            game_won = True
-                            # Switch back to normal music
-                            SoundManager.play_music(grassplain, loops=-1)
-                        else:  # Endless mode
-                            boss_death_time = pygame.time.get_ticks()
-                            boss_spawned = False
-                            # Switch back to normal music
-                            SoundManager.play_music(grassplain, loops=-1)
+                    # Return victory scene with player's score
+                    from Menu.scenes.victory_scene import VictoryScene
+                    victory_scene = VictoryScene(pygame.display.get_surface())
+                    victory_scene.setup(score=player.score)
+                    return victory_scene
         
         # Update game state
         if not is_paused:
@@ -339,15 +365,31 @@ def Run_Game(current_mode = 0, character_select = 0):
                         # Draw the trail image
                         screen.blit(trail['surf'], trail_rect)
         
-        # Draw all sprites
+        # Draw elite enemies' trail effects
+        for elite in elites:
+            if hasattr(elite, 'trail_positions') and elite.trail_positions:
+                for trail in elite.trail_positions:
+                    # Create a rect for the trail image and position it
+                    trail_rect = trail['surf'].get_rect(center=(trail['x'], trail['y']))
+                    # Apply camera position to the trail position
+                    trail_rect.x += camera.camera.x
+                    trail_rect.y += camera.camera.y
+                    # Draw the trail image
+                    screen.blit(trail['surf'], trail_rect)
+        
+        # Draw all sprites relative to the camera
         for entity in all_sprites:
             try:
-                if not isinstance(entity.surf, pygame.Surface):
-                    print(f"Error: Entity {entity.__class__.__name__} has invalid surface: {entity.surf}")
-                screen.blit(entity.surf, camera.apply(entity))
+                if hasattr(entity, 'draw'):
+                    entity.draw(screen, camera)
+                else:
+                    screen.blit(entity.surf, camera.apply(entity))
             except Exception as e:
-                print(f"Error drawing entity {entity.__class__.__name__}: {e}")
-            
+                print(f"Error drawing entity: {e}")
+                continue
+                
+        # No need for victory message here anymore - using VictoryScene instead
+                
         # Draw UI elements (health, energy, score, etc.)
         player.advanced_health()
         player.advanced_energy()
@@ -392,7 +434,7 @@ def Run_Game(current_mode = 0, character_select = 0):
             pygame.mouse.set_visible(True)  # Show default cursor when not paused
         
         # Check if player is dead
-        if player.health <= 0:
+        if player.current_health <= 0:
             # Play game over sound
             SoundManager.play_game_over()
             
@@ -446,4 +488,3 @@ def Run_Game(current_mode = 0, character_select = 0):
 
 if __name__ == '__main__':
     Run_Game()
-    # GUI.Run_User_Interface()

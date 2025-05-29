@@ -85,9 +85,10 @@ We welcome contributions to the project! If you'd like to contribute, please:
 
 ## 📜 License
 This project is licensed under the [MIT License](LICENSE).
-Game BGM is copyrighted by Arknights
-Menu BGM is copyrighted by Sky Force Reloaded
-Game SFX is copyrighted by Pixabay
+- Game BGM is copyrighted by Arknights
+- Menu BGM is copyrighted by Sky Force Reloaded
+- Game SFX is copyrighted by Pixabay
+- Game Sprite made by Doan Hoang Long [X](https://x.com/ryu_hoang)
 
 ## ✉️ Contact
 For any questions or contributions, please contact:

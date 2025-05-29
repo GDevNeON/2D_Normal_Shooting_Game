@@ -14,7 +14,7 @@ class SwordSkill(pygame.sprite.Sprite):
     def __init__(self, x, y, player):
         super(SwordSkill, self).__init__()
         self.sprite = []
-        self.animation_speed = 150  # Time between frames in ms
+        self.animation_speed = 500  # Time between frames in ms
         self.player = player
         self.damage = 15
         self.damage_dealt = False
@@ -24,18 +24,18 @@ class SwordSkill(pygame.sprite.Sprite):
             try:
                 img = pygame.image.load((mod_path / path).resolve()).convert_alpha()
                 # Scale using BOSS_SIZE
-                img = pygame.transform.scale_by(img, BOSS_SIZE * 0.8)  # Slightly smaller than boss size
+                img = pygame.transform.scale_by(img, BOSS_SIZE * 1.5)  # Slightly smaller than boss size
                 self.sprite.append(img)
             except Exception as e:
                 print(f"Error loading sword skill sprite {path}: {e}")
                 # Create a placeholder surface if loading fails
-                size = int(100 * BOSS_SIZE * 0.8)
+                size = int(100 * BOSS_SIZE * 1.5)
                 surf = pygame.Surface((size, size), pygame.SRCALPHA)
                 pygame.draw.rect(surf, (255, 0, 255), (0, 0, size, size))
                 self.sprite.append(surf)
         
         if not self.sprite:  # If no sprites were loaded
-            size = int(100 * BOSS_SIZE * 0.8)
+            size = int(100 * BOSS_SIZE * 1.5)
             self.sprite = [pygame.Surface((size, size), pygame.SRCALPHA)]
             pygame.draw.rect(self.sprite[0], (255, 0, 255), (0, 0, size, size))
         
@@ -69,7 +69,7 @@ class SwordCast(pygame.sprite.Sprite):
     def __init__(self, x, y, player):
         super(SwordCast, self).__init__()
         self.sprite = []
-        self.animation_speed = 150  # Time between frames in ms
+        self.animation_speed = 500  # Time between frames in ms
         self.player = player
         self.damage = 25
         self.damage_dealt = False
@@ -79,18 +79,18 @@ class SwordCast(pygame.sprite.Sprite):
             try:
                 img = pygame.image.load((mod_path / path).resolve()).convert_alpha()
                 # Scale using BOSS_SIZE
-                img = pygame.transform.scale_by(img, BOSS_SIZE * 0.9)  # Slightly smaller than boss size
+                img = pygame.transform.scale_by(img, BOSS_SIZE * 1.5)  # Slightly smaller than boss size
                 self.sprite.append(img)
             except Exception as e:
                 print(f"Error loading sword cast sprite {path}: {e}")
                 # Create a placeholder surface if loading fails
-                size = int(120 * BOSS_SIZE * 0.9)
+                size = int(120 * BOSS_SIZE * 1.5)
                 surf = pygame.Surface((size, size), pygame.SRCALPHA)
                 pygame.draw.rect(surf, (255, 165, 0), (0, 0, size, size))
                 self.sprite.append(surf)
         
         if not self.sprite:  # If no sprites were loaded
-            size = int(120 * BOSS_SIZE * 0.9)
+            size = int(120 * BOSS_SIZE * 1.5)
             self.sprite = [pygame.Surface((size, size), pygame.SRCALPHA)]
             pygame.draw.rect(self.sprite[0], (255, 165, 0), (0, 0, size, size))
         
@@ -193,8 +193,8 @@ class SkellyBoss(Enemy):
         self.screen_height = 1080
         
         # Stats for phase 1
-        self.health = 1000
-        self.max_health = 1000
+        self.health = 10000
+        self.max_health = 10000
         self.speed = 2
         self.dash_speed = 6  # Slower dash speed (was 10)
         self.collide_damage = 25
@@ -743,13 +743,16 @@ class SkellyBoss(Enemy):
                 if skill_sprites_to_use and len(skill_sprites_to_use) > 0:
                     frame_index = (current_time // 250) % len(skill_sprites_to_use)
                     try:
-                        # Make a copy of the sprite to avoid modifying the original
-                        current_sprite = skill_sprites_to_use[frame_index].copy()
+                        # Make a copy of the sprite and scale it to the boss's size
+                        current_sprite = pygame.transform.scale(
+                            skill_sprites_to_use[frame_index], 
+                            (self.size, self.size)
+                        )
                         
                         # Flip sprite based on direction
                         if hasattr(self, 'direction') and self.direction == "left":
                             current_sprite = pygame.transform.flip(current_sprite, True, False)
-                        
+                            
                         # Save the old center position
                         old_center = self.rect.center
                         

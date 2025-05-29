@@ -74,6 +74,66 @@ class HpItem(Items):
     def update(self):
         self.rect = self.surf.get_rect(center = self.rect.center)
         
+class EliteBullet(pygame.sprite.Sprite):
+    def __init__(self, origin_enemy, target_position=None, size=15, speed=10, damage=20, distance_limit=800, color=(255, 0, 0)):
+        super(EliteBullet, self).__init__()
+        
+        # Bullet attributes
+        self.speed = speed
+        self.damage = damage
+        self.origin = origin_enemy
+        self.color = color
+        
+        # Position attributes
+        self.x = origin_enemy.rect.centerx
+        self.y = origin_enemy.rect.centery
+        
+        # Target position
+        if target_position:
+            self.target_x, self.target_y = target_position
+        else:
+            # If no target specified, use the bullet's current position (for static bullets)
+            self.target_x, self.target_y = self.x, self.y
+        
+        # Direction vector
+        self.dx = self.target_x - self.x
+        self.dy = self.target_y - self.y
+        
+        # Normalize direction vector
+        distance = math.sqrt(self.dx**2 + self.dy**2)
+        if distance > 0:
+            self.dx_normalized = self.dx / distance
+            self.dy_normalized = self.dy / distance
+        else:
+            self.dx_normalized = 0
+            self.dy_normalized = 0
+        
+        # Range attributes
+        self.distance = 0
+        self.distance_limit = distance_limit
+        
+        # Create bullet surface
+        self.size = size
+        self.surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
+        pygame.draw.circle(self.surf, self.color, (self.size//2, self.size//2), self.size//2)
+        
+        # Set initial position
+        self.rect = self.surf.get_rect(center=(self.x, self.y))
+        
+        # Collision flag
+        self.collided = False
+    
+    def update(self, camera=None):
+        # Move bullet according to direction vector
+        self.rect.move_ip(self.dx_normalized * self.speed, self.dy_normalized * self.speed)
+        
+        # Calculate distance traveled
+        self.distance = math.sqrt((self.rect.centerx - self.x)**2 + (self.rect.centery - self.y)**2)
+        
+        # Remove bullet if it goes beyond distance limit
+        if self.distance > self.distance_limit:
+            self.kill()
+
 class Bullet(pygame.sprite.Sprite):
     def __init__(self, current, target):
         super(Bullet, self).__init__()

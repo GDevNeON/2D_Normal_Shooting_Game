@@ -13,6 +13,9 @@ from .base_scene import Scene
 from ..utils.asset_loader import AssetLoader
 from ..config.constants import BLACK_COLOR, WHITE_COLOR
 
+# Import Game font manager
+from Game.managers.font_manager import FontManager
+
 # Get the root directory of the project
 root_dir = Path(__file__).parent.parent.parent.parent
 
@@ -25,10 +28,16 @@ class VictoryScene(Scene):
         self.next_scene = None
         self.score = 0
         
-        # Fonts
-        self.large_font = pygame.font.Font(None, 72)
-        self.medium_font = pygame.font.Font(None, 48)
-        self.small_font = pygame.font.Font(None, 36)
+        # Initialize font manager
+        self.font_manager = FontManager()
+        self.title_font = self.font_manager.title_font
+        self.large_font = self.font_manager.large_font
+        self.medium_font = self.font_manager.medium_font
+        self.small_font = self.font_manager.small_font
+        
+        # Button attributes
+        self.back_button = None
+        self.button_hover = False
         
         # Colors
         self.GOLD = (255, 215, 0)
@@ -61,6 +70,15 @@ class VictoryScene(Scene):
         self.next_scene = None
         self.score = score
         
+        # Create back button
+        button_width, button_height = 200, 50
+        self.back_button = pygame.Rect(
+            (self.width - button_width) // 2,
+            self.height * 3 // 4,
+            button_width,
+            button_height
+        )
+        
         # Play victory music if available
         if self.victory_music:
             pygame.mixer.music.load(self.victory_music)
@@ -72,14 +90,17 @@ class VictoryScene(Scene):
             return True
             
         if event.type == pygame.KEYDOWN:
-            if event.key in (pygame.K_ESCAPE, pygame.K_RETURN, pygame.K_SPACE):
-                self.is_running = False
+            if event.key == pygame.K_ESCAPE:
                 self.next_scene = "menu"
+                self.is_running = False
                 return True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            self.is_running = False
-            self.next_scene = "menu"
-            return True
+            if self.back_button.collidepoint(event.pos):
+                self.next_scene = "menu"
+                self.is_running = False
+                return True
+        elif event.type == pygame.MOUSEMOTION:
+            self.button_hover = self.back_button.collidepoint(event.pos)
             
         return False
     
@@ -87,35 +108,45 @@ class VictoryScene(Scene):
         """Update scene state"""
         for element in self.ui_elements:
             element.update(dt)
+            
+        # Update button animation if needed
+        pass
     
     def draw(self):
         """Draw the scene"""
         # Clear the screen
         self.screen.fill(BLACK_COLOR)
         
+        # Create overlay for better text visibility
+        overlay = pygame.Surface((self.width, self.height), pygame.SRCALPHA)
+        overlay.fill((0, 0, 0, 180))  # Semi-transparent black
+        self.screen.blit(overlay, (0, 0))
+        
         # Draw background if available
         if self.background:
             self.screen.blit(self.background, (0, 0))
         
         # Draw victory text
-        victory_text = self.large_font.render("VICTORY!", True, self.GOLD)
+        victory_text = self.title_font.render("VICTORY!", True, self.GOLD)
         text_rect = victory_text.get_rect(center=(self.width // 2, self.height // 3))
         self.screen.blit(victory_text, text_rect)
         
         # Draw score
-        score_text = self.medium_font.render(f"Final Score: {self.score}", True, WHITE_COLOR)
+        score_text = self.large_font.render(f"Final Score: {self.score}", True, WHITE_COLOR)
         score_rect = score_text.get_rect(center=(self.width // 2, self.height // 2))
         self.screen.blit(score_text, score_rect)
         
-        # Draw instruction text
-        instruction = self.medium_font.render("Press any key to continue...", True, WHITE_COLOR)
-        instr_rect = instruction.get_rect(center=(self.width // 2, self.height * 2 // 3))
-        self.screen.blit(instruction, instr_rect)
+        # Draw back button
+        button_color = (100, 100, 255) if self.button_hover else (70, 70, 220)
+        pygame.draw.rect(self.screen, button_color, self.back_button, border_radius=10)
+        pygame.draw.rect(self.screen, (200, 200, 255), self.back_button, width=2, border_radius=10)
         
-        # Draw UI elements
-        for element in self.ui_elements:
-            element.draw(self.screen)
-            
+        # Draw button text
+        button_text = self.medium_font.render("Back to Menu", True, WHITE_COLOR)
+        button_text_rect = button_text.get_rect(center=self.back_button.center)
+        self.screen.blit(button_text, button_text_rect)
+        
+        # Update display
         pygame.display.flip()
     
     def cleanup(self):
