@@ -19,12 +19,12 @@ class Elite_4(Enemy):
         # Elite-specific attributes
         self.speed = 5
         self.hp = 500
-        self.collide_damage = 10
+        self.collide_damage = 50
         
         # Shooting attributes
-        self.bullet_size = 10  # Smaller bullets
+        self.bullet_size = 20  # Smaller bullets
         self.bullet_speed = 6
-        self.bullet_damage = 15
+        self.bullet_damage = 50
         self.fire_rate = 5  # Time between shots (in seconds)
         self.time_since_last_shot = random.uniform(3.0, 4.5)  # Randomize initial timing
         self.bullet_directions = 8  # Number of directions to shoot
@@ -47,7 +47,7 @@ class Elite_4(Enemy):
         self.rect = self.surf.get_rect()
         
         # Combat attributes
-        self.skill_dmg = [10, 20]
+        self.skill_dmg = [50, 100]
         self.fire_rate = 5  # Time between shots (in seconds) - 5 seconds between bursts
         self.time_since_last_shot = random.uniform(0, 2)  # Randomize initial timing
         self.move_rate = 3  # Time between moves (in seconds)
@@ -58,7 +58,7 @@ class Elite_4(Enemy):
         # Shooting attributes
         self.bullet_size = 12  # Smaller bullets
         self.bullet_speed = 6
-        self.bullet_damage = 12
+        self.bullet_damage = 50
         self.bullet_directions = 8  # Number of directions to shoot
         self.bullet_color = (255, 255, 0)  # Yellow bullets for Elite_4
         

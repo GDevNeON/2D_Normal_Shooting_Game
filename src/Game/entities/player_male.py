@@ -113,6 +113,7 @@ class Player_Male(Player):
             player_to_mouse = (mouse[0] - camera.camera.x - self.rect.centerx, mouse[1] - camera.camera.y - self.rect.centery)
             angle_to_mouse = - math.atan2(player_to_mouse[1], player_to_mouse[0])
 
+            self.bullet_amount = 10
             for b in range(self.bullet_amount):
                 rand_range = angle_to_mouse + math.radians(random.uniform(-self.spread_range, self.spread_range))
                 bullet_pos = (self.rect.centerx, self.rect.centery)
@@ -124,6 +125,7 @@ class Player_Male(Player):
             
             # Đặt lại thời gian giữa các lần bắn đạn
             self.time_since_last_burst_shot = 0
+        self.bullet_amount = 5
     
     def burst_(self, camera, clock, player_bullets, all_sprites):
         self.burst_clock += clock.get_time()

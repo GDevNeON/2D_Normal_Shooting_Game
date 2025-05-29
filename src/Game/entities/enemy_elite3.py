@@ -18,8 +18,8 @@ class Elite_3(Enemy):
         
         # Elite-specific attributes
         self.speed = 5
-        self.hp = 500
-        self.collide_damage = 10
+        self.hp = 700
+        self.collide_damage = 70
         
         # Use the pre-scaled sprites from image_manager
         self.sprite = eskeleton_sprite

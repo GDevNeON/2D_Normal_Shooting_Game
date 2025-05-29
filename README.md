@@ -85,10 +85,11 @@ We welcome contributions to the project! If you'd like to contribute, please:
 
 ## 📜 License
 This project is licensed under the [MIT License](LICENSE).
-- Game BGM is copyrighted by Arknights
-- Menu BGM is copyrighted by Sky Force Reloaded
-- Game SFX is copyrighted by Pixabay
-- Game Sprite made by Doan Hoang Long [X](https://x.com/ryu_hoang)
+- Game BGM is from [Arknights - Vector Breakthrough](https://youtu.be/Y6UvoGH40TE?si=Rk-mhNH96mBRQeL0)
+- Game boss BGM is from [Arknights - Vector Breakthrough](https://youtu.be/mpvDvu3ksds?si=DYGGpa8fxzN1e_Zq)
+- Menu BGM is from [Sky Force Reloaded](https://youtu.be/Jui7fDLyaSs?si=Xr6kcjXfiWXAsANZ)
+- Game SFX is from [Pixabay](https://pixabay.com/)
+- Game Sprite made by Doan Hoang Long - [X](https://x.com/ryu_hoang)
 
 ## ✉️ Contact
 For any questions or contributions, please contact:

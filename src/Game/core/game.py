@@ -33,7 +33,6 @@ def Run_Game(current_mode = 0, character_select = 0):
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     SoundManager.play_music(grassplain, loops=-1)
     
-
     enemies         = pygame.sprite.Group()
     elites          = pygame.sprite.Group()
     bosses          = pygame.sprite.Group()
@@ -55,10 +54,6 @@ def Run_Game(current_mode = 0, character_select = 0):
         player = Player_Female()
     all_sprites.add(player)
 
-    enemy = Normal(player)
-    enemy_new_speed = enemy.get_speed()
-    enemy_new_hp = enemy.get_hp()
-    enemy_new_damage = enemy.get_damage()
     background = Background(background_sprite)
     
     # Boss related variables
@@ -71,17 +66,14 @@ def Run_Game(current_mode = 0, character_select = 0):
     is_paused = False  # Thêm biến để kiểm tra trạng thái pause
     game_won = False   # Flag to check if player won the game in normal mode
     
-    # Reset game state and set boss spawn timer based on game mode
-    game_won = False
-    victory_time = 0
-    victory_delay = 5000  # 5 seconds delay before returning to menu
-    
+    difficulty_multiplier = 1.0
+
     if c_mode == 1:  # Normal mode (1 = Normal, 0 = Endless)
-        print("[DEBUG] Setting up NORMAL mode - boss will spawn in 30 seconds")
-        pygame.time.set_timer(ADD_BOSS, 3000)  # 30 seconds for normal mode
+        print("[DEBUG] Setting up NORMAL mode - boss will spawn in 5 minutes")
+        pygame.time.set_timer(ADD_BOSS, 300000)  # 5 minutes for normal mode
     else:  # Endless mode
         print("[DEBUG] Setting up ENDLESS mode - boss will spawn in 5 minutes")
-        pygame.time.set_timer(ADD_BOSS, 3000)  # 5 minutes for endless mode
+        pygame.time.set_timer(ADD_BOSS, 300000)  # 5 minutes for endless mode
     
     # Gameplay chạy trong này
     running = True
@@ -139,16 +131,14 @@ def Run_Game(current_mode = 0, character_select = 0):
             if event.type == ADD_ENEMY and not player.is_leveling_up and not is_paused:  # Không tạo enemy khi đang level up hoặc pause
                 for _ in range(20):  # Tạo 20 kẻ địch
                     new_enemy = Normal(player)
-                    new_enemy.set_speed(enemy_new_speed)
-                    new_enemy.set_hp(enemy_new_hp)
-                    new_enemy.set_damage(enemy_new_damage)
+                    new_enemy.set_speed(new_enemy.get_speed() * difficulty_multiplier)
+                    new_enemy.set_hp(new_enemy.get_hp() * difficulty_multiplier)
+                    new_enemy.set_damage(new_enemy.get_damage() * difficulty_multiplier)
                     enemies.add(new_enemy)
                     all_sprites.add(new_enemy)
                     
             if event.type == INCREASE_STAT and not is_paused:
-                enemy_new_speed += 1
-                enemy_new_hp += 10
-                enemy_new_damage += 10
+                difficulty_multiplier += 0.1
                  
             # Các sự kiện của enemy Elite
             if event.type == ADD_ELITE and not player.is_leveling_up and not is_paused:  # Không tạo elite khi đang level up hoặc pause
@@ -161,6 +151,9 @@ def Run_Game(current_mode = 0, character_select = 0):
                     new_elite = Elite_3(player)
                 else:
                     new_elite = Elite_4(player)
+                new_elite.set_speed(new_elite.get_speed() * difficulty_multiplier)
+                new_elite.set_hp(new_elite.get_hp() * difficulty_multiplier)
+                new_elite.set_damage(new_elite.get_damage() * difficulty_multiplier)
                 elites.add(new_elite)
                 all_sprites.add(new_elite)
                 
@@ -441,6 +434,12 @@ def Run_Game(current_mode = 0, character_select = 0):
             # Stop background music
             pygame.mixer.music.fadeout(1000)
             
+            # Hủy tất cả các timer
+            reset_timer()
+            
+            # Reset game clock
+            clock = pygame.time.Clock()  # Tạo mới clock object
+            
             # Display game over screen
             game_over_text = player.ui.big_font.render("GAME OVER", True, (255, 0, 0))
             score_text = player.ui.font.render(f"Final Score: {player.score}", True, (255, 255, 255))
@@ -460,6 +459,12 @@ def Run_Game(current_mode = 0, character_select = 0):
         
         # Draw victory message if player won in normal mode
         if game_won:
+            # Hủy tất cả các timer
+            reset_timer()
+            
+            # Reset game clock
+            clock = pygame.time.Clock()  # Tạo mới clock object
+            
             victory_text = player.ui.title_font.render("VICTORY!", True, (255, 215, 0))
             victory_rect = victory_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 50))
             screen.blit(victory_text, victory_rect)

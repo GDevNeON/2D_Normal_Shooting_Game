@@ -1,5 +1,5 @@
 import pygame
-import os
+
 from ..core.define import *
 from ..managers.font_manager import FontManager
 

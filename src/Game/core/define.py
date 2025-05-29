@@ -25,11 +25,11 @@ Yellow  = (255,255,0)
 
 # Tạo sự kiện
 ADD_ENEMY = USEREVENT + 1
-pygame.time.set_timer(ADD_ENEMY, 1000000)  # 10 giây
+pygame.time.set_timer(ADD_ENEMY, 7000)  # 7 giây
 INCREASE_STAT = USEREVENT + 2
-pygame.time.set_timer(INCREASE_STAT, 6000000)  # 1 phút
+pygame.time.set_timer(INCREASE_STAT, 60000)  # 1 phút
 ADD_ELITE = USEREVENT + 3
-pygame.time.set_timer(ADD_ELITE, 6000000)  # 1 phút
+pygame.time.set_timer(ADD_ELITE, 40000)  # 40 giây
 
 # Boss events
 ADD_BOSS = USEREVENT + 4
@@ -41,6 +41,20 @@ BOSS_DEFEATED = USEREVENT + 9
 BOSS_SPAWN_FEATHERS = USEREVENT + 10
 
 # Set timers for boss events (these can be overridden in the boss class)
-pygame.time.set_timer(ADD_BOSS, 6000)  # 5 phút (for endless mode)
+pygame.time.set_timer(ADD_BOSS, 300000)  # 5 phút (for endless mode)
 pygame.time.set_timer(BOSS_DASH, 5000)  # 5 giây (will be reset in boss class)
 pygame.time.set_timer(BOSS_SKILL_1, 10000)  # 10 giây (will be reset in boss class)
+
+
+def reset_timer():
+    pygame.time.set_timer(ADD_ENEMY, 0)
+    pygame.time.set_timer(INCREASE_STAT, 0)
+    pygame.time.set_timer(ADD_ELITE, 0)
+    pygame.time.set_timer(ADD_BOSS, 0)
+    pygame.time.set_timer(BOSS_DASH, 0)
+    pygame.time.set_timer(BOSS_SKILL_1, 0)
+    pygame.time.set_timer(BOSS_SKILL_2, 0)
+    pygame.time.set_timer(BOSS_PHASE_TRANSITION, 0)
+    pygame.time.set_timer(BOSS_DEFEATED, 0)
+    pygame.time.set_timer(BOSS_SPAWN_FEATHERS, 0)
+    

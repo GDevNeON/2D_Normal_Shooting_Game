@@ -19,7 +19,7 @@ class Elite_1(Enemy):
         # Elite-specific attributes
         self.speed = 5
         self.hp = 500
-        self.collide_damage = 10  # Higher damage for elite enemies
+        self.collide_damage = 30  # Higher damage for elite enemies
         
         # Use the pre-scaled sprites from image_manager
         self.sprite = eghost_sprite
@@ -47,8 +47,8 @@ class Elite_1(Enemy):
         self.hitted_time = 0
         
         # Bullet properties
-        self.bullet_size = 30  # Large bullet size
-        self.bullet_damage = 30
+        self.bullet_size = 50  # Large bullet size
+        self.bullet_damage = 50
         self.bullet_speed = 8
         self.bullet_color = (230, 0, 0)  # Red bullets for Elite_1
         

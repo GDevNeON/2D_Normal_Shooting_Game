@@ -221,18 +221,26 @@ class Player(pygame.sprite.Sprite):
     def handle_level_up_selection(self, mouse_pos):
         # Check which option was clicked
         option_height = 60
-        option_spacing = 20
+        option_spacing = 10  # Match the spacing in UI class
         total_options = len(self.available_buffs)
         
+        # Calculate menu dimensions to match UI class
+        menu_width = 600
+        menu_height = 400
+        menu_x = (SCREEN_WIDTH - menu_width) // 2
+        menu_y = (SCREEN_HEIGHT - menu_height) // 2
+        
+        # Button dimensions to match UI class
+        button_width = 500
+        button_height = 60
+        button_x = menu_x + (menu_width - button_width) // 2
+        
         for i in range(total_options):
-            option_rect = pygame.Rect(
-                SCREEN_WIDTH // 2 - 150,
-                SCREEN_HEIGHT // 2 - ((total_options * (option_height + option_spacing)) // 2) + i * (option_height + option_spacing),
-                300,
-                option_height
-            )
+            # Calculate button position to match UI class
+            button_y = menu_y + 120 + i * (button_height + option_spacing)
+            button_rect = pygame.Rect(button_x, button_y, button_width, button_height)
             
-            if option_rect.collidepoint(mouse_pos):
+            if button_rect.collidepoint(mouse_pos):
                 # Play button select sound
                 from ..managers.sound_manager import SoundManager
                 SoundManager.play_button_select()

@@ -212,8 +212,10 @@ class Enemy(pygame.sprite.Sprite):
     def generate_random_position(self, player):
         # Tạo một vị trí ngẫu nhiên xung quanh người chơi
         angle = random.uniform(0, 2 * math.pi)
-        random_x = player.get_position_x() + self.spawn_radius * math.cos(angle)
-        random_y = player.get_position_y() + self.spawn_radius * math.sin(angle)
+        # Sử dụng một bán kính ngẫu nhiên từ 700 đến 1200px
+        random_radius = random.uniform(700, 1200)
+        random_x = player.get_position_x() + random_radius * math.cos(angle)
+        random_y = player.get_position_y() + random_radius * math.sin(angle)
         # Cập nhật vị trí của kẻ địch
         self.rect.center = (random_x, random_y)
 
@@ -229,8 +231,8 @@ class Enemy(pygame.sprite.Sprite):
         elif dx < 0:
             self.direction = "left"
             
-        # Only move if player is further away than the minimum distance
-        min_distance = 30  # Adjust this value to change how close enemies can get
+        # Cho phép enemy tiến đến sát player
+        min_distance = 5  # Đã giảm khoảng cách tối thiểu xuống 5
         if distance > min_distance:
             # Normalize direction vector
             if distance != 0:
@@ -329,24 +331,12 @@ class Normal(Enemy):
         match rand:
             case 0:
                 self.sprite = ghost_sprite
-                self.health = 10
-                self.speed = 1.8
-                self.collide_damage = 10
             case 1:
                 self.sprite = goblin_sprite
-                self.health = 10
-                self.speed = 1.5
-                self.collide_damage = 15
             case 2:
                 self.sprite = skeleton_sprite
-                self.health = 10
-                self.speed = 1.2
-                self.collide_damage = 20
             case _:
                 self.sprite = slime_sprite
-                self.health = 10
-                self.speed = 0.8
-                self.collide_damage = 25
         
         # Use first sprite as initial surface (already scaled in image_manager)
         self.surf = self.sprite[0]

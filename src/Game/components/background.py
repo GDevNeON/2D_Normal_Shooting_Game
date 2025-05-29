@@ -1,7 +1,5 @@
-import pygame
-
 from ..core.define import (
-    LEVEL_WIDTH, LEVEL_HEIGHT, SCREEN_WIDTH, SCREEN_HEIGHT
+    LEVEL_WIDTH, LEVEL_HEIGHT
 )
 
 class Background:

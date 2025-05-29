@@ -14,7 +14,7 @@ from pygame.locals import (
 class Player_Female(Player):
     def __init__(self):
         super(Player_Female, self).__init__()
-        self.normal_bullet_damage = 1000
+        self.normal_bullet_damage = 10
         self.fire_rate = 200
 
         self.maximum_health = 300
