@@ -1,5 +1,6 @@
 import pygame
 import sys
+from Game.core.define import clear_all_timers
 
 class SceneManager:
     """
@@ -19,6 +20,9 @@ class SceneManager:
         Args:
             scene: The scene to start
         """
+        # Clear all timers before switching scenes
+        clear_all_timers()
+        
         # Ensure mouse is visible when switching scenes
         pygame.mouse.set_visible(True)
         self.current_scene = scene

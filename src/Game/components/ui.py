@@ -22,19 +22,6 @@ class UI:
         screen.blit(score_text, (10, 55))
         screen.blit(level_text, (10, 80))
     
-    def draw_stats(self, screen, player):
-        """Draw player stats information on screen"""
-        stats_y = SCREEN_HEIGHT - 100
-        stats = [
-            f"HP: {player.maximum_health}",
-            f"DMG: {player.normal_bullet_damage}",
-            f"SPD: {player.speed}"
-        ]
-        
-        for i, stat in enumerate(stats):
-            stat_text = self.font.render(stat, True, (255, 255, 255))
-            screen.blit(stat_text, (SCREEN_WIDTH - 150, stats_y + i * 25))
-    
     def draw_level_up_menu(self, screen, available_buffs):
         """Draw level up menu with buff options"""
         # Create semi-transparent overlay
@@ -92,50 +79,171 @@ class UI:
             
         return button_rects
     
-    def draw_pause_menu(self, screen):
-        """Draw pause menu overlay with options"""
+    def draw_pause_menu(self, screen, player=None, show_help=False):
+        """Draw pause menu overlay with character stats and options
+        
+        Args:
+            screen: The game screen surface
+            player: The player object for stats
+            show_help: If True, shows the help screen instead of the main pause menu
+            
+        Returns:
+            dict: Dictionary of button rectangles for click detection
+        """
         # Create semi-transparent overlay
         overlay = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
         overlay.fill((0, 0, 0, 180))  # Semi-transparent black
         screen.blit(overlay, (0, 0))
         
+        # Main menu container
+        menu_width = 800
+        menu_height = 500
+        menu_x = (SCREEN_WIDTH - menu_width) // 2
+        menu_y = (SCREEN_HEIGHT - menu_height) // 2
+        menu_rect = pygame.Rect(menu_x, menu_y, menu_width, menu_height)
+        
         # Draw menu background
-        menu_rect = pygame.Rect(SCREEN_WIDTH//2 - 200, SCREEN_HEIGHT//2 - 150, 400, 300)
         pygame.draw.rect(screen, (40, 40, 50), menu_rect)
         pygame.draw.rect(screen, (100, 100, 120), menu_rect, 3)
         
-        # Draw title
-        title = self.title_font.render("GAME PAUSED", True, (255, 255, 255))
-        title_rect = title.get_rect(centerx=SCREEN_WIDTH//2, top=menu_rect.top + 30)
-        screen.blit(title, title_rect)
+        if show_help:
+            # Show help screen
+            title = self.title_font.render("HOW TO PLAY", True, (100, 200, 255))
+            title_rect = title.get_rect(centerx=menu_rect.centerx, top=menu_rect.top + 30)
+            screen.blit(title, title_rect)
+            
+            # Help content
+            help_texts = [
+                "CONTROLS:",
+                "WASD - Move character",
+                "Mouse - Aim and shoot",
+                "P - Pause game",
+                "ESC - Exit to main menu",
+                "",
+                "GAME OBJECTIVES:",
+                "- Defeat enemies to earn experience and level up",
+                "- Collect health pickups to restore HP",
+                "- Level up to get powerful buffs",
+                "- Defeat the boss to win in Normal mode",
+                "- Survive as long as possible in Endless mode"
+            ]
+            
+            # Draw help texts
+            text_x = menu_rect.left + 40
+            text_y = menu_rect.top + 100
+            for i, text in enumerate(help_texts):
+                if ":" in text:  # Section headers
+                    color = (100, 200, 255)
+                    text_surface = self.font.render(text, True, color)
+                else:
+                    color = (220, 220, 220)
+                    text_surface = self.small_font.render(text, True, color)
+                screen.blit(text_surface, (text_x, text_y + i * 30))
+            
+            # Back button
+            back_button = pygame.Rect(menu_rect.centerx - 100, menu_rect.bottom - 70, 200, 50)
+            pygame.draw.rect(screen, (50, 50, 120), back_button)
+            pygame.draw.rect(screen, (100, 100, 200), back_button, 2)
+            back_text = self.font.render("Back", True, (255, 255, 255))
+            back_text_rect = back_text.get_rect(center=back_button.center)
+            screen.blit(back_text, back_text_rect)
+            
+            return {'back': back_button}
         
-        # Button properties
-        button_width = 250
-        button_height = 50
-        button_x = SCREEN_WIDTH//2 - button_width//2
-        button_spacing = 70
-        
-        # Resume button
-        self.resume_rect = pygame.Rect(button_x, menu_rect.centery - 30, button_width, button_height)
-        pygame.draw.rect(screen, (50, 120, 50), self.resume_rect)
-        pygame.draw.rect(screen, (100, 200, 100), self.resume_rect, 2)
-        resume_text = self.font.render("Resume Game", True, (255, 255, 255))
-        resume_text_rect = resume_text.get_rect(center=self.resume_rect.center)
-        screen.blit(resume_text, resume_text_rect)
-        
-        # Main Menu button
-        self.menu_rect = pygame.Rect(button_x, self.resume_rect.bottom + 20, button_width, button_height)
-        pygame.draw.rect(screen, (120, 50, 50), self.menu_rect)
-        pygame.draw.rect(screen, (200, 100, 100), self.menu_rect, 2)
-        menu_text = self.font.render("Main Menu", True, (255, 255, 255))
-        menu_text_rect = menu_text.get_rect(center=self.menu_rect.center)
-        screen.blit(menu_text, menu_text_rect)
-        
-        # Return the button rects for click detection
-        return {
-            'resume': self.resume_rect,
-            'menu': self.menu_rect
-        }
+        else:
+            # Show main pause menu
+            title = self.title_font.render("GAME PAUSED", True, (255, 255, 255))
+            title_rect = title.get_rect(centerx=menu_rect.centerx, top=menu_rect.top + 20)
+            screen.blit(title, title_rect)
+            
+            # Draw dividing line
+            pygame.draw.line(screen, (100, 100, 120), 
+                          (menu_rect.centerx, menu_rect.top + 60), 
+                          (menu_rect.centerx, menu_rect.bottom - 20), 2)
+            
+            # Left side: Character Stats
+            if player:
+                stats_x = menu_rect.left + 40
+                stats_y = menu_rect.top + 80
+                
+                # Character Info
+                char_title = self.font.render("CHARACTER STATS", True, (255, 255, 0))
+                screen.blit(char_title, (stats_x, stats_y))
+                
+                # Basic Stats
+                stats = [
+                    f"Level: {player.level}",
+                    f"HP: {int(player.health)} / {player.maximum_health}",
+                    f"Damage: {player.normal_bullet_damage}",
+                    f"Speed: {player.speed:.1f}",
+                    f"Fire Rate: {player.fire_rate}ms",
+                    "",
+                    "BUFFS:"
+                ]
+                
+                # Active Buffs
+                buffs = []
+                if player.attack_speed_buff > 0:
+                    buffs.append(f"Attack Speed: +{player.attack_speed_buff}%")
+                if player.damage_buff > 0:
+                    buffs.append(f"Damage: +{player.damage_buff}%")
+                if player.defense_buff > 0:
+                    buffs.append(f"Defense: +{player.defense_buff}%")
+                if player.movement_speed_buff > 0:
+                    buffs.append(f"Movement: +{player.movement_speed_buff}%")
+                if player.bullet_size_buff > 0:
+                    buffs.append(f"Bullet Size: +{player.bullet_size_buff}%")
+                if player.healing_efficiency > 0:
+                    buffs.append(f"Healing: +{player.healing_efficiency}%")
+                if player.exp_efficiency > 0:
+                    buffs.append(f"EXP Gain: +{player.exp_efficiency}%")
+                    
+                if not buffs:
+                    buffs = ["No active buffs"]
+                    
+                # Draw all stats and buffs
+                for i, stat in enumerate(stats + buffs):
+                    if stat:  # Skip empty strings used as separators
+                        color = (200, 200, 200) if i < len(stats) - 1 else (150, 255, 150)
+                        text = self.font.render(stat, True, color)
+                        screen.blit(text, (stats_x, stats_y + 40 + i * 30))
+            
+            # Right side: Menu Buttons
+            button_width = 250
+            button_height = 50
+            button_x = menu_rect.centerx + 40
+            button_start_y = menu_rect.centery - 30
+            
+            # Resume button
+            self.resume_rect = pygame.Rect(button_x, button_start_y, button_width, button_height)
+            pygame.draw.rect(screen, (50, 120, 50), self.resume_rect)
+            pygame.draw.rect(screen, (100, 200, 100), self.resume_rect, 2)
+            resume_text = self.font.render("Resume Game", True, (255, 255, 255))
+            resume_text_rect = resume_text.get_rect(center=self.resume_rect.center)
+            screen.blit(resume_text, resume_text_rect)
+            
+            # Main Menu button
+            self.menu_rect = pygame.Rect(button_x, button_start_y + 80, button_width, button_height)
+            pygame.draw.rect(screen, (120, 50, 50), self.menu_rect)
+            pygame.draw.rect(screen, (200, 100, 100), self.menu_rect, 2)
+            menu_text = self.font.render("Main Menu", True, (255, 255, 255))
+            menu_text_rect = menu_text.get_rect(center=self.menu_rect.center)
+            screen.blit(menu_text, menu_text_rect)
+            
+            # How to Play button
+            self.help_rect = pygame.Rect(button_x, button_start_y + 160, button_width, button_height)
+            pygame.draw.rect(screen, (50, 50, 120), self.help_rect)
+            pygame.draw.rect(screen, (100, 100, 200), self.help_rect, 2)
+            help_text = self.font.render("How to Play", True, (255, 255, 255))
+            help_text_rect = help_text.get_rect(center=self.help_rect.center)
+            screen.blit(help_text, help_text_rect)
+            
+            # Return the button rects for click detection
+            return {
+                'resume': self.resume_rect,
+                'menu': self.menu_rect,
+                'help': self.help_rect
+            }
     
     def draw_boss_health_bar(self, screen, boss):
         """Draw boss health bar at the top of the screen"""

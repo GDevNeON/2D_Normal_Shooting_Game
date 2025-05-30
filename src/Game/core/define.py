@@ -45,16 +45,17 @@ pygame.time.set_timer(ADD_BOSS, 300000)  # 5 phút (for endless mode)
 pygame.time.set_timer(BOSS_DASH, 5000)  # 5 giây (will be reset in boss class)
 pygame.time.set_timer(BOSS_SKILL_1, 10000)  # 10 giây (will be reset in boss class)
 
+def clear_all_timers():
+    """Clear all active pygame timers"""
+    # Clear all user events (events with IDs >= USEREVENT and < NUMEVENTS)
+    for event_id in range(pygame.USEREVENT, pygame.NUMEVENTS):
+        pygame.time.set_timer(event_id, 0)
+
+def clear_timers():
+    """Clear all game-specific timers"""
+    clear_all_timers()  # Clear all timers first
+    # Then set up any default timers if needed
+    # pygame.time.set_timer(ADD_ENEMY, 7000)  # Uncomment and set default values if needed
 
 def reset_timer():
-    pygame.time.set_timer(ADD_ENEMY, 0)
-    pygame.time.set_timer(INCREASE_STAT, 0)
-    pygame.time.set_timer(ADD_ELITE, 0)
-    pygame.time.set_timer(ADD_BOSS, 0)
-    pygame.time.set_timer(BOSS_DASH, 0)
-    pygame.time.set_timer(BOSS_SKILL_1, 0)
-    pygame.time.set_timer(BOSS_SKILL_2, 0)
-    pygame.time.set_timer(BOSS_PHASE_TRANSITION, 0)
-    pygame.time.set_timer(BOSS_DEFEATED, 0)
-    pygame.time.set_timer(BOSS_SPAWN_FEATHERS, 0)
-    
+    clear_timers()

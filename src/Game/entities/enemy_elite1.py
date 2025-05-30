@@ -39,7 +39,7 @@ class Elite_1(Enemy):
         
         # Combat attributes
         self.skill_dmg = [10, 20]
-        self.fire_rate = 5  # Time between shots (in seconds)
+        self.fire_rate = 3  # Time between shots (in seconds)
         self.time_since_last_shot = random.uniform(0, 2)  # Randomize initial timing
         self.move_rate = 3  # Time between moves (in seconds)
         self.time_since_last_moved = 0
@@ -47,7 +47,7 @@ class Elite_1(Enemy):
         self.hitted_time = 0
         
         # Bullet properties
-        self.bullet_size = 50  # Large bullet size
+        self.bullet_size = 100  # Large bullet size
         self.bullet_damage = 50
         self.bullet_speed = 8
         self.bullet_color = (230, 0, 0)  # Red bullets for Elite_1
@@ -56,6 +56,12 @@ class Elite_1(Enemy):
         self.target_pos = (player.get_position_x(), player.get_position_y())
         self.spawn_radius = 600
         self.generate_random_position(player)
+
+    def set_bullet_damage(self, damage):
+        self.bullet_damage = damage
+
+    def get_bullet_damage(self):
+        return self.bullet_damage
     
     def load_sprite(self, clock):
         self.left_or_right()

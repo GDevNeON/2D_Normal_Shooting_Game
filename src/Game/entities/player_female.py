@@ -17,7 +17,7 @@ class Player_Female(Player):
         self.normal_bullet_damage = 10
         self.fire_rate = 200
 
-        self.maximum_health = 300
+        self.maximum_health = 200
         self.current_health = self.maximum_health
         self.health = self.maximum_health
         self.update_health_ratio()  # Ensure health ratio is updated after setting max health

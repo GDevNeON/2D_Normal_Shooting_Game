@@ -19,7 +19,7 @@ class Player_Male(Player):
         self.bullet_amount = 5
         self.spread_range = 45
 
-        self.maximum_health = 500
+        self.maximum_health = 300
         self.current_health = self.maximum_health
         self.health = self.maximum_health
         self.update_health_ratio()  # Cập nhật tỉ lệ sau khi thiết lập máu tối đa

@@ -22,7 +22,7 @@ class Elite_4(Enemy):
         self.collide_damage = 50
         
         # Shooting attributes
-        self.bullet_size = 20  # Smaller bullets
+        self.bullet_size = 50  # Smaller bullets
         self.bullet_speed = 6
         self.bullet_damage = 50
         self.fire_rate = 5  # Time between shots (in seconds)
@@ -48,7 +48,7 @@ class Elite_4(Enemy):
         
         # Combat attributes
         self.skill_dmg = [50, 100]
-        self.fire_rate = 5  # Time between shots (in seconds) - 5 seconds between bursts
+        self.fire_rate = 3  # Time between shots (in seconds) - 3 seconds between bursts
         self.time_since_last_shot = random.uniform(0, 2)  # Randomize initial timing
         self.move_rate = 3  # Time between moves (in seconds)
         self.time_since_last_moved = 0
@@ -56,7 +56,7 @@ class Elite_4(Enemy):
         self.hitted_time = 0
         
         # Shooting attributes
-        self.bullet_size = 12  # Smaller bullets
+        self.bullet_size = 50  # Smaller bullets
         self.bullet_speed = 6
         self.bullet_damage = 50
         self.bullet_directions = 8  # Number of directions to shoot
@@ -67,6 +67,12 @@ class Elite_4(Enemy):
         self.spawn_radius = 600
         self.generate_random_position(player)
     
+    def set_bullet_damage(self, damage):
+        self.bullet_damage = damage
+
+    def get_bullet_damage(self):
+        return self.bullet_damage
+
     def load_sprite(self, clock):
         self.left_or_right()
         

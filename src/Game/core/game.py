@@ -28,7 +28,17 @@ pygame.mixer.init()
 pygame.init()
 
 
-def Run_Game(current_mode = 0, character_select = 0):    
+def Run_Game(current_mode=0, character_select=0, scene_manager=None):
+    # Clear all timers when starting a new game
+    from ..core.define import clear_all_timers, clear_timers, ADD_BOSS, ADD_ENEMY, ADD_ELITE, INCREASE_STAT
+    clear_all_timers()
+    
+    # Set up game timers
+    pygame.time.set_timer(ADD_ENEMY, 7000)     # Spawn normal enemies every 7 seconds
+    pygame.time.set_timer(ADD_ELITE, 40000)    # Spawn elite enemies every 40 seconds
+    pygame.time.set_timer(INCREASE_STAT, 60000) # Increase stats every 60 seconds
+    pygame.time.set_timer(ADD_BOSS, 300000)     # Spawn boss after 5 minutes
+    
     clock = pygame.time.Clock()
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     SoundManager.play_music(grassplain, loops=-1)
@@ -67,16 +77,11 @@ def Run_Game(current_mode = 0, character_select = 0):
     game_won = False   # Flag to check if player won the game in normal mode
     
     difficulty_multiplier = 1.0
-
-    if c_mode == 1:  # Normal mode (1 = Normal, 0 = Endless)
-        print("[DEBUG] Setting up NORMAL mode - boss will spawn in 5 minutes")
-        pygame.time.set_timer(ADD_BOSS, 300000)  # 5 minutes for normal mode
-    else:  # Endless mode
-        print("[DEBUG] Setting up ENDLESS mode - boss will spawn in 5 minutes")
-        pygame.time.set_timer(ADD_BOSS, 300000)  # 5 minutes for endless mode
     
-    # Gameplay chạy trong này
+    # Gameplay loop
     running = True
+    show_help = False  # Track if we're showing the help screen
+    
     while running:
         pressed_keys = pygame.key.get_pressed()
         SCREEN.fill(Black)            
@@ -89,13 +94,16 @@ def Run_Game(current_mode = 0, character_select = 0):
             # Handle keyboard events
             if event.type == KEYDOWN:
                 if event.key == K_ESCAPE:
-                    running = False
-                elif event.key == K_p:  # Toggle pause with P key
+                    if show_help:
+                        # If showing help, go back to pause menu
+                        show_help = False
+                    else:
+                        # Otherwise, exit to main menu
+                        running = False
+                elif event.key == K_p and not show_help:  # Only allow pausing when not in help screen
                     is_paused = not is_paused
                     if is_paused:
-                        # Play pause sound and show menu
                         SoundManager.play_pause_game()
-                        # The menu will be drawn in the main loop
                 elif event.key == K_q and player.energy >= player.maximum_energy and player.burst_clock < player.burst_time and not is_paused and not player.is_leveling_up:
                     player.energy = 0
                     player.burst = True
@@ -105,15 +113,26 @@ def Run_Game(current_mode = 0, character_select = 0):
                 mouse_pos = pygame.mouse.get_pos()
                 
                 if is_paused:
-                    # Handle pause menu button clicks
-                    if hasattr(player.ui, 'resume_rect') and player.ui.resume_rect.collidepoint(mouse_pos):
-                        SoundManager.play_button_select()
-                        is_paused = False
-                    elif hasattr(player.ui, 'menu_rect') and player.ui.menu_rect.collidepoint(mouse_pos):
-                        SoundManager.play_button_select()
-                        SoundManager.play_button_select()
-                        pygame.mouse.set_visible(True)  # Make sure cursor is visible when returning to menu
-                        return  # Return to main menu
+                    if show_help:
+                        # Handle help screen back button
+                        button_rects = player.ui.draw_pause_menu(SCREEN, player, show_help=True)
+                        if button_rects.get('back') and button_rects['back'].collidepoint(mouse_pos):
+                            SoundManager.play_button_select()
+                            show_help = False
+                    else:
+                        # Handle pause menu button clicks
+                        button_rects = player.ui.draw_pause_menu(SCREEN, player)
+                        if button_rects.get('resume') and button_rects['resume'].collidepoint(mouse_pos):
+                            SoundManager.play_button_select()
+                            is_paused = False
+                        elif button_rects.get('menu') and button_rects['menu'].collidepoint(mouse_pos):
+                            SoundManager.play_button_select()
+                            SoundManager.play_button_select()
+                            pygame.mouse.set_visible(True)
+                            return  # Return to main menu
+                        elif button_rects.get('help') and button_rects['help'].collidepoint(mouse_pos):
+                            SoundManager.play_button_select()
+                            show_help = True
                 
                 # Handle level up menu
                 elif player.is_leveling_up:
@@ -126,6 +145,7 @@ def Run_Game(current_mode = 0, character_select = 0):
                         is_paused = not is_paused
                         if is_paused:
                             SoundManager.play_pause_game()
+                            show_help = False  # Reset help screen when pausing
                 
             # Các sự kiện của Enemy
             if event.type == ADD_ENEMY and not player.is_leveling_up and not is_paused:  # Không tạo enemy khi đang level up hoặc pause
@@ -145,21 +165,26 @@ def Run_Game(current_mode = 0, character_select = 0):
                 rand = random.randint(1, 4)
                 if rand == 1:
                     new_elite = Elite_1(player)
+                    new_elite.set_bullet_damage(new_elite.get_bullet_damage() * difficulty_multiplier)
                 elif rand == 2:
                     new_elite = Elite_2(player)
                 elif rand == 3:
                     new_elite = Elite_3(player)
                 else:
                     new_elite = Elite_4(player)
+                    new_elite.set_bullet_damage(new_elite.get_bullet_damage() * difficulty_multiplier)
                 new_elite.set_speed(new_elite.get_speed() * difficulty_multiplier)
                 new_elite.set_hp(new_elite.get_hp() * difficulty_multiplier)
                 new_elite.set_damage(new_elite.get_damage() * difficulty_multiplier)
+
                 elites.add(new_elite)
                 all_sprites.add(new_elite)
                 
             # Handle boss events
             if event.type == ADD_BOSS and not is_paused and not player.is_leveling_up and not boss_spawned:
-                print(f"[DEBUG] ADD_BOSS event triggered. Mode: {'NORMAL' if c_mode == 0 else 'ENDLESS'}, Game won: {game_won}, Time since death: {pygame.time.get_ticks() - boss_death_time}ms")
+                print(f"[DEBUG] ADD_BOSS event triggered. Mode: {'NORMAL' if c_mode == 0 else 'ENDLESS'}, Game won: {game_won}")
+                # Clear the timer after the boss spawns to prevent multiple spawns
+                pygame.time.set_timer(ADD_BOSS, 0)
                 if (c_mode == 1 and not game_won) or (c_mode == 0 and pygame.time.get_ticks() - boss_death_time >= boss_respawn_time):
                     print("[DEBUG] Attempting to spawn boss...")
                     # Switch to boss music
@@ -214,7 +239,9 @@ def Run_Game(current_mode = 0, character_select = 0):
                     game_won = True
                     SoundManager.play_music(grassplain, loops=-1)
                     from Menu.scenes.main_menu_scene import MainMenuScene
-                    return MainMenuScene(pygame.display.get_surface())
+                    menu_scene = MainMenuScene(scene_manager.screen, scene_manager)
+                    scene_manager.start_scene(menu_scene)
+                    return  # Return to main menu
                 else:  # Endless mode - continue playing
                     # Clear boss and skills
                     bosses.empty()
@@ -388,12 +415,12 @@ def Run_Game(current_mode = 0, character_select = 0):
         player.advanced_energy()
         player.advanced_exp()
         
-        # Draw game mode indicator
-        mode_text = player.ui.font.render("MODE: NORMAL" if c_mode == 1 else "MODE: ENDLESS", True, (255, 255, 255))
-        screen.blit(mode_text, (10, 10))
-        
+        # Draw score and level first
         player.ui.draw_score_and_level(screen, player.score, player.level)
-        player.ui.draw_stats(screen, player)
+        
+        # Draw game mode indicator below score
+        mode_text = player.ui.small_font.render(f"MODE: {'NORMAL' if c_mode == 1 else 'ENDLESS'}", True, (200, 200, 200))
+        screen.blit(mode_text, (10, 85))  # Positioned below the level text
         
         # Draw boss health bar if boss exists
         if boss_spawned:
@@ -404,27 +431,34 @@ def Run_Game(current_mode = 0, character_select = 0):
         if player.is_leveling_up:
             player.ui.draw_level_up_menu(screen, player.available_buffs)
         
-        # Draw pause button (only show when game is not paused or leveling up)
-        if not is_paused and not player.is_leveling_up:
-            pause_rect = pygame.Rect(SCREEN_WIDTH - 50, 10, 40, 40)
-            pygame.draw.rect(screen, (100, 100, 100), pause_rect)
-            pygame.draw.rect(screen, (200, 200, 200), pause_rect, 2)
-            pause_text = player.ui.small_font.render("II", True, (255, 255, 255))
-            screen.blit(pause_text, (SCREEN_WIDTH - 40, 20))
+        # Draw pause button (only when game is not paused)
+        if not is_paused:
+            pause_button = pygame.Rect(SCREEN_WIDTH - 50, 10, 40, 40)
+            pygame.draw.rect(screen, (100, 100, 100), pause_button)
+            pygame.draw.rect(screen, (200, 200, 200), pause_button, 2)
+            pause_text = player.ui.font.render("II", True, (255, 255, 255))
+            pause_text_rect = pause_text.get_rect(center=pause_button.center)
+            screen.blit(pause_text, pause_text_rect)
         
-        # Draw pause menu if game is paused
-        if is_paused and not player.is_leveling_up:
-            # Draw the pause menu and get button rectangles
-            pause_menu_buttons = player.ui.draw_pause_menu(screen)
-            
-            # Draw custom cursor for better UX
+        # Draw pause menu or help screen if game is paused
+        if is_paused:
+            if show_help:
+                # Draw help screen
+                player.ui.draw_pause_menu(screen, player, show_help=True)
+            else:
+                # Draw regular pause menu
+                player.ui.draw_pause_menu(screen, player, show_help=False)
+        
+        # Draw custom cursor for better UX when not in level up menu
+        if not player.is_leveling_up:
             mouse_pos = pygame.mouse.get_pos()
             pygame.mouse.set_visible(False)  # Hide default cursor
+            # Draw crosshair cursor
             pygame.draw.circle(screen, (255, 255, 255), mouse_pos, 10, 1)
             pygame.draw.line(screen, (255, 255, 255), (mouse_pos[0]-5, mouse_pos[1]), (mouse_pos[0]+5, mouse_pos[1]), 1)
             pygame.draw.line(screen, (255, 255, 255), (mouse_pos[0], mouse_pos[1]-5), (mouse_pos[0], mouse_pos[1]+5), 1)
         else:
-            pygame.mouse.set_visible(True)  # Show default cursor when not paused
+            pygame.mouse.set_visible(True)  # Show default cursor in level up menu
         
         # Check if player is dead
         if player.current_health <= 0:

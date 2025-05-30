@@ -32,13 +32,11 @@ class Enemy(pygame.sprite.Sprite):
         self.surf = pygame.Surface((self.size, self.size))
         self.rect = self.surf.get_rect()
         
-        # Spawn and death effects
-        self.is_spawning = True
+        # Animation states (spawn/death animations disabled)
+        self.is_spawning = False
         self.is_dying = False
-        self.animation_start_time = pygame.time.get_ticks()
-        self.animation_duration = 1000  # 1 second for spawn/death animation
-        self.is_invincible = True  # Invincible during spawn/death animations
-        self.original_sprite = None  # Store the original sprite for animation
+        self.is_invincible = False
+        self.original_sprite = None  # Store the original sprite for reference
         
         # Movement tracking
         self.spawn_radius = 700
@@ -91,86 +89,27 @@ class Enemy(pygame.sprite.Sprite):
         self.old_x = new_x      # Cập nhật vị trí mới của old_x
         
     def update_animation(self, clock):
-        """Update spawn/death animations"""
-        current_time = pygame.time.get_ticks()
-        elapsed = current_time - self.animation_start_time
-        
-        if self.is_spawning or self.is_dying:
-            # Calculate animation progress (0.0 to 1.0)
-            progress = min(1.0, elapsed / self.animation_duration)
-            
-            # Blinking effect (faster blinking as animation progresses)
-            if int(progress * 10) % 2 == 0:  # Blink faster as animation progresses
-                if self.is_spawning:
-                    # For spawn: fade in with white color
-                    self.surf = change_color(self.original_sprite, (255, 255, 255, int(255 * progress)))
-                else:
-                    # For death: fade out with red color
-                    self.surf = change_color(self.original_sprite, (255, 0, 0, int(255 * (1 - progress))))
-            else:
-                self.surf = self.original_sprite
-            
-            # End of animation
-            if progress >= 1.0:
-                if self.is_spawning:
-                    self.is_spawning = False
-                    self.is_invincible = False
-                    self.surf = self.original_sprite
-                elif self.is_dying:
-                    self.kill()  # Remove enemy when death animation completes
-                    return True  # Indicate that enemy should be removed
+        """Animation update (spawn/death animations disabled)"""
+        if self.is_dying:
+            self.kill()  # Remove enemy immediately when dead
+            return True
         return False
     
     def start_death_animation(self):
-        """Start the death animation sequence"""
-        if not self.is_dying:  # Prevent multiple death triggers
+        """Mark enemy for immediate removal (death animation disabled)"""
+        if not self.is_dying:
             self.is_dying = True
-            self.is_invincible = True
-            self.animation_start_time = pygame.time.get_ticks()
             return True
         return False
     
     def load_sprite(self, clock):
-        # Get the current time
-        current_time = pygame.time.get_ticks()
-        
-        # Handle spawn animation
-        if self.is_spawning:
-            elapsed = current_time - self.animation_start_time
-            if elapsed >= self.animation_duration:
-                self.is_spawning = False
-                self.is_invincible = False
-                self.surf = self.original_sprite
-                return False  # Don't remove the enemy
-                
-            # Blink effect during spawn
-            if (current_time // 100) % 2 == 0:
-                self.surf = change_color(self.original_sprite, (255, 255, 255, 180))  # White flash
-            else:
-                self.surf = self.original_sprite
-            
-            # Update the rect to match the new surface size
-            old_center = self.rect.center
-            self.rect = self.surf.get_rect(center=old_center)
-            self.size = max(self.rect.width, self.rect.height)
-            return False
-            
-        # Handle death animation
-        elif self.is_dying:
-            elapsed = current_time - self.animation_start_time
-            if elapsed >= self.animation_duration:
-                return True  # Signal to remove this enemy
-                
-            # Fade out and red flash effect during death
-            alpha = max(0, 255 - (elapsed / self.animation_duration) * 255)
-            if (current_time // 50) % 2 == 0:  # Flash effect
-                self.surf = change_color(self.original_sprite, (255, 100, 100, int(alpha)))
-            else:
-                self.surf = change_color(self.original_sprite, (255, 50, 50, int(alpha)))
-            return False
+        # Skip spawn/death animations, just handle normal sprite updates
+        if self.is_dying:
+            return True  # Remove enemy immediately
             
         # Handle hit animation
-        elif hasattr(self, 'is_hit') and self.is_hit:
+        if hasattr(self, 'is_hit') and self.is_hit:
+            current_time = pygame.time.get_ticks()
             elapsed = current_time - self.hit_time
             if elapsed < self.hit_cooldown:
                 # Flash white when hit
@@ -285,16 +224,16 @@ class Enemy(pygame.sprite.Sprite):
         elif self.rect.centerx < self.old_position[0]:
             self.direction = "left"
             
-        # Move towards player if not in hit stun
-        if not self.is_hit:
+        # Always move towards player if not in hit stun and not dying
+        if not self.is_hit and not self.is_dying:
             self.move_towards_player(player)
             
         # Check for collisions with player bullets
         if not self.is_invincible and hasattr(self, 'check_bullet_collisions'):
             self.check_bullet_collisions(player_bullets, all_sprites)
             
-        # Check for collision with player
-        if not self.is_invincible and not self.is_hit and not self.is_dying and not self.is_spawning:
+        # Check for collision with player (only if not invincible, not hit, and not dying)
+        if not self.is_invincible and not self.is_hit and not self.is_dying:
             if hasattr(player, 'rect') and hasattr(self, 'rect'):
                 if self.rect.colliderect(player.rect):
                     if hasattr(player, 'take_damage') and hasattr(self, 'collide_damage'):
@@ -354,10 +293,9 @@ class Normal(Enemy):
         self.animation_speed = 0.15  # Lower is faster
         self.last_update = pygame.time.get_ticks()
         
-        # Start spawn animation
-        self.is_spawning = True
-        self.is_invincible = True
-        self.animation_start_time = pygame.time.get_ticks()
+        # No spawn animation - enemies appear and can move immediately
+        self.is_spawning = False
+        self.is_invincible = False
         
         # Generate random position around player
         self.generate_random_position(player)

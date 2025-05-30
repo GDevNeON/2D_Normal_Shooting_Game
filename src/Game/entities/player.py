@@ -74,6 +74,8 @@ class Player(pygame.sprite.Sprite):
         self.movement_speed_buff = 0  # Tỷ lệ tăng tốc độ di chuyển
         self.defense_buff = 0  # Tỷ lệ tăng phòng thủ
         self.bullet_size_buff = 0  # Tỷ lệ tăng kích thước đạn
+        self.healing_efficiency = 0  # Tỷ lệ tăng hiệu quả hồi máu (tối đa 50%)
+        self.exp_efficiency = 0  # Tỷ lệ tăng kinh nghiệm nhận được (tối đa 50%)
         
         # Level up state
         self.is_leveling_up = False
@@ -120,7 +122,11 @@ class Player(pygame.sprite.Sprite):
         if self.is_leveling_up:  # Don't gain exp while leveling up
             return
             
-        self.exp += amount
+        # Apply experience efficiency buff (max 50%)
+        exp_amount = int(amount * (1 + self.exp_efficiency / 100))
+        self.exp += exp_amount
+        print(f"Gained {exp_amount} EXP (Efficiency: {self.exp_efficiency}%)")
+        
         # Check if we have enough exp to level up
         if self.exp >= self.maximum_exp:
             self.exp = self.maximum_exp  # Cap at max exp until level up is processed
@@ -258,7 +264,7 @@ class Player(pygame.sprite.Sprite):
         self.level += 1
         
         # Increase maximum exp for next level
-        self.maximum_exp = int(self.maximum_exp * 1.2)  # Increase by 20% each level
+        self.maximum_exp = int(self.maximum_exp * 1.1)  # Increase by 10% each level
         self.exp_ratio = self.maximum_exp / self.exp_bar_length
         
         # Play level up sound effect
@@ -269,7 +275,7 @@ class Player(pygame.sprite.Sprite):
         self.available_buffs = []
         buff_options = [
             "attack_speed", "damage", "max_hp", "movement_speed", 
-            "defense", "bullet_size"
+            "defense", "bullet_size", "healing_eff", "exp_eff"
         ]
         # Select 3 random unique buffs
         selected_buffs = random.sample(buff_options, min(3, len(buff_options)))
@@ -287,8 +293,10 @@ class Player(pygame.sprite.Sprite):
                 self.available_buffs.append(("Defense +15%", "defense", 15))
             elif buff == "bullet_size":
                 self.available_buffs.append(("Bullet Size +15%", "bullet_size", 15))
-            elif buff == "damage_reduction":
-                self.available_buffs.append(("Damage Reduction +10%", "damage_reduction", 10))
+            elif buff == "healing_eff" and self.healing_efficiency < 50:  # Cap at 50%
+                self.available_buffs.append(("Healing +10%", "healing_eff", 10))
+            elif buff == "exp_eff" and self.exp_efficiency < 50:  # Cap at 50%
+                self.available_buffs.append(("EXP Gain +10%", "exp_eff", 10))
     
     def apply_buff(self, buff):
         buff_name = buff[0]
@@ -332,6 +340,14 @@ class Player(pygame.sprite.Sprite):
         elif buff_type == "bullet_size":
             self.bullet_size_buff += buff_value
             print(f"Bullet size buff: {self.bullet_size_buff}%")
+            
+        elif buff_type == "healing_eff":
+            self.healing_efficiency = min(50, self.healing_efficiency + buff_value)  # Cap at 50%
+            print(f"Healing efficiency: {self.healing_efficiency}%")
+            
+        elif buff_type == "exp_eff":
+            self.exp_efficiency = min(50, self.exp_efficiency + buff_value)  # Cap at 50%
+            print(f"EXP efficiency: {self.exp_efficiency}%")
             
 
     

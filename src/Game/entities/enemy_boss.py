@@ -16,7 +16,7 @@ class SwordSkill(pygame.sprite.Sprite):
         self.sprite = []
         self.animation_speed = 500  # Time between frames in ms
         self.player = player
-        self.damage = 15
+        self.damage = 150
         self.damage_dealt = False
         
         # Load sprites
@@ -71,7 +71,7 @@ class SwordCast(pygame.sprite.Sprite):
         self.sprite = []
         self.animation_speed = 500  # Time between frames in ms
         self.player = player
-        self.damage = 25
+        self.damage = 250
         self.damage_dealt = False
         
         # Load sprites
@@ -705,9 +705,9 @@ class SkellyBoss(Enemy):
             # Set the appropriate skill animation
             if self.phase == 1:
                 skill_sprites_to_use = skelly_skill_sprite
-                spawn_interval = 500  # Spawn swords every 0.5 seconds
+                spawn_interval = 1000  # Spawn swords every 1 seconds
                 spawn_count = 5  # Spawn 5 swords at once
-                skill_radius = 1000
+                skill_radius = 1500
                 skill_class = SwordSkill
                 # Fallback to paths if needed
                 fallback_paths = skelly_1st_skill_path
@@ -855,8 +855,8 @@ class SkellyBoss(Enemy):
             self.phase = 2
             
             # Upgrade boss for phase 2
-            self.health = 1500
-            self.max_health = 1500
+            self.health = 15000
+            self.max_health = 15000
             self.speed = 3
             self.dash_speed = 15
             self.collide_damage = 40

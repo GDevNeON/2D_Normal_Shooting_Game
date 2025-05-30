@@ -59,7 +59,7 @@ def player_collide_with_exp_items(player, exp_items):
             from ..managers.sound_manager import SoundManager
             SoundManager.play_collect_item()
             
-            player.add_experience(50)  # Use the new method to add experience
+            player.add_experience(10)  # Use the new method to add experience
             exp.kill()
             return True
     return False
@@ -85,9 +85,10 @@ def player_collide_with_hp_items(player, hp_items):
             from ..managers.sound_manager import SoundManager
             SoundManager.play_collect_item()
             
-            player.health += 10
-            if player.health >= player.maximum_health:
-                player.health = player.maximum_health
+            # Apply healing efficiency buff (max 50%)
+            healing_amount = 10 * (1 + player.healing_efficiency / 100)
+            player.health = min(player.maximum_health, player.health + healing_amount)
+            print(f"Healed for {healing_amount:.1f} (Efficiency: {player.healing_efficiency}%)")
             hp.kill()
             return True
     return False
@@ -162,21 +163,23 @@ def elite_collide_with_player_bullets(elite, player_bullets, clock, flag):
     return elite_died, flag
 
 def elite_collide_with_player(elites, player, clock, flag):
+    immune_time = 0
+
     for elite in elites:
         if elite.hp <= 0:
             elite.kill()
             flag += 1
             return True
         else:
+            immune_time += clock.get_time()
             if pygame.sprite.collide_rect(player, elite):
-                elite.is_hitted = True
-                player.health = 0
-                # print('HP remaining: ', elite.hp)
-                elite.hp -= 10
-            
-    # if elite.is_hitted == True:
-    #     # elite.surf = change_color(elite.surf, White)
-    #     elite.is_hitted = False
+                elite.surf = change_color(elite.surf, White)
+                if immune_time >= 100:
+                    immune_time = 0
+                    elite.is_hitted = True
+                    # Use the player's take_damage method to handle damage properly
+                    player.take_damage(elite.collide_damage)
+                    elite.hp -= 10  # Elite takes some damage on collision too
     return False
 
 def boss_collide_with_player_bullets(boss, player_bullets, clock):
