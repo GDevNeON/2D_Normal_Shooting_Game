@@ -212,7 +212,7 @@ class UI:
             button_width = 250
             button_height = 50
             button_x = menu_rect.centerx + 40
-            button_start_y = menu_rect.centery - 30
+            button_start_y = menu_rect.centery - 100
             
             # Resume button
             self.resume_rect = pygame.Rect(button_x, button_start_y, button_width, button_height)

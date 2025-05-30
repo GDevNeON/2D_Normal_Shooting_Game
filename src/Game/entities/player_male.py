@@ -14,7 +14,7 @@ from pygame.locals import (
 class Player_Male(Player):
     def __init__(self):
         super(Player_Male, self).__init__()
-        self.normal_bullet_damage = 10
+        self.normal_bullet_damage = 20
         self.fire_rate = 700
         self.bullet_amount = 5
         self.spread_range = 45
@@ -108,7 +108,7 @@ class Player_Male(Player):
     def burst_skill(self, camera, clock, player_bullets, all_sprites):
         self.time_since_last_burst_shot += clock.get_time()
         
-        if self.time_since_last_burst_shot >= self.fire_rate:
+        if self.time_since_last_burst_shot >= 500:
             mouse = pygame.mouse.get_pos()
             player_to_mouse = (mouse[0] - camera.camera.x - self.rect.centerx, mouse[1] - camera.camera.y - self.rect.centery)
             angle_to_mouse = - math.atan2(player_to_mouse[1], player_to_mouse[0])

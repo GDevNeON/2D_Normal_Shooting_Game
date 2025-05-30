@@ -29,6 +29,9 @@ pygame.init()
 
 
 def Run_Game(current_mode=0, character_select=0, scene_manager=None):
+    # Debug info about parameters
+    print(f"[DEBUG] Run_Game called with: mode={current_mode}, character={character_select}")
+    print(f"[DEBUG] scene_manager provided: {scene_manager is not None}")
     # Clear all timers when starting a new game
     from ..core.define import clear_all_timers, clear_timers, ADD_BOSS, ADD_ENEMY, ADD_ELITE, INCREASE_STAT
     clear_all_timers()
@@ -269,9 +272,13 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
                 # Game over if player died from enemy collision
                 if player.current_health <= 0:
                     SoundManager.play_game_over()
+                    print(f"[DEBUG] Player died from collision, score: {player.score}")
                     from Menu.scenes.game_over_scene import GameOverScene
                     game_over_scene = GameOverScene(pygame.display.get_surface())
                     game_over_scene.setup(score=player.score)
+                    game_over_scene.final_score = player.score  # Direct assignment
+                    game_over_scene.score = player.score  # Set base class score too
+                    print(f"[DEBUG] Game over scene final_score: {game_over_scene.final_score}")
                     return game_over_scene
                     
             # Handle other collisions
@@ -331,9 +338,12 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
                     SoundManager.play_music(grassplain, loops=-1)
                     
                     # Return victory scene with player's score
+                    print(f"[DEBUG] Boss defeated, returning victory scene, score: {player.score}")
                     from Menu.scenes.victory_scene import VictoryScene
                     victory_scene = VictoryScene(pygame.display.get_surface())
                     victory_scene.setup(score=player.score)
+                    victory_scene.score = player.score  # Direct assignment to be sure
+                    print(f"[DEBUG] Victory scene score: {victory_scene.score}")
                     return victory_scene
         
         # Update game state
@@ -420,7 +430,7 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
         
         # Draw game mode indicator below score
         mode_text = player.ui.small_font.render(f"MODE: {'NORMAL' if c_mode == 1 else 'ENDLESS'}", True, (200, 200, 200))
-        screen.blit(mode_text, (10, 85))  # Positioned below the level text
+        screen.blit(mode_text, (10, 105))  # Positioned below the level text
         
         # Draw boss health bar if boss exists
         if boss_spawned:
@@ -471,22 +481,32 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
             # Hủy tất cả các timer
             reset_timer()
             
-            # Reset game clock
-            clock = pygame.time.Clock()  # Tạo mới clock object
+            # Debug print score before transition
+            print(f"[DEBUG] Player score at game over: {player.score}")
             
-            # Display game over screen
-            game_over_text = player.ui.big_font.render("GAME OVER", True, (255, 0, 0))
-            score_text = player.ui.font.render(f"Final Score: {player.score}", True, (255, 255, 255))
-            game_over_rect = game_over_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 30))
-            score_rect = score_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 30))
-            screen.blit(game_over_text, game_over_rect)
-            screen.blit(score_text, score_rect)
-            pygame.display.flip()
-            pygame.time.delay(3000)  # Show game over for 3 seconds
+            # Transition to the Game Over scene with player's score
+            from Menu.scenes.game_over_scene import GameOverScene
+            game_over_scene = GameOverScene(pygame.display.get_surface())
             
-            # Return to main menu
-            from Menu.scenes.main_menu_scene import MainMenuScene
-            return MainMenuScene(pygame.display.get_surface())
+            # Manually set score in a way that ensures it gets displayed
+            game_over_scene.setup(score=player.score)  # Pass the player's score
+            game_over_scene.final_score = player.score  # Direct assignment to be sure
+            game_over_scene.score = player.score  # Set base class score too
+            
+            # Debug final score value
+            print(f"[DEBUG] Game over scene final_score: {game_over_scene.final_score}")
+            
+            # If scene_manager is available, use it for the transition
+            if scene_manager:
+                # Debug scene_manager
+                print(f"[DEBUG] Using scene_manager to change to game_over scene")
+                scene_manager.change_scene('game_over', player.score)
+                return None
+            else:
+                # Debug direct return
+                print(f"[DEBUG] Returning game_over_scene directly")
+                # Return the scene directly if no scene manager
+                return game_over_scene
         
         # Draw exp bar
         player.advanced_exp()
@@ -496,29 +516,31 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
             # Hủy tất cả các timer
             reset_timer()
             
-            # Reset game clock
-            clock = pygame.time.Clock()  # Tạo mới clock object
+            # Debug print score before transition
+            print(f"[DEBUG] Player score at victory: {player.score}")
             
-            victory_text = player.ui.title_font.render("VICTORY!", True, (255, 215, 0))
-            victory_rect = victory_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 - 50))
-            screen.blit(victory_text, victory_rect)
+            # Transition to Victory scene with player's score
+            from Menu.scenes.victory_scene import VictoryScene
+            victory_scene = VictoryScene(pygame.display.get_surface())
             
-            continue_text = player.ui.font.render("Press any key to continue", True, (255, 255, 255))
-            continue_rect = continue_text.get_rect(center=(SCREEN_WIDTH//2, SCREEN_HEIGHT//2 + 50))
-            screen.blit(continue_text, continue_rect)
+            # Manually set score in a way that ensures it gets displayed
+            victory_scene.setup(score=player.score)  # Pass the player's score
+            victory_scene.score = player.score  # Direct assignment to be sure
             
-            pygame.display.flip()
+            # Debug final score value
+            print(f"[DEBUG] Victory scene score: {victory_scene.score}")
             
-            # Wait for any key press
-            waiting = True
-            while waiting:
-                for event in pygame.event.get():
-                    if event.type == pygame.QUIT:
-                        pygame.quit()
-                        sys.exit()
-                    if event.type == pygame.KEYDOWN or event.type == pygame.MOUSEBUTTONDOWN:
-                        waiting = False
-                        return  # Return to main menu
+            # If scene_manager is available, use it for the transition
+            if scene_manager:
+                # Debug scene_manager
+                print(f"[DEBUG] Using scene_manager to change to victory scene")
+                scene_manager.change_scene('victory', player.score)
+                return None
+            else:
+                # Debug direct return
+                print(f"[DEBUG] Returning victory_scene directly")
+                # Return the scene directly if no scene manager
+                return victory_scene
         
         # Update display
         pygame.display.flip()

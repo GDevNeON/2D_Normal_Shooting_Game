@@ -59,7 +59,7 @@ def player_collide_with_exp_items(player, exp_items):
             from ..managers.sound_manager import SoundManager
             SoundManager.play_collect_item()
             
-            player.add_experience(10)  # Use the new method to add experience
+            player.add_experience(20)  # Use the new method to add experience
             exp.kill()
             return True
     return False
@@ -86,7 +86,7 @@ def player_collide_with_hp_items(player, hp_items):
             SoundManager.play_collect_item()
             
             # Apply healing efficiency buff (max 50%)
-            healing_amount = 10 * (1 + player.healing_efficiency / 100)
+            healing_amount = 20 * (1 + player.healing_efficiency / 100)
             player.health = min(player.maximum_health, player.health + healing_amount)
             print(f"Healed for {healing_amount:.1f} (Efficiency: {player.healing_efficiency}%)")
             hp.kill()

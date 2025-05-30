@@ -33,6 +33,11 @@ def main():
     
     # Start with main menu scene
     main_menu = MainMenuScene(screen)
+    
+    # Store the scene manager for future reference
+    # This will be passed down to all scenes
+    main_menu.parent_scene_manager = manager
+    
     manager.start_scene(main_menu)
     
     # Run the game loop

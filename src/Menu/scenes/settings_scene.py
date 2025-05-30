@@ -66,6 +66,16 @@ class SettingsScene(Scene):
         tab_btn_spacing = 180  # Increased spacing between tab buttons
         
         # Create all tab buttons with same style
+        self.howto_button = Button(
+            screen_center_x - tab_btn_spacing * 2, 
+            tab_button_y, 
+            tab_btn_width, 
+            tab_btn_height, 
+            "HOW-TO", 
+            normal_font, 
+            hover_color=(100, 100, 200)
+        ).set_callback(self.on_howto_clicked)
+        
         self.video_settings_button = Button(
             screen_center_x - tab_btn_spacing, 
             tab_button_y, 
@@ -151,6 +161,7 @@ class SettingsScene(Scene):
         
         # Add common UI elements
         self.common_ui_elements = [
+            self.howto_button,
             self.video_settings_button,
             self.audio_settings_button,
             self.credits_button,
@@ -175,7 +186,7 @@ class SettingsScene(Scene):
             ]}
         ]
         
-        # Set initial UI elements based on current tab
+        # Initialize settings elements
         self.update_ui_elements()
         
         # Import SoundManager to initialize volumes
@@ -184,6 +195,33 @@ class SettingsScene(Scene):
         # Settings state
         self.resolution = (1920, 1080)
         self.is_fullscreen = False
+        
+        # How-to instructions
+        self.how_to_instructions = [
+            {"title": "GAME CONTROLS", "content": [
+                "Move: WASD",
+                "Pause: ESC or P",
+                "Move your mouse to direct your character to shoot"
+            ]},
+            {"title": "GAME OBJECTIVES", "content": [
+                "Survive waves of enemies",
+                "Collect power-ups to enhance your abilities",
+                "Defeat the boss to complete each level",
+                "Achieve the highest score possible"
+            ]},
+            {"title": "TIPS", "content": [
+                "Keep moving to avoid enemy fire",
+                "Conserve your special ability for tough situations",
+                "Prioritize collecting health, exp",
+                "Focus fire on one enemy at a time"
+            ]}
+        ]
+        
+        # How-to scrolling state
+        self.howto_scroll_y = 0
+        self.howto_scroll_speed = 0.5
+        self.howto_total_height = 600  # Tổng chiều cao nội dung how-to
+        self.last_howto_update = 0
         
         # Initialize volumes from SoundManager
         self.music_volume = SoundManager.get_music_volume()
@@ -217,9 +255,10 @@ class SettingsScene(Scene):
         """Update the settings screen"""
         super().update(dt)
         
+        current_time = pygame.time.get_ticks()
+        
         # Update credits scrolling if credits tab is active
         if self.current_tab == "credits":
-            current_time = pygame.time.get_ticks()
             if current_time - self.last_credits_update > 16:  # ~60fps
                 self.credits_scroll_y += self.credits_scroll_speed
                 self.last_credits_update = current_time
@@ -227,6 +266,16 @@ class SettingsScene(Scene):
                 # Reset scroll position when it reaches the bottom
                 if self.credits_scroll_y > self.credits_total_height:
                     self.credits_scroll_y = -450  # Reset to just above the visible area
+                    
+        # Update how-to scrolling if how-to tab is active
+        elif self.current_tab == "howto":
+            if current_time - self.last_howto_update > 16:  # ~60fps
+                self.howto_scroll_y += self.howto_scroll_speed
+                self.last_howto_update = current_time
+                
+                # Reset scroll position when it reaches the bottom
+                if self.howto_scroll_y > self.howto_total_height:
+                    self.howto_scroll_y = -450  # Reset to just above the visible area
     
     def draw(self):
         """Draw the settings screen"""
@@ -247,7 +296,7 @@ class SettingsScene(Scene):
         settings_menu_width = 1152  # Increased width
         settings_menu_height = 700   # Increased height
         settings_menu_x = (screen_width - settings_menu_width) / 2
-        settings_menu_y = (screen_height - settings_menu_height) / 2 - 30  # Slightly higher up
+        settings_menu_y = (screen_height - settings_menu_height) / 2  # Slightly higher up
         
         # Create settings panel with semi-transparent background
         settings_menu_surface = pygame.Surface((settings_menu_width, settings_menu_height), pygame.SRCALPHA)
@@ -269,7 +318,9 @@ class SettingsScene(Scene):
         super().draw()
         
         # Draw specific content based on current tab
-        if self.current_tab == "video":
+        if self.current_tab == "howto":
+            self.draw_howto()
+        elif self.current_tab == "video":
             self.draw_video_settings()
         elif self.current_tab == "audio":
             self.draw_audio_settings()
@@ -374,6 +425,13 @@ class SettingsScene(Scene):
     def on_audio_settings_clicked(self):
         """Switch to audio settings tab"""
         self.current_tab = "audio"
+        self.update_ui_elements()
+        
+    def on_howto_clicked(self):
+        """Switch to how-to tab"""
+        self.current_tab = "howto"
+        self.howto_scroll_y = -450  # Bắt đầu từ dưới lên
+        self.last_howto_update = pygame.time.get_ticks()
         self.update_ui_elements()
         
     def on_credits_clicked(self):
@@ -500,3 +558,48 @@ class SettingsScene(Scene):
         SoundManager.set_sfx_volume(self.sfx_volume)
         # Play a sound to demonstrate volume
         SoundManager.play_sound(select_button_sfx, volume=0.5)
+        
+    def draw_howto(self):
+        """Draw how-to content with smooth scrolling"""
+        # Get screen dimensions
+        screen_width = self.screen.get_width()
+        screen_center_x = screen_width // 2
+        
+        # Get fonts
+        heading_font = self.font_manager.subheading_font()
+        title_font = self.font_manager.normal_font()
+        content_font = self.font_manager.small_font()
+        
+        # How-to title (fixed position)
+        draw_text(self.screen, "HOW TO PLAY", heading_font, WHITE_COLOR, screen_center_x, 190)
+        
+        # Create surface for the how-to content with transparency
+        howto_height = 450  # Height of the scrollable area
+        howto_surface = pygame.Surface((screen_width - 200, howto_height), pygame.SRCALPHA)
+        
+        # Draw how-to content with scrolling
+        y_pos = 0  # Start drawing at the top of the surface
+        section_spacing = 40
+        line_spacing = 35
+        
+        for section in self.how_to_instructions:
+            # Draw section title
+            title_y = y_pos - self.howto_scroll_y
+            if -50 < title_y < howto_height + 50:  # Only draw if visible or nearly visible
+                draw_text(howto_surface, section["title"], title_font, (200, 200, 255), 
+                        howto_surface.get_width() // 2, title_y)
+            y_pos += section_spacing
+            
+            # Draw section content
+            for line in section["content"]:
+                line_y = y_pos - self.howto_scroll_y
+                if -50 < line_y < howto_height + 50:  # Only draw if visible or nearly visible
+                    draw_text(howto_surface, line, content_font, WHITE_COLOR, 
+                            howto_surface.get_width() // 2, line_y)
+                y_pos += line_spacing
+            
+            # Add space after each section
+            y_pos += section_spacing
+        
+        # Apply the how-to surface to the screen
+        self.screen.blit(howto_surface, (100, 260))
