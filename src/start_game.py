@@ -20,7 +20,7 @@ from Menu.managers.scene_manager import SceneManager
 from Menu.config.constants import WIDTH_SCREEN, HEIGHT_SCREEN
 
 # Import Game modules
-from Game.core.define import *
+from Game.core.game_engine import *
 
 def main():
     """Main entry point for the game"""

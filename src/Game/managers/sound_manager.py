@@ -37,6 +37,12 @@ player_hit_sfx = (mod_path / player_hit_path).resolve()
 select_button_path = f"{sfx_dir}/select_button.mp3"
 select_button_sfx = (mod_path / select_button_path).resolve()
 
+male_shot_path = f"{sfx_dir}/male_shot.wav"
+male_shot_sfx = (mod_path / male_shot_path).resolve()
+
+female_shot_path = f"{sfx_dir}/female_shot.wav"
+female_shot_sfx = (mod_path / female_shot_path).resolve()
+
 class SoundManager:
     """Manages all game sounds and music"""
     _sfx_volume = 1.0  # Default SFX volume
@@ -199,6 +205,16 @@ class SoundManager:
         return cls.play_sound(player_hit_sfx, volume=0.5)
     
     @classmethod
+    def play_male_shot(cls):
+        """Play male character shooting sound effect"""
+        return cls.play_sound(male_shot_sfx)
+        
+    @classmethod
+    def play_female_shot(cls):
+        """Play female character shooting sound effect"""
+        return cls.play_sound(female_shot_sfx)
+        
+    @classmethod
     def play_button_select(cls):
-        """Play button select sound"""
+        """Play button select sound effect"""
         return cls.play_sound(select_button_sfx, volume=0.4)

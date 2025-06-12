@@ -117,6 +117,7 @@ class UI:
                 "CONTROLS:",
                 "WASD - Move character",
                 "Mouse - Aim and shoot",
+                "Q - Use skill",
                 "P - Pause game",
                 "ESC - Exit to main menu",
                 "",
@@ -137,7 +138,7 @@ class UI:
                     text_surface = self.font.render(text, True, color)
                 else:
                     color = (220, 220, 220)
-                    text_surface = self.small_font.render(text, True, color)
+                    text_surface = self.tiny_font.render(text, True, color)
                 screen.blit(text_surface, (text_x, text_y + i * 30))
             
             # Back button
@@ -174,7 +175,7 @@ class UI:
                 stats = [
                     f"Level: {player.level}",
                     f"HP: {int(player.health)} / {player.maximum_health}",
-                    f"Damage: {player.normal_bullet_damage}",
+                    f"Damage: {int(player.normal_bullet_damage * (1 + player.damage_buff / 100))}",
                     f"Speed: {player.speed:.1f}",
                     f"Fire Rate: {player.fire_rate}ms",
                     "",
@@ -245,40 +246,74 @@ class UI:
                 'help': self.help_rect
             }
     
-    def draw_boss_health_bar(self, screen, boss):
-        """Draw boss health bar at the top of the screen"""
-        if boss.health <= 0 and boss.phase == 1:
+    def draw_boss_health_bar(self, screen, boss, offset_y=0):
+        """Draw boss health bar at the top of the screen with vertical offset
+        
+        Args:
+            screen: The screen surface to draw on
+            boss: The boss object containing health information
+            offset_y: Vertical offset from the top of the screen (default: 0)
+        """
+        if boss.health <= 0 and hasattr(boss, 'phase') and boss.phase == 1:
             # Don't show health bar during phase transition
             return
             
         # Background bar (empty)
         bar_width = 500
-        bar_height = 30
+        bar_height = 20
         bar_x = (SCREEN_WIDTH - bar_width) // 2
-        bar_y = 20
-        pygame.draw.rect(screen, (100, 100, 100), (bar_x, bar_y, bar_width, bar_height))
+        bar_y = 20 + offset_y  # Apply vertical offset
         
-        # Health bar (filled)
-        health_ratio = boss.health / boss.max_health
-        health_width = bar_width * health_ratio
+        # Draw background
+        pygame.draw.rect(screen, (50, 50, 50), (bar_x - 2, bar_y - 2, bar_width + 4, bar_height + 4))  # Outer border
+        pygame.draw.rect(screen, (100, 100, 100), (bar_x, bar_y, bar_width, bar_height))  # Background
         
-        # Color changes based on health
-        if health_ratio > 0.6:
-            color = (0, 255, 0)  # Green
-        elif health_ratio > 0.3:
-            color = (255, 255, 0)  # Yellow
+        # Calculate health ratio safely
+        if hasattr(boss, 'max_health') and boss.max_health > 0:
+            health_ratio = max(0, min(1, boss.health / boss.max_health))
         else:
-            color = (255, 0, 0)  # Red
+            health_ratio = 0
             
-        pygame.draw.rect(screen, color, (bar_x, bar_y, health_width, bar_height))
-        pygame.draw.rect(screen, (255, 255, 255), (bar_x, bar_y, bar_width, bar_height), 2)  # Border
+        health_width = int(bar_width * health_ratio)
         
-        # Boss name and health value
-        name_text = self.boss_font.render(f"{boss.name} - Phase {boss.phase}", True, (255, 255, 255))
-        health_text = self.boss_font.render(f"{boss.health}/{boss.max_health} HP", True, (255, 255, 255))
+        # Gradient health bar (red to yellow to green)
+        if health_ratio > 0:
+            # Draw health gradient
+            for i in range(health_width):
+                ratio = i / bar_width
+                if ratio > 0.5:
+                    # Green to yellow (0.5 to 1.0)
+                    g = 255
+                    r = int(510 * (1 - ratio))
+                else:
+                    # Yellow to red (0.0 to 0.5)
+                    r = 255
+                    g = int(510 * ratio)
+                pygame.draw.line(screen, (r, g, 0), (bar_x + i, bar_y), (bar_x + i, bar_y + bar_height - 1))
         
-        screen.blit(name_text, (bar_x, bar_y - 20))
-        screen.blit(health_text, (bar_x + bar_width - health_text.get_width(), bar_y - 20))
+        # Draw border
+        pygame.draw.rect(screen, (200, 200, 200), (bar_x, bar_y, bar_width, bar_height), 1)
+        
+        # Boss name and health percentage
+        boss_name = getattr(boss, 'name', 'Boss')
+        phase = getattr(boss, 'phase', 1)
+        current_health = getattr(boss, 'health', 0)
+        max_health = getattr(boss, 'max_health', 100)
+        
+        # Draw boss name and phase
+        name_text = self.boss_font.render(f"{boss_name} (Phase {phase})", True, (255, 255, 255))
+        name_x = bar_x + 5
+        name_y = bar_y - 18
+        
+        # Draw name with shadow for better visibility
+        shadow_surface = self.boss_font.render(f"{boss_name} (Phase {phase})", True, (0, 0, 0))
+        screen.blit(shadow_surface, (name_x + 1, name_y + 1))
+        screen.blit(name_text, (name_x, name_y))
+        
+        # Draw health text
+        health_text = self.boss_font.render(f"{int(current_health)}/{int(max_health)} ({health_ratio*100:.1f}%)", True, (255, 255, 255))
+        health_x = bar_x + bar_width - health_text.get_width() - 5
+        screen.blit(health_text, (health_x, name_y))
         
         # If boss is in defeated state and in feather collection phase, draw feather indicator
         if boss.defeated and boss.phase == 2 and hasattr(boss, 'feathers') and boss.feathers:

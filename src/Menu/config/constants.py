@@ -47,6 +47,11 @@ PATH_TO_TRY_AGAIN_BUTTON = os.path.join(PATH_DIRECTORY, "assets/imgs/back button
 PATH_TO_GAME_MODE_NM = os.path.join(PATH_DIRECTORY, "assets/imgs/normalbutton.png")
 PATH_TO_GAME_MODE_EL = os.path.join(PATH_DIRECTORY, "assets/imgs/endlessbutton.png")
 
+# Custom game mode images
+PATH_TO_GAME_MODE_ELITE = os.path.join(PATH_DIRECTORY, "assets/gamemodes/custom_elite.png")
+PATH_TO_GAME_MODE_TINY = os.path.join(PATH_DIRECTORY, "assets/gamemodes/custom_tiny.png")
+PATH_TO_GAME_MODE_BOZOS = os.path.join(PATH_DIRECTORY, "assets/gamemodes/custom_bozos.png")
+
 # Characters
 PATH_TO_MALE_CHAR = os.path.join(PATH_DIRECTORY, "assets/imgs/malemc.png")
 PATH_TO_FEMALE_CHAR = os.path.join(PATH_DIRECTORY, "assets/imgs/femalemc.png")

@@ -1,12 +1,14 @@
 import pygame
 import random
 import sys
+import importlib
+import pkgutil
+from types import ModuleType
 
 sys.path.insert(0, r"./src/Menu")
 
 # Import from our reorganized modules
 from ..core.define import *
-from ..core.camera import *
 from ..entities.player_male import Player_Male
 from ..entities.player_female import Player_Female
 from ..entities.enemy import Normal
@@ -19,33 +21,59 @@ from ..entities.items import *
 from ..utils.functions import *
 from ..managers.image_manager import *
 from ..components.background import Background
+from ..components.camera import *
 from ..managers.sound_manager import SoundManager, grassplain, grassplain_boss
 
 # Import VictoryScene from Menu.scenes
 from Menu.scenes.victory_scene import VictoryScene
 
+# Import game modes
+from .gamemodes import GAME_MODES
+
 pygame.mixer.init()
 pygame.init()
 
+def load_custom_game_mode(mode_name):
+    """Dynamically load a custom game mode by name."""
+    if not mode_name:
+        return None
+        
+    # Try to import the module if it's not already loaded
+    if mode_name not in GAME_MODES:
+        try:
+            module_name = f"Game.core.gamemodes.{mode_name}"
+            importlib.import_module(module_name)
+        except ImportError as e:
+            print(f"[ERROR] Failed to load game mode {mode_name}: {e}")
+            return None
+    
+    return GAME_MODES.get(mode_name)
 
-def Run_Game(current_mode=0, character_select=0, scene_manager=None):
+def Run_Game(current_mode=0, character_select=0, custom_mode_name=None, scene_manager=None):
     # Debug info about parameters
-    print(f"[DEBUG] Run_Game called with: mode={current_mode}, character={character_select}")
+    print(f"[DEBUG] Run_Game called with: mode={current_mode}, character={character_select}, custom_mode={custom_mode_name}")
     print(f"[DEBUG] scene_manager provided: {scene_manager is not None}")
+    
     # Clear all timers when starting a new game
-    from ..core.define import clear_all_timers, clear_timers, ADD_BOSS, ADD_ENEMY, ADD_ELITE, INCREASE_STAT
+    from ..core.define import clear_all_timers, ADD_BOSS, ADD_ENEMY, ADD_ELITE, INCREASE_STAT
     clear_all_timers()
     
-    # Set up game timers
+    # Set up default game timers
     pygame.time.set_timer(ADD_ENEMY, 7000)     # Spawn normal enemies every 7 seconds
     pygame.time.set_timer(ADD_ELITE, 40000)    # Spawn elite enemies every 40 seconds
     pygame.time.set_timer(INCREASE_STAT, 60000) # Increase stats every 60 seconds
     pygame.time.set_timer(ADD_BOSS, 300000)     # Spawn boss after 5 minutes
     
+    # Initialize game mode
+    game_mode = None
+    if custom_mode_name and isinstance(custom_mode_name, str):
+        game_mode = load_custom_game_mode(custom_mode_name.lower())
+    
     clock = pygame.time.Clock()
     pygame.display.set_caption('A 2D NORMAL SHOOTING GAME')
     SoundManager.play_music(grassplain, loops=-1)
     
+    # Game state groups
     enemies         = pygame.sprite.Group()
     elites          = pygame.sprite.Group()
     bosses          = pygame.sprite.Group()
@@ -58,16 +86,34 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
     items_group     = pygame.sprite.Group()
     all_sprites     = pygame.sprite.Group()
     
-    # Tạo ra 1 object
+    # Create camera
     camera = Camera(LEVEL_WIDTH, LEVEL_HEIGHT)
     
+    # Create player
     if character_select == 1:
         player = Player_Male()
     else:
         player = Player_Female()
     all_sprites.add(player)
-
+    
     background = Background(background_sprite)
+    
+    # Game state dictionary to pass to game modes
+    game_state = {
+        'player': player,
+        'enemies': enemies,
+        'elites': elites,
+        'bosses': bosses,
+        'boss_skills': boss_skills,
+        'player_bullets': player_bullets,
+        'elite_bullets': elite_bullets,
+        'exp_items': exp_items,
+        'energy_items': energy_items,
+        'hp_items': hp_items,
+        'items_group': items_group,
+        'all_sprites': all_sprites,
+        'camera': camera
+    }
     
     # Boss related variables
     boss_spawned = False
@@ -76,23 +122,70 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
     
     flag = 0
     c_mode = current_mode
-    is_paused = False  # Thêm biến để kiểm tra trạng thái pause
-    game_won = False   # Flag to check if player won the game in normal mode
+    is_paused = False
+    game_won = False
     
     difficulty_multiplier = 1.0
+    
+    # Initialize game mode if custom mode is selected
+    if game_mode:
+        print(f"[DEBUG] Initializing game mode: {game_mode.name}")
+        game_mode.setup(game_state)
+        # Update game mode based on custom mode rules
+        if game_mode.rules.get('disable_normal_enemies', False):
+            pygame.time.set_timer(ADD_ENEMY, 0)  # Disable normal enemies
+        if game_mode.rules.get('disable_boss', False):
+            pygame.time.set_timer(ADD_BOSS, 0)   # Disable boss
+    else:
+        # Set up default game mode based on current_mode (normal/endless)
+        if current_mode == 1:  # Normal mode
+            # Normal mode settings (default timers)
+            pygame.time.set_timer(ADD_ENEMY, 7000)
+            pygame.time.set_timer(ADD_ELITE, 40000)
+            pygame.time.set_timer(INCREASE_STAT, 60000)
+            pygame.time.set_timer(ADD_BOSS, 300000)
+        else:  # Endless mode
+            # Endless mode settings (faster spawns)
+            pygame.time.set_timer(ADD_ENEMY, 5000)
+            pygame.time.set_timer(ADD_ELITE, 30000)
+            pygame.time.set_timer(INCREASE_STAT, 45000)
+            pygame.time.set_timer(ADD_BOSS, 300000)
     
     # Gameplay loop
     running = True
     show_help = False  # Track if we're showing the help screen
+    last_time = pygame.time.get_ticks()
     
     while running:
+        current_time = pygame.time.get_ticks()
+        dt = current_time - last_time
+        last_time = current_time
+        
         pressed_keys = pygame.key.get_pressed()
         SCREEN.fill(Black)            
 
+        # Update game mode if active
+        if game_mode and not is_paused and not show_help and not player.is_leveling_up:
+            game_mode.update(game_state, dt)
+            
+            # Check win/lose conditions from game mode
+            if game_mode.check_lose_condition(game_state):
+                print(f"[DEBUG] Game over - {game_mode.name} lose condition met")
+                from Menu.scenes.game_over_scene import GameOverScene
+                return GameOverScene(SCREEN, player.score)
+                
+            if game_mode.check_win_condition(game_state):
+                print(f"[DEBUG] Game won - {game_mode.name} win condition met")
+                return VictoryScene(SCREEN, player.score)
+        
         # Handle events
         for event in pygame.event.get():
             if event.type == QUIT:
                 running = False
+            
+            # Let game mode handle events first if it wants to
+            if game_mode and not is_paused and not show_help and not player.is_leveling_up:
+                game_mode.handle_events(game_state, event)
             
             # Handle keyboard events
             if event.type == KEYDOWN:
@@ -355,18 +448,21 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
                 elites.update(player, elite_bullets, all_sprites, clock)
                 
                 # Update boss and boss skills
-                if boss_spawned:
+                current_boss_spawned = boss_spawned or game_state.get('boss_spawned', False)
+                if current_boss_spawned and bosses:
                     for boss in bosses:
-                        boss.update(player, player_bullets, all_sprites, clock, boss_skills)
-                        
-                        # Update feathers if boss is defeated
-                        if boss.defeated and hasattr(boss, 'feathers'):
-                            for feather in boss.feathers[:]:  # Use a copy for safe iteration
-                                if hasattr(feather, 'update'):
-                                    feather.update()
+                        if hasattr(boss, 'update'):
+                            boss.update(player, player_bullets, all_sprites, clock, boss_skills)
+                            
+                            # Update feathers if boss is defeated
+                            if boss.defeated and hasattr(boss, 'feathers'):
+                                for feather in boss.feathers[:]:  # Use a copy for safe iteration
+                                    if hasattr(feather, 'update'):
+                                        feather.update()
                     
-                    boss_skills.update(clock)
-                
+                    if hasattr(boss_skills, 'update'):
+                        boss_skills.update(clock)
+                        
                 # Update all projectiles and items
                 player_bullets.update(camera)
                 elite_bullets.update(camera)
@@ -382,18 +478,24 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
         background.draw(screen, camera)
         
         # Draw boss trail effect if boss is dashing
-        if boss_spawned:
+        current_boss_spawned = boss_spawned or game_state.get('boss_spawned', False)
+        if current_boss_spawned and bosses:
             for boss in bosses:
-                if hasattr(boss, 'trail_positions') and boss.trail_positions and not boss.defeated:
+                if (hasattr(boss, 'trail_positions') and 
+                    hasattr(boss, 'dash_sprite') and 
+                    hasattr(boss, 'defeated') and
+                    boss.trail_positions and 
+                    not boss.defeated):
                     # Draw each trail position on the screen
                     for trail in boss.trail_positions:
-                        # Create a rect for the trail image and position it
-                        trail_rect = boss.dash_sprite.get_rect(center=(trail['x'], trail['y']))
-                        # Apply camera position to the trail position
-                        trail_rect.x += camera.camera.x
-                        trail_rect.y += camera.camera.y
-                        # Draw the trail image
-                        screen.blit(trail['surf'], trail_rect)
+                        if 'x' in trail and 'y' in trail and 'surf' in trail:
+                            # Create a rect for the trail image and position it
+                            trail_rect = boss.dash_sprite.get_rect(center=(trail['x'], trail['y']))
+                            # Apply camera position to the trail position
+                            trail_rect.x += camera.camera.x
+                            trail_rect.y += camera.camera.y
+                            # Draw the trail image
+                            screen.blit(trail['surf'], trail_rect)
         
         # Draw elite enemies' trail effects
         for elite in elites:
@@ -432,10 +534,30 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
         mode_text = player.ui.small_font.render(f"MODE: {'NORMAL' if c_mode == 1 else 'ENDLESS'}", True, (200, 200, 200))
         screen.blit(mode_text, (10, 105))  # Positioned below the level text
         
-        # Draw boss health bar if boss exists
-        if boss_spawned:
-            for boss in bosses:
-                player.ui.draw_boss_health_bar(screen, boss)
+        # Draw boss health bars if bosses exist
+        current_boss_spawned = boss_spawned or game_state.get('boss_spawned', False)
+        
+        # Initialize boss music state if not exists
+        if 'boss_music_playing' not in game_state:
+            game_state['boss_music_playing'] = False
+            
+        if current_boss_spawned and bosses:
+            # Draw each boss's health bar with vertical offset
+            for i, boss in enumerate(bosses):
+                if hasattr(boss, 'health') and hasattr(boss, 'max_health'):
+                    # Offset each health bar vertically (50px between them)
+                    offset_y = i * 50
+                    player.ui.draw_boss_health_bar(screen, boss, offset_y=offset_y)
+            
+            # Change to boss music if not already playing
+            if not game_state['boss_music_playing']:
+                SoundManager.play_music(grassplain_boss, loops=-1)
+                game_state['boss_music_playing'] = True
+        else:
+            # Change back to normal music when no bosses
+            if game_state['boss_music_playing']:
+                SoundManager.play_music(grassplain, loops=-1)
+                game_state['boss_music_playing'] = False
             
         # Draw level up menu if leveling up
         if player.is_leveling_up:
@@ -486,27 +608,19 @@ def Run_Game(current_mode=0, character_select=0, scene_manager=None):
             
             # Transition to the Game Over scene with player's score
             from Menu.scenes.game_over_scene import GameOverScene
+            
+            # Create the game over scene
             game_over_scene = GameOverScene(pygame.display.get_surface())
             
-            # Manually set score in a way that ensures it gets displayed
-            game_over_scene.setup(score=player.score)  # Pass the player's score
-            game_over_scene.final_score = player.score  # Direct assignment to be sure
-            game_over_scene.score = player.score  # Set base class score too
+            # Set up the scene with the score
+            game_over_scene.setup(score=player.score)
+            game_over_scene.final_score = player.score
+            game_over_scene.score = player.score
             
-            # Debug final score value
             print(f"[DEBUG] Game over scene final_score: {game_over_scene.final_score}")
             
-            # If scene_manager is available, use it for the transition
-            if scene_manager:
-                # Debug scene_manager
-                print(f"[DEBUG] Using scene_manager to change to game_over scene")
-                scene_manager.change_scene('game_over', player.score)
-                return None
-            else:
-                # Debug direct return
-                print(f"[DEBUG] Returning game_over_scene directly")
-                # Return the scene directly if no scene manager
-                return game_over_scene
+            # Return the scene to be handled by the GameScene
+            return game_over_scene
         
         # Draw exp bar
         player.advanced_exp()

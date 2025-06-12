@@ -58,8 +58,17 @@ class SwordSkill(pygame.sprite.Sprite):
             self.sprite_time = 0
             
             # Check for collision with player on the 4th frame
-            if self.sprite_index == 3 and not self.damage_dealt:
-                if self.rect.colliderect(self.player.rect):
+            if self.sprite_index == 3 and not self.damage_dealt and self.rect.colliderect(self.player.rect):
+                # Create a hitbox for the bottom 1/4 of the sword
+                hitbox = pygame.Rect(
+                    self.rect.left,
+                    self.rect.top + (self.rect.height * 3 // 4),  # Bottom 1/4
+                    self.rect.width,
+                    self.rect.height // 4
+                )
+                
+                # Check if player's hitbox intersects with the bottom 1/4 of the sword
+                if hitbox.colliderect(self.player.rect):
                     self.player.take_damage(self.damage)
                     self.damage_dealt = True
 
@@ -248,6 +257,10 @@ class SkellyBoss(Enemy):
         self.skill_duration = 10000  # 10 seconds skill duration
         self.skill_start_time = 0
         self.sword_spawn_timer = 0
+        
+        # Skill sprite management
+        self.skill_sprite_count = 1  # Base number of skill sprites
+        self.max_skill_sprite_count = 10  # Maximum number of skill sprites
         
         # Phase transition
         self.is_transitioning = False
@@ -711,17 +724,22 @@ class SkellyBoss(Enemy):
                 skill_class = SwordSkill
                 # Fallback to paths if needed
                 fallback_paths = skelly_1st_skill_path
+                
+                # Increase spawn count based on skill sprite count
+                spawn_count = min(5 * self.skill_sprite_count, 25)  # Cap at 25 swords
             else:
                 skill_sprites_to_use = []
                 # Check if we have 2nd phase skill sprites
                 from ..managers.image_manager import skelly_2nd_skill1, skelly_2nd_skill2
                 try:
-                    # Create sprite array if it doesn't exist
+                    # Create sprite array with multiple instances of each sprite
                     phase2_sprites = []
+                    # Add multiple instances of each sprite based on skill_sprite_count
                     for path in [skelly_2nd_skill1, skelly_2nd_skill2]:
-                        img = pygame.image.load((mod_path / path).resolve()).convert_alpha()
-                        img = pygame.transform.scale(img, (self.size, self.size))
-                        phase2_sprites.append(img)
+                        for _ in range(self.skill_sprite_count):
+                            img = pygame.image.load((mod_path / path).resolve()).convert_alpha()
+                            img = pygame.transform.scale(img, (self.size, self.size))
+                            phase2_sprites.append(img)
                     skill_sprites_to_use = phase2_sprites
                 except Exception as e:
                     print(f"Error loading phase 2 skill sprites: {e}")
@@ -730,11 +748,11 @@ class SkellyBoss(Enemy):
                         skill_sprites_to_use = skelly_skill_sprite
                 
                 spawn_interval = 1000  # Spawn swords every 1 second
-                spawn_count = 10  # Spawn 10 swords at once
+                spawn_count = min(10 * self.skill_sprite_count, 50)  # Cap at 50 swords
                 skill_radius = 1500
                 skill_class = SwordCast
                 # Fallback to paths if needed
-                fallback_paths = skelly_2nd_skill_path
+                fallback_paths = skelly_2nd_skill_path * self.skill_sprite_count  # Repeat paths based on count
             
             # Update skill animation
             self.sprite_time += clock.get_time()

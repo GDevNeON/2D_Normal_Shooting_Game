@@ -30,19 +30,33 @@ class SceneManager:
         pygame.mouse.set_visible(True)
         self.current_scene = scene
         
-        # Setup scene with data if provided
+        # Set score attribute if provided
         if data is not None:
             print(f"[DEBUG] Setting up scene with score={data}")
-            self.current_scene.setup(score=data)
-            # Directly ensure score is set for GameOverScene and VictoryScene
+            # Set score attributes before calling setup
             if hasattr(self.current_scene, 'final_score'):
-                print(f"[DEBUG] Directly setting final_score={data}")
+                print(f"[DEBUG] Setting final_score={data}")
                 self.current_scene.final_score = data
-            # Always set the base score property
-            self.current_scene.score = data
-        else:
-            print(f"[DEBUG] Setting up scene with default values")
-            self.current_scene.setup()
+            if hasattr(self.current_scene, 'score'):
+                self.current_scene.score = data
+        
+        # Call setup with score if the method accepts it
+        try:
+            if data is not None:
+                self.current_scene.setup(score=data)
+            else:
+                # Try to get score from scene if available
+                score = getattr(self.current_scene, 'score', None)
+                if score is not None:
+                    self.current_scene.setup(score=score)
+                else:
+                    self.current_scene.setup()
+        except TypeError as e:
+            # If setup doesn't accept score parameter, call without it
+            if "unexpected keyword argument 'score'" in str(e):
+                self.current_scene.setup()
+            else:
+                raise
         
     def change_scene(self, scene_name, data=None):
         """

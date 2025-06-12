@@ -179,7 +179,10 @@ def convert_to_img(img_group_sprite, img_group_path, enemy_type="normal"):
     TARGET_SIZES = {
         "normal": (64, 64),
         "elite": (96, 96),  # 1.5x normal size
-        "boss": (192, 192)  # 3x normal size
+        "boss": (192, 192), # 3x normal size
+        "mini_normal": (32, 32),
+        "mini_elite": (64, 64),
+        "mini_boss": (96, 96)
     }
     
     target_size = TARGET_SIZES.get(enemy_type, (64, 64))

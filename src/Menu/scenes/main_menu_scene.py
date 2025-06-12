@@ -16,9 +16,10 @@ from ..config.constants import *
 
 class MainMenuScene(Scene):
     """Main menu scene with play, settings, and quit options"""
-    def __init__(self, screen):
+    def __init__(self, screen, manager=None):
         super().__init__(screen)
         self.assets = AssetLoader()
+        self.manager = manager  # Store reference to scene manager
         
     def setup(self):
         """Initialize the main menu elements"""

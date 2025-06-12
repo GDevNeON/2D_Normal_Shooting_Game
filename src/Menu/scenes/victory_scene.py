@@ -64,7 +64,7 @@ class VictoryScene(Scene):
         # Setup UI elements
         self.ui_elements = []
         
-    def setup(self, score=0):
+    def setup(self, score):
         """Initialize the scene with the player's score"""
         super().setup()
         self.next_scene = None

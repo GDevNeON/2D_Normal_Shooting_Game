@@ -34,7 +34,7 @@ class GameOverScene(Scene):
         self.back_button = None
         self.final_score = 0
         
-    def setup(self, score=0):
+    def setup(self, score):
         """Initialize game over elements"""
         super().setup()
         self.final_score = score
@@ -93,18 +93,20 @@ class GameOverScene(Scene):
             return True
             
         if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_ESCAPE:
-                from .main_menu_scene import MainMenuScene
-                self.next_scene = "menu"  # Use string to match scene_manager implementation
+            if event.key == pygame.K_ESCAPE or event.key == pygame.K_RETURN:
+                self.next_scene = "menu"
                 self.is_running = False
                 return True
         elif event.type == pygame.MOUSEBUTTONDOWN:
-            if self.back_button.collidepoint(event.pos):
-                from .main_menu_scene import MainMenuScene
-                self.next_scene = "menu"  # Use string to match scene_manager implementation
-                self.is_running = False
-                return True
+            if event.button == 1:  # Left mouse button
+                if self.back_button and self.back_button.collidepoint(event.pos):
+                    self.next_scene = "menu"
+                    self.is_running = False
+                    return True
         elif event.type == pygame.MOUSEMOTION:
-            self.button_hover = self.back_button.collidepoint(event.pos)
-            
+            # Update button hover state
+            if self.back_button:
+                self.button_hover = self.back_button.collidepoint(event.pos)
+                return True
+                
         return False

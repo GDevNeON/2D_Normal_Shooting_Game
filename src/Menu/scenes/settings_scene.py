@@ -10,9 +10,10 @@ sys.path.insert(0, os.path.dirname(menu_dir))  # Add src directory
 # Use relative imports
 from .base_scene import Scene
 from ..components.button import Button, ImageButton
+from ..components.scrollable_panel import ScrollablePanel
 from ..utils.asset_loader import AssetLoader
 from ..utils.drawing import draw_text, draw_image
-from ..utils.font_manager import FontManager
+from ..managers.font_manager import FontManager
 from ..config.constants import WHITE_COLOR, BLACK_COLOR
 from Game.managers.sound_manager import SoundManager, select_button_sfx
 
@@ -200,7 +201,9 @@ class SettingsScene(Scene):
         self.how_to_instructions = [
             {"title": "GAME CONTROLS", "content": [
                 "Move: WASD",
-                "Pause: ESC or P",
+                "Use skill: Q",
+                "Pause: P",
+                "Exit game: Esc",
                 "Move your mouse to direct your character to shoot"
             ]},
             {"title": "GAME OBJECTIVES", "content": [
@@ -212,16 +215,83 @@ class SettingsScene(Scene):
             {"title": "TIPS", "content": [
                 "Keep moving to avoid enemy fire",
                 "Conserve your special ability for tough situations",
-                "Prioritize collecting health, exp",
+                "Prioritize collecting health, EXP",
                 "Focus fire on one enemy at a time"
             ]}
         ]
         
-        # How-to scrolling state
-        self.howto_scroll_y = 0
-        self.howto_scroll_speed = 0.5
-        self.howto_total_height = 600  # Tổng chiều cao nội dung how-to
-        self.last_howto_update = 0
+        # Initialize scrollable panel for how-to
+        self.howto_panel = None
+        self.setup_howto_panel()
+        
+    def setup_howto_panel(self):
+        """Initialize the scrollable panel for how-to content"""
+        try:
+            screen_width = self.screen.get_width()
+            screen_height = self.screen.get_height()
+            
+            # Create scrollable panel for how-to content
+            panel_width = screen_width - 200
+            panel_height = 450  # Same as credits height
+            panel_x = 100
+            panel_y = 260
+            
+            # Create the panel with a visible background for debugging
+            self.howto_panel = ScrollablePanel(
+                panel_x, panel_y, 
+                panel_width, panel_height,
+                background_color=(30, 30, 50, 200)  # Semi-transparent dark blue
+            )
+            
+            # Create a surface for the how-to content
+            content_font = self.font_manager.small_font()
+            title_font = self.font_manager.normal_font()
+            
+            # Calculate total height needed for content
+            section_spacing = 30
+            line_spacing = 30
+            total_height = 0
+            
+            # First pass: calculate total height
+            for section in self.how_to_instructions:
+                total_height += section_spacing  # Section title
+                total_height += len(section["content"]) * line_spacing  # Section content
+                total_height += section_spacing  # Space after section
+            
+            # Add some padding at the bottom
+            total_height += 20
+            
+            # Create content surface with per-pixel alpha
+            content_surface = pygame.Surface((panel_width - 40, total_height), pygame.SRCALPHA)
+            
+            # Draw content on the surface
+            y_pos = 0
+            for section in self.how_to_instructions:
+                # Draw section title
+                title_surface = title_font.render(section["title"], True, (100, 200, 255))
+                title_rect = title_surface.get_rect(x=10, top=y_pos)
+                content_surface.blit(title_surface, title_rect)
+                y_pos += section_spacing
+                
+                # Draw section content
+                for line in section["content"]:
+                    line_surface = content_font.render(line, True, (255, 255, 255))
+                    line_rect = line_surface.get_rect(x=30, top=y_pos)
+                    content_surface.blit(line_surface, line_rect)
+                    y_pos += line_spacing
+                
+                y_pos += section_spacing // 2  # Smaller space after section
+            
+            # Save the content surface for debugging
+            self.debug_content = content_surface
+            
+            # Update panel content
+            self.howto_panel.update_content(content_surface)
+            
+        except Exception as e:
+            print(f"Error setting up how-to panel: {e}")
+            import traceback
+            traceback.print_exc()
         
         # Initialize volumes from SoundManager
         self.music_volume = SoundManager.get_music_volume()
@@ -267,15 +337,9 @@ class SettingsScene(Scene):
                 if self.credits_scroll_y > self.credits_total_height:
                     self.credits_scroll_y = -450  # Reset to just above the visible area
                     
-        # Update how-to scrolling if how-to tab is active
-        elif self.current_tab == "howto":
-            if current_time - self.last_howto_update > 16:  # ~60fps
-                self.howto_scroll_y += self.howto_scroll_speed
-                self.last_howto_update = current_time
-                
-                # Reset scroll position when it reaches the bottom
-                if self.howto_scroll_y > self.howto_total_height:
-                    self.howto_scroll_y = -450  # Reset to just above the visible area
+        # Update how-to panel if active
+        elif self.current_tab == "howto" and self.howto_panel:
+            self.howto_panel.update()
     
     def draw(self):
         """Draw the settings screen"""
@@ -430,8 +494,7 @@ class SettingsScene(Scene):
     def on_howto_clicked(self):
         """Switch to how-to tab"""
         self.current_tab = "howto"
-        self.howto_scroll_y = -450  # Bắt đầu từ dưới lên
-        self.last_howto_update = pygame.time.get_ticks()
+        self.setup_howto_panel()  # Rebuild panel in case window was resized
         self.update_ui_elements()
         
     def on_credits_clicked(self):
@@ -488,7 +551,7 @@ class SettingsScene(Scene):
         
         # Draw version and copyright (fixed position at bottom)
         footer_y = 700  # Position at bottom of credits area
-        version_text = "Version 1.0.0"
+        version_text = "Version 1.1.0"
         copyright_text = "© 2025 NeON. All rights reserved."
         
         draw_text(self.screen, version_text, content_font, (180, 180, 180), screen_center_x, footer_y)
@@ -559,47 +622,42 @@ class SettingsScene(Scene):
         # Play a sound to demonstrate volume
         SoundManager.play_sound(select_button_sfx, volume=0.5)
         
+    def handle_event(self, event):
+        """Handle pygame events"""
+        # Handle how-to panel events if active
+        if self.current_tab == "howto" and self.howto_panel:
+            if self.howto_panel.handle_event(event):
+                return True
+                
+        # Let the base class handle other events
+        return super().handle_event(event)
+        
     def draw_howto(self):
-        """Draw how-to content with smooth scrolling"""
-        # Get screen dimensions
+        """Draw the how-to content with scrollable panel"""
+        # Get screen dimensions and fonts
         screen_width = self.screen.get_width()
         screen_center_x = screen_width // 2
-        
-        # Get fonts
         heading_font = self.font_manager.subheading_font()
-        title_font = self.font_manager.normal_font()
-        content_font = self.font_manager.small_font()
         
-        # How-to title (fixed position)
+        # Draw the title
         draw_text(self.screen, "HOW TO PLAY", heading_font, WHITE_COLOR, screen_center_x, 190)
         
-        # Create surface for the how-to content with transparency
-        howto_height = 450  # Height of the scrollable area
-        howto_surface = pygame.Surface((screen_width - 200, howto_height), pygame.SRCALPHA)
-        
-        # Draw how-to content with scrolling
-        y_pos = 0  # Start drawing at the top of the surface
-        section_spacing = 40
-        line_spacing = 35
-        
-        for section in self.how_to_instructions:
-            # Draw section title
-            title_y = y_pos - self.howto_scroll_y
-            if -50 < title_y < howto_height + 50:  # Only draw if visible or nearly visible
-                draw_text(howto_surface, section["title"], title_font, (200, 200, 255), 
-                        howto_surface.get_width() // 2, title_y)
-            y_pos += section_spacing
+        # Draw the scrollable panel if it exists
+        if self.howto_panel:
+            # Draw a background for the panel
+            panel_bg = pygame.Surface((self.howto_panel.rect.width, self.howto_panel.rect.height), pygame.SRCALPHA)
+            panel_bg.fill((30, 30, 50, 200))  # Semi-transparent dark blue
+            self.screen.blit(panel_bg, (self.howto_panel.rect.x, self.howto_panel.rect.y))
             
-            # Draw section content
-            for line in section["content"]:
-                line_y = y_pos - self.howto_scroll_y
-                if -50 < line_y < howto_height + 50:  # Only draw if visible or nearly visible
-                    draw_text(howto_surface, line, content_font, WHITE_COLOR, 
-                            howto_surface.get_width() // 2, line_y)
-                y_pos += line_spacing
+            # Draw the scrollable panel
+            self.howto_panel.draw(self.screen)
             
-            # Add space after each section
-            y_pos += section_spacing
-        
-        # Apply the how-to surface to the screen
-        self.screen.blit(howto_surface, (100, 260))
+            # Draw a border around the panel for better visibility
+            pygame.draw.rect(self.screen, (100, 100, 150), 
+                           (self.howto_panel.rect.x - 1, 
+                            self.howto_panel.rect.y - 1,
+                            self.howto_panel.rect.width + 2,
+                            self.howto_panel.rect.height + 2), 
+                           2, border_radius=5)
+            
+            # Debug code has been removed

@@ -43,6 +43,9 @@ class AssetLoader:
             'female_char': pygame.image.load(PATH_TO_FEMALE_CHAR).convert_alpha(),
             'game_over_title': pygame.image.load(PATH_TO_GAME_OVER_TITLE).convert_alpha(),
             'try_again_button': pygame.image.load(PATH_TO_TRY_AGAIN_BUTTON).convert_alpha(),
+            'custom_elite': pygame.image.load(PATH_TO_GAME_MODE_ELITE).convert_alpha(),
+            'custom_tiny': pygame.image.load(PATH_TO_GAME_MODE_TINY).convert_alpha(),
+            'custom_bozos': pygame.image.load(PATH_TO_GAME_MODE_BOZOS).convert_alpha(),
         }
         
         # Load all sounds

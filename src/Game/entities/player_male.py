@@ -89,6 +89,10 @@ class Player_Male(Player):
         self.time_since_last_burst_shot += clock.get_time()
         
         if self.time_since_last_burst_shot >= self.fire_rate:
+            # Play male shooting sound
+            from ..managers.sound_manager import SoundManager
+            SoundManager.play_male_shot()
+            
             mouse = pygame.mouse.get_pos()
             player_to_mouse = (mouse[0] - camera.camera.x - self.rect.centerx, mouse[1] - camera.camera.y - self.rect.centery)
             angle_to_mouse = - math.atan2(player_to_mouse[1], player_to_mouse[0])

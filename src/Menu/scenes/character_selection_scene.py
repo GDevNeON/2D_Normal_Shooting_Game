@@ -13,18 +13,23 @@ from .base_scene import Scene
 from ..components.button import ImageButton, Button
 from ..utils.asset_loader import AssetLoader
 from ..utils.drawing import draw_image, draw_text
-from ..utils.font_manager import FontManager
+from ..managers.font_manager import FontManager
 from ..config.constants import WHITE_COLOR
 
 class CharacterSelectionScene(Scene):
     """Scene for selecting player character"""
-    def __init__(self, screen, game_mode):
+    def __init__(self, screen, game_mode, custom_mode=None, manager=None):
         super().__init__(screen)
         self.assets = AssetLoader()
         self.font_manager = FontManager()
-        self.game_mode = game_mode  # 1: normal, 0: endless
+        self.game_mode = game_mode  # 1: normal, 0: endless, 2: custom
+        self.custom_mode = custom_mode  # Custom mode name if in custom mode
+        self.manager = manager  # Reference to scene manager
         self.character = 1  # 1: male, 0: female
         self.character_names = {1: "MALE KNIGHT", 0: "FEMALE ARCHER"}
+        
+        # Debug info
+        print(f"[DEBUG] CharacterSelectionScene - Game Mode: {game_mode}, Custom Mode: {custom_mode}")
         
     def setup(self):
         """Initialize character selection elements"""
@@ -238,8 +243,23 @@ class CharacterSelectionScene(Scene):
         # Import here to avoid circular imports
         from .game_scene import GameScene
         
-        # Switch to game scene with selected character and mode
-        self.switch_to_scene(GameScene(self.screen, self.character, self.game_mode))
+        print(f"[DEBUG] Starting game - Character: {self.character}, "
+              f"Game Mode: {self.game_mode}, Custom Mode: {self.custom_mode}")
+        
+        # Create game scene with all parameters
+        game_scene = GameScene(
+            screen=self.screen,
+            character_select=self.character,
+            game_mode=self.game_mode,
+            custom_mode_name=self.custom_mode
+        )
+        
+        # If we have a scene manager, use it to set the scene
+        if self.manager:
+            self.manager.change_scene("game", game_scene)
+        else:
+            # Fallback to direct scene switching
+            self.switch_to_scene(game_scene)
         
     def on_left_clicked(self):
         """Handle left arrow click"""

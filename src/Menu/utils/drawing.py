@@ -1,21 +1,27 @@
 import pygame
 
-def draw_text(surface, text, font, text_color, x, y, wrap_width=None):
+def draw_text(surface, text, font, text_color, x, y, wrap_width=None, align="center"):
     """
-    Draw text on a surface at the specified position with optional word wrapping
+    Draw text on a surface at the specified position with optional word wrapping and alignment
     
     Args:
         surface: The pygame surface to draw on
         text: The text to draw
         font: The pygame font to use
         text_color: The color of the text (RGB tuple)
-        x: X position (center x if wrap_width is provided, left otherwise)
+        x: X position (position depends on align parameter)
         y: Y position (top position for the text block)
-        wrap_width: Optional maximum width for text wrapping. If provided, text will be centered.
+        wrap_width: Optional maximum width for text wrapping
+        align: Text alignment - "left", "center", or "right"
     """
     if wrap_width is None:
         img = font.render(text, True, text_color)
-        surface.blit(img, (x - img.get_width() // 2, y))
+        if align == "center":
+            surface.blit(img, (x - img.get_width() // 2, y))
+        elif align == "left":
+            surface.blit(img, (x, y))
+        elif align == "right":
+            surface.blit(img, (x - img.get_width(), y))
         return
     
     # Split text into words and build lines
@@ -42,7 +48,13 @@ def draw_text(surface, text, font, text_color, x, y, wrap_width=None):
     line_height = font.get_linesize()
     for i, line in enumerate(lines):
         img = font.render(line, True, text_color)
-        surface.blit(img, (x - img.get_width() // 2, y + i * line_height))
+        if align == "center":
+            pos_x = x - img.get_width() // 2
+        elif align == "left":
+            pos_x = x
+        elif align == "right":
+            pos_x = x - img.get_width()
+        surface.blit(img, (pos_x, y + i * line_height))
 
 def draw_image(surface, img, scale, x, y):
     """

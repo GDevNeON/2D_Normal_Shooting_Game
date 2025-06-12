@@ -87,6 +87,10 @@ class Player_Female(Player):
         self.time_since_last_shot += clock.get_time()
 
         if self.time_since_last_shot >= self.fire_rate:
+            # Play female shooting sound
+            from ..managers.sound_manager import SoundManager
+            SoundManager.play_female_shot()
+            
             mouse = pygame.mouse.get_pos()
             player_to_mouse = (mouse[0] - camera.camera.x - self.rect.centerx, 
                              mouse[1] - camera.camera.y - self.rect.centery)
